@@ -14,46 +14,50 @@ const Button = styled.button`
 
 const alphabet =
   "a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z ";
-export default function DoenetDashboard(props){
- 
+export default function DoenetDashboard(props) {
 
-   let [x, setX] = useState(0);
-    const menuControls = [<Button>Search</Button>];
-    const menuControlsEditor = [<Button>Edit</Button>];
-    const menuControlsViewer = [<Button>Update</Button>];
 
-    return (
-      <>
-        <ToolLayout toolName="Dashboard">
+  let [x, setX] = useState(0);
+  // const menuControls = [<Button>Search</Button>];
+  // const menuControlsEditor = [<Button>Edit</Button>];
+  // const menuControlsViewer = [<Button>Update</Button>];
 
-       <ToolLayoutPanel
-            // menuControls={menuControls}
-            panelName="context"
-          >
-            {x}
-          <button onClick={()=>setX(x + 1)}>Count</button>
+  const toolPanelsWidthResize = function(leftW, middleW, rightW) {
+    console.log("leftWidth ---", leftW + " middleWidth ---", middleW + " rightWidth ---",  rightW);
+  };
+
+  return (
+    <>
+      <ToolLayout toolName="Dashboard" toolPanelsWidth={toolPanelsWidthResize}>
+
+        <ToolLayoutPanel
+          // menuControls={menuControls}
+          panelName="context"
+        >
+          {x}
+          <button onClick={() => setX(x + 1)}>Count</button>
           <p>test</p>
-          </ToolLayoutPanel> 
+        </ToolLayoutPanel>
 
-       <ToolLayoutPanel
-            // menuControls={menuControlsEditor}
-            panelName="Editor">
+        <ToolLayoutPanel
+          // menuControls={menuControlsEditor}
+          panelName="Editor">
 
-            {alphabet} {alphabet} {alphabet} {alphabet} {alphabet} {alphabet}
-            {alphabet}
-            {alphabet}
-            {alphabet}
-            {alphabet} {alphabet} {alphabet} {alphabet} {alphabet} {alphabet}
-            {alphabet}
-            {alphabet}
-            {alphabet}
-          </ToolLayoutPanel>
+          {alphabet} {alphabet} {alphabet} {alphabet} {alphabet} {alphabet}
+          {alphabet}
+          {alphabet}
+          {alphabet}
+          {alphabet} {alphabet} {alphabet} {alphabet} {alphabet} {alphabet}
+          {alphabet}
+          {alphabet}
+          {alphabet}
+        </ToolLayoutPanel>
 
-          {/* <ToolLayoutPanel menuControls={menuControlsViewer} panelName="Viewer">
+        {/* <ToolLayoutPanel menuControls={menuControlsViewer} panelName="Viewer">
             {alphabet} {alphabet} {alphabet} {alphabet}
           </ToolLayoutPanel>  */}
-        </ToolLayout>
-      </>
-    );
-  }
+      </ToolLayout>
+    </>
+  );
+}
 
