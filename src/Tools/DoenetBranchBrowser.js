@@ -509,7 +509,7 @@ class DoenetBranchBrowser extends Component {
   jumpToDirectory(folderId) {
     // pop all items after folderId
     this.setState({selectedItems: [], selectedItemType: []});
-    while (this.state.directoryStack.length > 0 && this.peekDirectoryStack() !== folderId) {
+    while (this.state.directoryStack.length > 1 && this.peekDirectoryStack() !== folderId) {
       this.upOneDirectory();      
     }
   }
@@ -732,7 +732,7 @@ class DoenetBranchBrowser extends Component {
                                                             <FontAwesomeIcon icon={faArrowDown} className="sortOrderIcon"/> : ""}
                     </th>
                   </tr>
-                  {this.state.directoryStack.length !== 0 &&
+                  {this.state.directoryStack.length > 1 &&
                   <DropItem 
                     id={ChooserConstants.PREVIOUS_DIR_ID} 
                     onDrop={() => this.onFolderDropCb(ChooserConstants.PREVIOUS_DIR_ID)} 

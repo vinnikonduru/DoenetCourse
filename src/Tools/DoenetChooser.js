@@ -234,7 +234,7 @@ class DoenetChooser extends Component {
     //     title = "Untitled Document " + num;
     //   }
 
-    let currentFolderId = this.state.directoryStack.length == 0 ? "root" : this.state.directoryStack[this.state.directoryStack.length - 1];
+    let currentFolderId = this.state.directoryStack.length == 1 ? "root" : this.state.directoryStack[this.state.directoryStack.length - 1];
 
     Promise.all([
       new Promise(resolve => this.saveContentToServer({
@@ -305,7 +305,7 @@ class DoenetChooser extends Component {
       this.displayToast("Please sign in to create new content");
       return;
     }
-    const currentFolderId = this.state.directoryStack.length == 0 ? "root" : this.state.directoryStack[this.state.directoryStack.length - 1];
+    const currentFolderId = this.state.directoryStack.length == 1 ? "root" : this.state.directoryStack[this.state.directoryStack.length - 1];
     Promise.all([
       new Promise(resolve => this.saveUrl({
         urlId: urlId,
@@ -318,7 +318,6 @@ class DoenetChooser extends Component {
       new Promise(resolve => this.addContentToFolder([urlId], ["url"], currentFolderId, () => { resolve() })), // add url to current folder
     ])
       .then(() => {
-        alert("DONE")
         this.loadUserUrls(() => {
           this.setState({
             selectedItems: [urlId],
@@ -371,7 +370,7 @@ class DoenetChooser extends Component {
   loadUserContentBranches = (callback = (() => { })) => {
     this.branches_loaded = false;
 
-    let currentFolderId = this.state.directoryStack.length === 0 ?
+    let currentFolderId = this.state.directoryStack.length === 1 ?
       "root" : this.state.directoryStack[this.state.directoryStack.length - 1];
 
     const data = { folderId: currentFolderId };
@@ -596,7 +595,7 @@ class DoenetChooser extends Component {
 
   saveFolder = (folderId, title, childContent, childType, operationType, isRepo, isPublic, callback = (() => { })) => {
     // get current directory folderId/root
-    let currentFolderId = this.state.directoryStack.length == 0 ? "root" : this.state.directoryStack[this.state.directoryStack.length - 1];
+    let currentFolderId = this.state.directoryStack.length == 1 ? "root" : this.state.directoryStack[this.state.directoryStack.length - 1];
     // setup parent
     let parentId = this.folderInfo[folderId] ? this.folderInfo[folderId].parentId : currentFolderId;
     if (isRepo) parentId = "root";  // repo always at root
@@ -661,13 +660,14 @@ class DoenetChooser extends Component {
 
     // check if parent folder is private or isPublic
     let isPublic = false;
-    if (this.state.directoryStack.length != 0  // not in root
-      && this.folderInfo[this.state.directoryStack[0]].isRepo  // in repo
-      && this.folderInfo[this.state.directoryStack[0]].isPublic) {  // in public repo
+    if (this.state.directoryStack.length > 1  // not in root
+      && this.folderInfo[this.state.directoryStack[1]].isRepo  // in repo
+      && this.folderInfo[this.state.directoryStack[1]].isPublic) {  // in public repo
       isPublic = true;
     }
     // console.log("here!!!!!!!!",this.state.directoryStack);    
     const currentFolderId = this.state.directoryStack.length == 0 ? "root" : this.state.directoryStack[this.state.directoryStack.length - 1];
+
     Promise.all([
       new Promise(resolve => this.saveFolder(folderId, title, [], [], "insert", false, isPublic, () => { resolve() })), // add new folder
       new Promise(resolve => this.saveUserContent([folderId], ["folder"], "insert", () => { resolve() })),  // add to user root
@@ -739,7 +739,6 @@ class DoenetChooser extends Component {
 
   addContentToFolder = (childIds, childType, folderId, callback = (() => { })) => {
     let operationType = "insert";
-    alert(folderId)
     let title = this.folderInfo[folderId].title;
     let isRepo = this.folderInfo[folderId].isRepo;
     let isPublic = this.folderInfo[folderId].isPublic;
