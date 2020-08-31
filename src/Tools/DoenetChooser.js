@@ -477,7 +477,7 @@ class DoenetChooser extends Component {
         }else{
           console.warn("not student or instructor role")
         }
-        
+        console.log("Printing CourseInfo from getCourses: ****", this.courseInfo);
       }
       //Sort by position
       // console.log("this.studentCourseIds",this.studentCourseIds)
@@ -548,8 +548,6 @@ class DoenetChooser extends Component {
       // this.folders_loaded = false;
       // this.branches_loaded = false;
       this.updateIndexedDBCourseContent(courseId);
-      // this.loadCourseContent(courseId);
-      // console.log("courseId:::::", courseId);
       this.loadCourseHeadingsAndAssignments(courseId);
     } else if (drive === "Global") {
       this.setState({
@@ -790,7 +788,7 @@ class DoenetChooser extends Component {
     // filter selected repos in childIds
     let filteredChildIds = [], filteredChildType = [];
     for (let i = 0; i < childIds.length; i++) {
-      if (childType[i] == "folder" && itemDataInfo[childIds[i]]["isRepo"]) {
+      if (childType[i] == "folder" && itemDataInfo[childIds[i]] && itemDataInfo[childIds[i]]["isRepo"]) {
         const repoTitle = itemDataInfo[childIds[i]]["title"];
         this.displayToast(`Failed to move '${repoTitle}': Item of type Repository must be at root directory`);
       } else {
@@ -1067,41 +1065,44 @@ class DoenetChooser extends Component {
       })
   }
 
-  jumpToDirectory = (directoryData) => {
+  jumpToDirectory = (directoryStack) => {
     this.setState({
-      directoryStack: directoryData,
-      selectedItems: directoryData,
+      directoryStack: directoryStack,
+      selectedItems: directoryStack,
       selectedItemsType: ["folder"],
     })
   }
 
-  getFolderPath(id, foldersInfo) {
-    let path = [id];
-    let flag = true;
-    while (flag) {
-      if (foldersInfo[id].parentId !== 'root') {
-        path.unshift(foldersInfo[id].parentId);
-      } else {
-        flag = false;
-      }
-      id = foldersInfo[id].parentId;
-    }
-    return path;
-  }
+  // getFolderPath(id, foldersInfo) {
+  //   console.log("Here ###############", id , foldersInfo)
+  //   let path = [id];
+  //   let flag = true;
+  //   while (flag) {
+  //     if (foldersInfo[id].parentId !== 'root') {
+  //       path.unshift(foldersInfo[id].parentId);
+  //     } else {
+  //       flag = false;
+  //     }
+  //     id = foldersInfo[id].parentId;
+  //   }
+  //   return path;
+  // }
 
-  goToFolder(id, foldersInfo, drive) {
-    console.log("goToFolder!!!!!!!!!!!!!!!!!!", id, foldersInfo);
-    const path = this.getFolderPath(id, foldersInfo);
+  goToFolder({id, foldersInfo, courseId,  drive} = {}) {
+    console.log("step 2 -- goToFolder!!!!!!!!!!!!!!!!!!", "id:",id,"folders info", foldersInfo,"selectedcourseId$$$$$", courseId, "drive---", drive);
+    // const path = this.getFolderPath(id, foldersInfo);
+    console.log("getToFolder path:" ,path , foldersInfo[id]);
     this.setState({
       directoryStack: path,
       selectedItems: path,
       selectedItemsType: ["folder"],
       selectedDrive: drive,
+      selectedCourse: courseId
     })
   }
 
   splitPanelGoToFolder(id, foldersInfo) {
-    const path = this.getFolderPath(id, foldersInfo);
+    // const path = this.getFolderPath(id, foldersInfo);
     this.setState({
       splitPanelDirectoryStack: path,
       splitPanelSelectedItems: path,
@@ -1179,6 +1180,7 @@ class DoenetChooser extends Component {
     // open a connection to the database
     indexedDB.openDB((result) => {
       // update current course content
+      console.log("courseContent IndexDB" ,this.courseInfo);
       indexedDB.insert("course_content_store", {
         courseId: courseId,
         courseContent: this.courseInfo[courseId].content,
@@ -2803,6 +2805,7 @@ class DoenetChooser extends Component {
       browserContentInfo= this.branchId_info;
       browserUrlInfo = this.urlInfo;
 
+      console.log( "Folder Info", this.folderInfo);
       // tree data
       treeContainerId = "user";
       treeContainerType = ChooserConstants.USER_CONTENT_TYPE;
@@ -2813,31 +2816,30 @@ class DoenetChooser extends Component {
     } else if (this.state.selectedDrive == "Courses") {
       loading = !this.assignments_and_headings_loaded;
 
+            // browser data
+            browserContainerId = this.state.selectedCourse;
+            console.log("Here))))))))))))))))))");
+            console.log("Here))))))))))))))))))",this.headingsInfo);
 
-      // browser data
-      browserContainerId = this.state.selectedCourse;
-      // if (this.allCourseInfo[this.state.selectedCourse]["root"]) {
-      //   folderList = this.allCourseInfo[this.state.selectedCourse]["root"]["childFolders"]; 
-      //   contentList = this.allCourseInfo[this.state.selectedCourse]["root"]["childContent"]; 
-      if (this.allCourseInfo[this.state.selectedCourse]["root"]) {
-        folderList = this.allCourseInfo[this.state.selectedCourse]["root"]["childFolders"]; 
-        contentList = this.allCourseInfo[this.state.selectedCourse]["root"]["childContent"]; 
-
-      }
-      browserFolderInfo = this.headingsInfo[this.state.selectedCourse]
-      browserContentInfo = this.assignmentsInfo[this.state.selectedCourse]
-
-      // tree data
-      treeContainerId = this.state.selectedCourse;
-      treeContainerType = ChooserConstants.COURSE_ASSIGNMENTS_TYPE;
-      treeParentsInfo = this.headingsInfo[this.state.selectedCourse];
-      treeChildrenInfo = this.assignmentsInfo[this.state.selectedCourse];
-    }
-
+            if (this.headingsInfo[this.state.selectedCourse]["root"]) {
+              folderList = this.headingsInfo[this.state.selectedCourse]["root"]["childFolders"]; 
+              contentList = this.headingsInfo[this.state.selectedCourse]["root"]["childContent"]; 
+              urlList = this.headingsInfo[this.state.selectedCourse]["root"]["childUrls"]
+            }
+            browserFolderInfo = this.headingsInfo[this.state.selectedCourse]
+            browserContentInfo = this.assignmentsInfo[this.state.selectedCourse]
+            // browserUrlInfo = this.urlInfo;
+      
+            // tree data
+            treeContainerId = this.state.selectedCourse;
+            treeContainerType = ChooserConstants.COURSE_ASSIGNMENTS_TYPE;
+            treeParentsInfo = this.headingsInfo[this.state.selectedCourse];
+            treeChildrenInfo = this.assignmentsInfo[this.state.selectedCourse];
+          }
 
 const TreeNodeItem = ({title, icon}) => {
-  const contentInfo = this.folderInfo        
-  const currentInfo = Object.keys(contentInfo).filter((i) => contentInfo[i].title === title)    
+  const contentInfo = this.folderInfo
+  const currentInfo = Object.keys(contentInfo).filter((i) => contentInfo[i].title === title)
   const parentId = contentInfo[currentInfo[0]]?.parentId || ''
   const parentTitle = currentInfo.length && parentId ? contentInfo[parentId]?.title : 'Content'
   const path = (parentTitle === 'Content' || parentTitle === 'root') ? currentInfo[0] : `${parentId}/${currentInfo[0]}`
@@ -2876,12 +2878,11 @@ const TreeNodeItem = ({title, icon}) => {
           onDraggableDragOver={this.onTreeDraggableDragOver}
           onDropEnter={this.onTreeDropEnter}
           onDrop={this.onTreeDrop}
-          directoryData={[...this.state.directoryStack]}
+          directoryStack={[...this.state.directoryStack]}
           parentNodeItem={TreeNodeItem}
           leafNodeItem={TreeNodeItem}
           specialNodes={this.tempSet}
           openedNodes={this.treeOpenedNodes}
-          // specialNodes={new Set(this.tempSet).add(selectedItem.parentId)}
           treeStyles={{
             specialChildNode: {
               "title": { color: "#2675ff" },
@@ -2890,17 +2891,14 @@ const TreeNodeItem = ({title, icon}) => {
             specialParentNode: {
               "title": { color: "#2675ff", background: "#e6efff", paddingLeft: "5px", borderRadius: "0 50px 50px 0" },
             },
-            // parentNode: {
-            //   "node": { background: "rgba(58,172,144)" },
-            // },
-            emptyParentExpanderIcon: <span></span>,
+            emptyParentExpanderIcon: {opened: <span style={{padding: "0 10px"}}></span>, closed: <span style={{padding: "0 10px"}}></span>}
           }}
           onLeafNodeClick={(id, type) => {
             // get path to item
             const dataSource = this.getDataSource(treeContainerId, treeContainerType);
             const itemParentId = dataSource[type][id]["parentId"];
             const pathToSelectedFolder = itemParentId == "root" ? [] : this.getPathToFolder(itemParentId, treeParentsInfo);
-            // select item and switch to directory            
+            // select item and switch to directory
             this.setState({
               selectedItems: [id],
               selectedItemsType: [type],
@@ -2987,7 +2985,7 @@ return <div>
         onDraggableDragOver={this.onTreeDraggableDragOver}
         onDropEnter={this.onTreeDropEnter}
         onDrop={this.onTreeDrop}
-        directoryData={[...this.state.splitPanelDirectoryStack]}
+        directoryStack={[...this.state.splitPanelDirectoryStack]}
         specialNodes={this.tempSet}
         treeStyles={{
           specialChildNode: {
@@ -3047,51 +3045,61 @@ return <div>
     if (!!Object.keys(this.state.userFolderInfo).length) {
       contentParentInfo = this.state.userFolderInfo
     }
-    let coursesParentInfo = treeParentsInfo;
-    if (!!Object.keys(this.state.userFolderInfo).length) {
-      coursesParentInfo = this.state.userFolderInfo
-    }
-    //////////
+    // let coursesParentInfo = treeParentsInfo ;
+    // if (!!Object.keys(this.userFolderInfo).length) {
+    //   coursesParentInfo = this.userFolderInfo
+    // }
+   
     let leftNavContentParentInfo = JSON.parse(JSON.stringify(contentParentInfo));
-    let leftNavContentChildrenInfo = JSON.parse(JSON.stringify(treeChildrenInfo));
+    // let leftNavContentChildrenInfo = JSON.parse(JSON.stringify(treeChildrenInfo));
     if (!!Object.keys(leftNavContentParentInfo).length) {
       leftNavContentParentInfo["root"]["title"] = "Content";
       leftNavContentParentInfo["root"]["childContent"] = [];
+      leftNavContentParentInfo["root"]["childFolders"] = [];
+      leftNavContentParentInfo["root"]["childUrls"] = [];
 
     }
     for (let key in leftNavContentParentInfo) {
-      console.log(key);
+      console.log("left nav content key",key);
       if (key !== 'root') {
         leftNavContentParentInfo[key].childContent = [];
-        // leftNavContentParentInfo[key].childFolders = [];
+         leftNavContentParentInfo[key].childFolders = [];
         leftNavContentParentInfo[key].childUrls = [];
       }
     }
-    ///////
+
+    console.log("Left nav parent content ^^^^^^^^^", leftNavContentParentInfo)
+    console.log("Left nav parent courses ^^^^^^^^^", leftNavCoursesParentInfo)
     let leftNavCoursesParentInfo = {
       root: {
         title: "Courses",
         type: "folder",
         parentId: "root",
         rootId:"root",
-        childFolders: [],
+        childFolders: [], // [courseIds...]
         childContent: [],
         childUrls: [],
-      }
+      },
+      // [courseId] : {childFolders: [headingIds...], childContent: [assignmentIds...]},
+      // [folderId] : {}
     };
 
-    let leftNavCoursesChildrenInfo = { ...this.courseInfo };
-  
-    for (let courseId in leftNavCoursesChildrenInfo) {
-      // console.log("courseId", courseId);
-      leftNavCoursesChildrenInfo[courseId].parentId = 'root';
-      leftNavCoursesChildrenInfo[courseId].rootId = 'root';
-      leftNavCoursesChildrenInfo[courseId].title = leftNavCoursesChildrenInfo[courseId]['courseCode'];
-      leftNavCoursesChildrenInfo[courseId].type = 'content';
-      leftNavCoursesParentInfo['root']['childFolders'].push(courseId);
+    // generate headings structure for left nav course tree
+    let coursesHeadingsInfo = {};
+    Object.keys(this.headingsInfo).map(courseId => {
+      coursesHeadingsInfo = { ...coursesHeadingsInfo, ...this.headingsInfo[courseId]};
+      coursesHeadingsInfo[courseId] = this.headingsInfo[courseId]["root"];
+      coursesHeadingsInfo[courseId]["title"] = this.courseInfo[courseId]['courseCode'];
+      delete coursesHeadingsInfo["root"];
+    });
+    console.log("GENERATE COURSE HEADINGS", this.headingsInfo, coursesHeadingsInfo)
+    leftNavCoursesParentInfo = { ...leftNavCoursesParentInfo, ...coursesHeadingsInfo};
 
-
-    }
+    // generate assignments structure for left nav course tree
+    let leftNavCoursesChildrenInfo = {};
+    Object.keys(this.assignmentsInfo).map(courseId => {
+      leftNavCoursesChildrenInfo = { ...leftNavCoursesChildrenInfo, ...this.assignmentsInfo[courseId]};
+    });
 
 
 
@@ -3099,9 +3107,14 @@ const customizedTreeNodeItem = (nodeItem, item) => {
       const { title, icon } = nodeItem
       const contentInfo = leftNavContentParentInfo
       const coursesInfo = { ...leftNavCoursesChildrenInfo, ...leftNavCoursesParentInfo }
+      // const coursesInfo = leftNavCoursesParentInfo 
       const folderInfo = item === 'content' ? contentInfo : coursesInfo
       const currentInfo = Object.keys(folderInfo).filter((i) => folderInfo[i].title === title)
+      console.log("Customized tree Folder Info", folderInfo);
+      console.log("Customized tree Current Info", currentInfo);
       const { parentId } = folderInfo[currentInfo[0]]
+      console.log("Customized tree parent ID", parentId);
+       console.log("step 0 -- parentId:", parentId, folderInfo[currentInfo[1]]);
       const parentTitle = folderInfo[parentId]?.title
       // const path = (parentTitle === 'Content' || parentTitle === 'Courses') ? title : `${parentTitle}/${title}`
       const path = (parentTitle === 'Content' || parentTitle === 'Courses') ? currentInfo[0] : `${parentId}/${currentInfo[0]}`
@@ -3122,47 +3135,49 @@ const customizedTreeNodeItem = (nodeItem, item) => {
 
       </div>
     };
-    const accordionClick = (label) => {
-      if (label === 'CONTENT' && this.state.directoryStack.length) {
-        // console.log('label:', label, this.state.directoryStack)
-        this.history.push('/content')
-        this.setState({
-          directoryStack: []
-        })
-      }      
-    }
+    // const accordionClick = (label) => {
+    //   if (label === 'CONTENT' && this.state.directoryStack.length) {
+    //     // console.log('label:', label, this.state.directoryStack)
+    //     this.history.push('/content')
+    //     this.setState({
+    //       directoryStack: []
+    //     })
+    //   }      
+    // }
     this.customizedTree = () => {
-      console.log('leftNavContentParentInfo:', leftNavContentParentInfo)
-      console.log('leftNavContentChildrenInfo:', leftNavContentChildrenInfo)
-      console.log('leftNavCoursesParentInfo:', leftNavCoursesParentInfo)
-      console.log('leftNavCoursesChildrenInfo:',  leftNavCoursesChildrenInfo)
+      console.log("Original Children Course Info", leftNavCoursesChildrenInfo);
+      console.log("Updated Children Course Info", coursesPInfo);
       const coursesPInfo = Object.keys(leftNavCoursesChildrenInfo).reduce((acc, i) => {
+         console.log("currentCourseId@@@@@@@@@@@!!!!!!!!",i);
+        console.log("leftNavCoursesInfo##################",leftNavCoursesChildrenInfo);
         return ({
           ...acc,
           [i]: {
             childContent: [],
             childFolders: [],
             childUrls: [],
-            
-            // isPinned: false,
-            // isPublic: false,
-            // isRepo: false,
-            // numChild: 0,
-            // publishDate: "",
-            parentId: leftNavCoursesChildrenInfo[i].parentId,
+            // parentId: leftNavCoursesChildrenInfo[i].parentId,
             rootId: leftNavCoursesChildrenInfo[i].rootId,
-            title: leftNavCoursesChildrenInfo[i].title,
-
-            type: "folder",
+            // title: leftNavCoursesChildrenInfo[i].title,
+            type: leftNavCoursesChildrenInfo[i].type,
+            content: leftNavCoursesChildrenInfo[i].content,
+            folders: leftNavCoursesChildrenInfo[i].folders,
+            
           }
         })
       }, { ...leftNavCoursesParentInfo })
-      this.courseInfo = coursesPInfo
+      console.log("Updated Children Course Info", coursesPInfo);
+      // coursesPInfo["selectedCourse"] = leftNavCoursesParentInfo["root"]["childFolders"]
+      console.log("coursesPInfo:", coursesPInfo);
+      // this.courseInfo = [{...leftNavCoursesChildrenInfo}, {...leftNavCoursesParentInfo}];
+      this.courseInfo = coursesPInfo;
       console.log('CompleteCourseParentInfo:', coursesPInfo)
       return (<div className="tree-column">
       <Accordion>
-        <div label="CONTENT" activeChild={this.state.contentActiveChild} onClick={accordionClick}>
-        
+        <div label="CONTENT" activeChild={this.state.contentActiveChild} 
+        // onClick={accordionClick}
+        >
+        {console.log("Content error",leftNavContentParentInfo)}
           <TreeView
             containerId={treeContainerId}
             containerType={treeContainerType}
@@ -3277,7 +3292,8 @@ const customizedTreeNodeItem = (nodeItem, item) => {
                 this.customizedTempSet.add(nodeId);
                 this.tempSet.clear();
                 this.tempSet.add(nodeId);
-                this.goToFolder(nodeId, leftNavContentParentInfo, 'Content');
+                debugger
+                this.goToFolder({id:nodeId, foldersInfo:leftNavContentParentInfo, drive:'Content'});
                 if (!this.state.splitPanelLayout) {
                   this.splitPanelGoToFolder(nodeId, leftNavContentParentInfo);
                 }
@@ -3291,12 +3307,17 @@ const customizedTreeNodeItem = (nodeItem, item) => {
         </Accordion>
         <Accordion>
           <div label="COURSES" activeChild={this.state.courseActiveChild}>
+            {console.log("courses not loading", leftNavCoursesChildrenInfo)}
+            {console.log("load courses", coursesPInfo)}
             <TreeView
               containerId={treeContainerId}
               containerType={treeContainerType}
               loading={!this.folders_loaded || !this.branches_loaded || !this.urls_loaded}
+              // parentsInfo={leftNavCoursesParentInfo}
               parentsInfo={coursesPInfo}
-              childrenInfo={{}}
+
+              // childrenInfo={{}}
+              childrenInfo={leftNavCoursesChildrenInfo}
               specialNodes={this.customizedTempSet}
               hideRoot={true}
               parentNodeItem={(node) => customizedTreeNodeItem(node, 'courses')}
@@ -3379,7 +3400,7 @@ const customizedTreeNodeItem = (nodeItem, item) => {
                       border: "1px solid darkblue",
                       borderRadius: '2px',
                       marginLeft: "5px"
-  
+
                     }}
                   />,
                   closed: <FontAwesomeIcon icon={faChevronRight}
@@ -3394,39 +3415,29 @@ const customizedTreeNodeItem = (nodeItem, item) => {
                 }
               }}
               onLeafNodeClick={(nodeId) => {
-                console.log("nodeId:", nodeId)
-                //To Do : only run this when only choosing course
-                this.loadCourseContent(nodeId,
-                  ()=>{
-                    let foldersInfo = [];
-                  this.goToFolder(nodeId, foldersInfo);
-                });
-                // this.goToFolder(nodeId);
-                // this.selectDrive("Courses", drive)
-                // this.customizedTempSet.clear();
-                // this.customizedTempSet.add(nodeId);
-                // if (this.tempSet.has(nodeId)) this.tempSet.delete(nodeId);
-                // else this.tempSet.add(nodeId);
-                // this.forceUpdate();
+
               }}
-              onParentNodeClick={(nodeId, type) => {
-                this.customizedTempSet.clear();
+
+
+              onParentNodeClick={(nodeId) => {
                 this.customizedTempSet.add(nodeId);
-                // this.tempSet.clear();
-                // this.tempSet.add(nodeId);
-                /*this.loadCourseContent(nodeId,
-                  ()=>{
-                    let foldersInfo = [];
-                  //this.goToFolder(nodeId, foldersInfo);
-                });*/
+                console.log("correct course info", leftNavCoursesChildrenInfo);
+                console.log("courses p info %%%%%%%%%%%%",coursesPInfo);
                 
-                console.log('coursesPInfo:', coursesPInfo)
+                console.log(" step 1 -- nodeId:@@@@",nodeId,'coursesPInfo:', coursesPInfo, "currentCourseId:", coursesPInfo.currentCourseId)
+                
                 this.setState({
-                  selectedDrive: 'Courses',
-                })
-                this.goToFolder(nodeId, coursesPInfo, 'Courses');
-                this.setState({courseActiveChild: true});
-                this.forceUpdate()
+                  selectedCourse: nodeId
+                });
+                // console.log("courses selected state %%%%%%%%%%%%",leftNavCoursesChildrenInfo[nodeId]);
+
+                // this.selectDrive("Courses", coursesPInfo.selectedCourse[0]);
+                this.selectDrive("Courses", nodeId);
+                // this.goToFolder({id:nodeId, foldersInfo:coursesPInfo, courseId:coursesPInfo.selectedCourse[0], drive:'Courses'});
+                // this.goToFolder({id:nodeId, foldersInfo:coursesPInfo, courseId:coursesPInfo.currentCourseId, drive:'Courses'});
+                this.goToFolder({id:nodeId, foldersInfo:leftNavCoursesParentInfo, courseId:nodeId, drive:'Courses'});
+
+
               }}
               onParentNodeDoubleClick={(nodeId) => {
                 ////console.log(`${nodeId} double clicked!`)
@@ -3438,6 +3449,8 @@ const customizedTreeNodeItem = (nodeItem, item) => {
     }
      // console.log('branch id info', this.branchId_info);
       this.mainSection = (history) => (<React.Fragment>
+        {console.log("all Course info to browser@@@@@@@@@@@@@@@@@",leftNavCoursesChildrenInfo)}
+        {console.log("All folder info" , browserFolderInfo)}
         <DoenetBranchBrowser
           loading={loading}
           containerId={browserContainerId}
@@ -3451,8 +3464,12 @@ const customizedTreeNodeItem = (nodeItem, item) => {
           ref={this.browser}         
           key={"browser" + this.updateNumber}                     
           selectedDrive={this.state.selectedDrive}                
-          selectedCourse={this.state.selectedCourse}             
-          allCourseInfo={this.courseInfo}                        
+          selectedCourse={this.state.selectedCourse}  
+          allCourseInfo ={this.courseInfo}
+           
+          // allCourseInfo ={this.courseInfo}
+          // allCourseInfo={coursesPInfo}                        
+                        
           updateSelectedItems={this.updateSelectedItems}    
           handleContentItemDoubleClick={this.handleContentItemDoubleClick}          // optional
           updateDirectoryStack={this.updateDirectoryStack}       
@@ -3460,7 +3477,7 @@ const customizedTreeNodeItem = (nodeItem, item) => {
           addContentToRepo={this.addContentToRepo}               
           removeContentFromCourse={this.removeContentFromCourse} 
           removeContentFromFolder={this.removeContentFromFolder} 
-          directoryData={this.state.directoryStack}              
+          directoryStack={this.state.directoryStack}              
           selectedItems={this.state.selectedItems}               
           selectedItemsType={this.state.selectedItemsType}       
           renameFolder={this.renameFolder}                       
@@ -3475,6 +3492,7 @@ const customizedTreeNodeItem = (nodeItem, item) => {
           history={history}
         />
       </React.Fragment>)
+
 
 ////console.log('branch id onfo 2 ',this.branchId_info);
     this.splitPanelMainSection = (history) => (<React.Fragment>
@@ -3498,7 +3516,7 @@ const customizedTreeNodeItem = (nodeItem, item) => {
         addContentToRepo={this.addContentToRepo}               // optional
         removeContentFromCourse={this.removeContentFromCourse}  // optional
         removeContentFromFolder={this.removeContentFromFolder}  // optional                  
-        directoryData={this.state.splitPanelDirectoryStack}               // optional
+        directoryStack={this.state.splitPanelDirectoryStack}               // optional
         selectedItems={this.state.splitPanelSelectedItems}                // optional
         selectedItemsType={this.state.splitPanelSelectedItemsType}        // optional
         renameFolder={this.renameFolder}                        // optional
@@ -3585,7 +3603,7 @@ const customizedTreeNodeItem = (nodeItem, item) => {
         label: this.courseInfo[key].title,
         value: this.courseInfo[key].courseCode,
         icon: faDotCircle,
-        path: this.getFolderPath(key, this.courseInfo),
+        //  path: this.getFolderPath(key, this.courseInfo),
         callback: this.handleSplitPanelDropdownCallback
       })
     }
@@ -3597,7 +3615,7 @@ const customizedTreeNodeItem = (nodeItem, item) => {
           label: this.userFolderInfo[key].title,
           value: key,
           icon: faFolderOpen,
-          path: this.getFolderPath(key, this.userFolderInfo),
+          //  path: this.getFolderPath(key, this.userFolderInfo),
           callback: this.handleSplitPanelDropdownCallback
         })
       }
@@ -3729,7 +3747,10 @@ const customizedTreeNodeItem = (nodeItem, item) => {
               allFolderInfo={browserFolderInfo}
               allContentInfo={browserContentInfo}
               allUrlInfo={browserUrlInfo}
-              allCourseInfo={this.courseInfo}
+              // allCourseInfo={this.courseInfo}
+              // allCourseInfo={leftNavCoursesChildrenInfo}
+              allCourseInfo={leftNavCoursesChildrenInfo}
+
               publicizeRepo={this.publicizeRepo}
               grantRepoAccess={this.grantRepoAccess}
               revokeRepoAccess={this.revokeRepoAccess}
