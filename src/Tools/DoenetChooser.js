@@ -342,6 +342,7 @@ class DoenetChooser extends Component {
     }
     axios.post(apiUrl, data)
       .then(resp => {
+        console.log(resp);
         callback();
       })
       .catch(function (error) {
@@ -1414,6 +1415,8 @@ class DoenetChooser extends Component {
 
     this.setState({
       currentDraggedObject: { id: draggedId, type: draggedType, sourceContainerId: sourceContainerId, dataObject: dataObject, sourceParentId: sourceParentId },
+      selectedItems: [draggedId],
+      selectedItemsType: [draggedType]
     })
     this.cachedCurrentDraggedObject = { id: draggedId, type: draggedType, sourceContainerId: sourceContainerId, dataObject: dataObject, sourceParentId: sourceParentId };
     this.validDrop = false;
@@ -1697,7 +1700,8 @@ class DoenetChooser extends Component {
       urlInfo: data["url"],
       courseId: containerId
     })
-
+    this.tempSet.clear();
+    this.tempSet.add(this.state.currentDraggedObject.id);
     // update headings
     parentDataSource[this.state.currentDraggedObject.sourceParentId][childrenListKey] = sourceParentChildrenList;
     if (this.state.currentDraggedObject.type == "header") parentDataSource[this.state.currentDraggedObject.id] = this.state.currentDraggedObject.dataObject;
@@ -2320,7 +2324,7 @@ class DoenetChooser extends Component {
   updateTree = ({ containerType, folderInfo = {}, contentInfo = {}, urlInfo = {}, courseId = "" }) => {
     switch (containerType) {
       case ChooserConstants.COURSE_ASSIGNMENTS_TYPE:
-        this.saveAssignmentsTree({ courseId: courseId, headingsInfo: folderInfo, assignmentsInfo: contentInfo, callback: () => {
+        this.saveAssignmentsTree({ courseId: courseId, headingsInfo: folderInfo, assignmentsInfo: contentInfo, callback: () => { 
         } });
         break;
       case ChooserConstants.USER_CONTENT_TYPE:
@@ -2460,7 +2464,6 @@ class DoenetChooser extends Component {
     const newPanelData = {
       values: values,
       activeContainer: view
-
     }
     this.setState({
       panelsCollection: {
@@ -2774,9 +2777,11 @@ class DoenetChooser extends Component {
       })
     }
 
-    // this.buildCourseList();
-    // this.buildLeftNavPanel();
-    // this.buildTopToolbar();
+    this.buildCourseList();
+    this.buildLeftNavPanel();
+    this.buildTopToolbar();
+  
+    console.log(this.courseInfo)
 
     // setup mainSection to be chooser / CourseForm
     this.mainSection;
@@ -2864,7 +2869,7 @@ const TreeNodeItem = ({title, icon}) => {
 };
 
 
-          this.tree = <div className="tree" style={{ paddingLeft: "1em" }}>
+      this.tree = <div className="tree" style={{ paddingLeft: "1em" }}>
         <TreeView
           containerId={treeContainerId}
           containerType={treeContainerType}
@@ -3449,15 +3454,15 @@ const customizedTreeNodeItem = (nodeItem, item) => {
 
           updateSelectedItems={this.updateSelectedItems}
           handleContentItemDoubleClick={this.handleContentItemDoubleClick}          // optional
-          updateDirectoryStack={this.updateDirectoryStack}
-          addContentToFolder={this.addContentToFolder}
-          addContentToRepo={this.addContentToRepo}
-          removeContentFromCourse={this.removeContentFromCourse}
-          removeContentFromFolder={this.removeContentFromFolder}
-          directoryStack={this.state.directoryStack}
-          selectedItems={this.state.selectedItems}
-          selectedItemsType={this.state.selectedItemsType}
-          renameFolder={this.renameFolder}
+          updateDirectoryStack={this.updateDirectoryStack}       
+          addContentToFolder={this.addContentToFolder}           
+          addContentToRepo={this.addContentToRepo}               
+          removeContentFromCourse={this.removeContentFromCourse} 
+          removeContentFromFolder={this.removeContentFromFolder} 
+          directoryStack={this.state.directoryStack}              
+          selectedItems={this.state.selectedItems}               
+          selectedItemsType={this.state.selectedItemsType}       
+          renameFolder={this.renameFolder}                       
           openEditCourseForm={() => this.toggleFormModal(ChooserConstants.EDIT_COURSE_INFO_MODE)}
           publicizeRepo={this.publicizeRepo}
           onDragStart={this.onBrowserDragStart}
@@ -3492,7 +3497,7 @@ const customizedTreeNodeItem = (nodeItem, item) => {
         addContentToFolder={this.addContentToFolder}            // optional
         addContentToRepo={this.addContentToRepo}               // optional
         removeContentFromCourse={this.removeContentFromCourse}  // optional
-        removeContentFromFolder={this.removeContentFromFolder}  // optional
+        removeContentFromFolder={this.removeContentFromFolder}  // optional                  
         directoryStack={this.state.splitPanelDirectoryStack}               // optional
         selectedItems={this.state.splitPanelSelectedItems}                // optional
         selectedItemsType={this.state.splitPanelSelectedItemsType}        // optional
