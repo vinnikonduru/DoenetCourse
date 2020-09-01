@@ -3733,11 +3733,7 @@ const customizedTreeNodeItem = (nodeItem, item) => {
                 })
               }
             </Switch>
-          {console.log('info Panel browserFolderInfo:', browserFolderInfo,
-           " browserContentInfo:",browserContentInfo, 
-           "this.courseInfo:",this.courseInfo, 
-          "this.state.selectedItems:", this.state.selectedItems, 
-          "this.state.selectedItemsType:",this.state.selectedItemsType)}
+
           <ToolLayoutPanel panelName="Info Panel" key={'right'}>
             <InfoPanel
               selectedItems={this.state.selectedItems}
