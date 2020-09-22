@@ -18,7 +18,7 @@
 }
 
 .toolName{
-  width: 300px;
+  /* width: 300px; */
   display: flex;
   flex-direction: row;
   justify-content: left;
@@ -27,12 +27,13 @@
   padding: 0px 20px;
 }
 
-.toolName span {
+.toolName div {
   font-size: 20px;
   color: #333333;
   /* color: #fff; */
   font-weight: 700;
   margin-left: 10px;
+  width: fit-content;
 }
 
 .headingTitle{
@@ -63,7 +64,7 @@
 
 .headingToolbar {
   position: relative;
-  width: 400px;
+  /* width: 400px; */
   display:flex;
   margin: 0px 20px 0px 10px;
   flex-direction: row;
