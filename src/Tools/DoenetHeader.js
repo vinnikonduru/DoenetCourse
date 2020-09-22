@@ -313,7 +313,10 @@ class DoenetHeader extends Component {
     if (!!this.refs.extendedHeader) {
       this.headerSectionCount = this.refs.extendedHeader.children.length;
     }
-    const extendedMarginOffTop = (this.headerSectionCount + 1) * 50;
+    var extendedMarginOffTop = (this.headerSectionCount + 1) * 50;
+    if(this.props.headingTitle && this.props.headingTitle.length > 0) {
+      extendedMarginOffTop = extendedMarginOffTop + 50;
+    }
     
     const menuIcon = <Icon><FontAwesomeIcon icon={faTh} size={'lg'} /></Icon>;
     const profilePicture = <ProfilePicture position={'left'} pic={this.profilePicture} name="changeProfilePicture" id="changeProfilePicture" />;
@@ -329,7 +332,7 @@ class DoenetHeader extends Component {
           </div>
           <div className="toolName">
             <img id="doenetLogo"  src={doenetImage} height='40px' />
-            <span>{this.props.toolName}</span>
+            <div>{this.props.toolName}</div>
           </div>
 
           {this.props.headingTitle && <div className="headingTitle">
