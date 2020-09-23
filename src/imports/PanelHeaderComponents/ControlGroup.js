@@ -1,19 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
-import VerticalDivider from "../../Doenet/components/VerticalDivider.js";
 
 
 const ControlGroupParent =styled.div`
 display:flex;
-background-color:pink;
 `;
 
-export default function ControlGroup(){
+export default function ControlGroup(props){
     return (
       <React.Fragment>
       <ControlGroupParent>
-        hello
-        {/* <VerticalDivider /> */}
+        {props.children}
+        <p>Test Group Controls</p>
+    
+       
       </ControlGroupParent>
       </React.Fragment>
     );
