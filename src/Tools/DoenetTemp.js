@@ -4,7 +4,7 @@ import ToolLayout from "./ToolLayout/ToolLayout";
 import ToolLayoutPanel from "./ToolLayout/ToolLayoutPanel";
 import styled from "styled-components";
 import ControlGroup from "../imports/PanelHeaderComponents/ControlGroup";
-import VerticalDivider from "../Doenet/components/VerticalDivider";
+import VerticalDivider from "../imports/PanelHeaderComponents/VerticalDivider.js";
 
 const alphabet =
   "a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z ";
@@ -53,6 +53,31 @@ export default function DoenetExampleTool(props) {
     </>
   );
 }
+// import React from 'react';
+// import SearchBar from "../imports/PanelHeaderComponents/SearchBar.js";
+// import Textfield from "../imports/PanelHeaderComponents/Textfield.js";
+// import VerticalDivider from "../imports/PanelHeaderComponents/VerticalDivider.js";
+// import Button from "../imports/PanelHeaderComponents/Button.js";
+// import ActionButton from "../imports/PanelHeaderComponents/ActionButton.js";
+// import ToggleButton from "../imports/PanelHeaderComponents/ToggleButton.js";
+
+// export default function attempt() {
+// return (
+// <div>
+//   <p>Button</p>
+//   <Button/>
+//   <p>ToggleButton</p>
+//   <ToggleButton/>
+//   <p>ActionButton</p>
+//   <ActionButton/>
+//   <p>textfield</p>
+//   <Textfield/>
+//   <p>searchbar</p>
+//   <SearchBar/>
+  
+// </div>
+// );
+// };
 
 
 

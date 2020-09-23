@@ -11,10 +11,11 @@ import './toollayout.css';
 import styled from 'styled-components';
 import SplitLayoutPanel from './SplitLayoutPanel';
 
+
 const MainContent = styled.div`
   width: 100%;
   overflow:auto;
-  height:  calc(100vh - ${props => props.height});
+  height: calc(100vh - ${props => props.height});
   flex-direction: row;
   display: flex;
 `;
