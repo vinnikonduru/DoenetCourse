@@ -3,13 +3,18 @@ import React, { useState } from "react";
 import ToolLayout from "./ToolLayout/ToolLayout";
 import ToolLayoutPanel from "./ToolLayout/ToolLayoutPanel";
 import styled from "styled-components";
+import ControlGroup from "../imports/PanelHeaderComponents/ControlGroup";
+import VerticalDivider from "../Doenet/components/VerticalDivider";
 
 const alphabet =
   "a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z ";
 
 export default function DoenetExampleTool(props) {
 
-  const mainControls = [<button>Test</button>];
+  const mainControls = [          <ControlGroup/> ,<VerticalDivider/>, <ControlGroup/> ];
+  const supportControls = [          <ControlGroup/>
+  ];
+
 
   return (
     <>
@@ -17,31 +22,33 @@ export default function DoenetExampleTool(props) {
       
       
       <ToolLayout toolName="my example"
-      headingTitle="Example tool"
+      headingTitle="Example tool" 
 
 
       >
+          <ToolLayoutPanel
+          panelName="Support"
+          panelHeaderControls={supportControls}
+          purpose="support">
+          start support{alphabet}{alphabet}{alphabet}{alphabet}{alphabet}end
+
+          </ToolLayoutPanel>
+
+           <ToolLayoutPanel
+          panelHeaderControls={mainControls}
+          panelName="Main"
+          purpose="main" 
+          >
+          start main{alphabet}{alphabet}{alphabet}{alphabet}{alphabet}{alphabet}end
+        </ToolLayoutPanel>
+
+        
         <ToolLayoutPanel
-          // panelHeaderControls={menuControls}
           isLeftPanel={true}
           purpose = "navigation"
         >
-          start {alphabet} {alphabet} {alphabet}{alphabet} {alphabet}{alphabet}end
+          start navigation {alphabet} {alphabet} {alphabet}{alphabet} {alphabet}end
         </ToolLayoutPanel>
-
-        <ToolLayoutPanel
-          panelHeaderControls={mainControls}
-          panelName="Main"
-          // purpose="main" 
-          >
-          start {alphabet}{alphabet}{alphabet}{alphabet}{alphabet}{alphabet}{alphabet}end
-        </ToolLayoutPanel>
-
-        <ToolLayoutPanel
-          panelName="Support"
-          purpose="support">
-          start {alphabet}{alphabet}{alphabet}{alphabet}{alphabet}{alphabet}end
-          </ToolLayoutPanel>
       </ToolLayout>
     </>
   );
