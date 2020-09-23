@@ -137,12 +137,13 @@ else {
   const [rightOpenBtn, setRightOpenBtn] = useState(!!props.rightPanelClose);
   const [sliderVisible, setSliderVisible] = useState(false);
   const [headerSectionCount, setHeaderSectionCount] = useState(1);
-  const [phoneVisiblePanel, setPhoneVisiblePanel] = useState("middle");
   const [middleWidth, setMiddleWidth] = useState(middleW);
   const container = useRef();
   const [deviceType, setDeviceType] = useState(widthToDevice());
   const [totalWidthNoLeft, setTotalWidthNoLeft] = useState(isLeftPanel && leftCloseBtn ? w - leftW : w);
-
+  const [phoneButtonsWidth, setPhoneButtonsWidth] = useState(0);
+  const [showHideMiddlePanel, setShowHideMiddlePanel] = useState(true);
+  const [showHideRightPanel, setSHowHideRightPanel] = useState(false);
   useEffect(() => {
 
     if (deviceType === "computer") {
@@ -204,6 +205,7 @@ else {
     else {
       middleW = window.innerWidth;
       setTotalWidthNoLeft(middleW);
+      setPhoneButtonsWidth(middleW - leftWidth);
     }
     setMiddleWidth(middleW);
     //toolPanelsWidthHandler(leftW, middleW, rightW);
@@ -343,7 +345,7 @@ else {
     setLeftOpenBtn(true);
     let middleW = "";
     if(deviceType === "computer") {
-      middleW = w - resizerW - resizerW - (!!rightCloseBtn ? rightWidth : 0);
+      middleW = w - resizerW - (!!rightCloseBtn ? rightWidth : 0);
     }
     else {
       if(!leftCloseBtn) {
@@ -381,13 +383,13 @@ else {
     }
     setLeftCloseBtn(true);
     setLeftOpenBtn(false);
-    let middleW = w - resizerW - resizerW - leftW - (!!rightCloseBtn && deviceType === "computer" ? rightWidth : 0);
+    let middleW = w - resizerW - leftW - (!!rightCloseBtn && deviceType === "computer" ? rightWidth : 0);
     if (props.children.length === 2) {
       middleW = w - leftW - resizerW;
     }
     setLeftWidth(leftW);
     setTotalWidthNoLeft(w - leftW);
-
+    setPhoneButtonsWidth(middleW + resizerW + resizerW);
     setMiddleWidth(middleW);
   };
   const rightPanelVisible = () => {
@@ -425,9 +427,20 @@ else {
     setSliderVisible(flag);
     setHeaderSectionCount(count);
   }
+
+  const setPhoneVisiblePanel = (panelName) => {
+    if (panelName === "middle") {
+      setShowHideMiddlePanel(true);
+      setSHowHideRightPanel(false);
+    }
+    if (panelName === "right") {
+      setShowHideMiddlePanel(false);
+      setSHowHideRightPanel(true);
+    }
+  }
   //Props children[0]
   // console.log("props",props.children[0])
-  let leftNavContent = props.children && Array.isArray(props.children) ? props.children[0] : props.children;
+  let leftNavContent = props.children && Array.isArray(props.children) ? props.children.filter(obj => obj.props.purpose === "navigation")[0] : props.children;
   let panelHeadersControlVisible = {
     sliderVisible: false,
     hideMenu: false,
@@ -445,90 +458,112 @@ else {
   panelHeadersControlVisible.phoneButtonsDisplay = deviceType === "phone" ? ((purposeArr.length === 2 && purposeArr.indexOf("navigation") !== -1) || purposeArr.length === 1 && purposeArr.indexOf("main") !== -1) ? false : true : false;
   panelHeadersControlVisible.purpose = purposeArr;
   panelHeadersControlVisible.deviceTypeToPanels = deviceType;
-  let leftNav = <PlacementContext.Provider 
-  value={{ 
-    leftCloseBtn: deviceType === "phone" ? false : leftCloseBtn ,
-    leftOpenBtn: deviceType === "phone" ? true : leftOpenBtn,
-    // width: `${leftWidth}px`, 
-    position: 'left', 
-    panelHeadersControlVisible, 
-    leftPanelHideable, 
-    leftPanelVisible,
-    isResizing 
-  }}>{leftNavContent}</PlacementContext.Provider>
-  // !props.guestUser && purposeArr && purposeArr.indexOf("navigation") !== -1 ? allParts.push(
-  //   <div key="part1"
+  panelHeadersControlVisible.headingTitle = props.headingTitle;
 
-  //     id="leftpanel"
-  //     className="leftpanel"
-  //     style={{
-  //       width: `${leftWidth}px`,
-  //       marginLeft: `${leftOpenBtn ? `-${leftWidth}px` : '0px'} `
-  //     }} >
-  //     {leftNav}</div> ): null;
+  let leftNav = <PlacementContext.Provider
+    value={{
+      leftCloseBtn: deviceType === "phone" ? false : leftCloseBtn,
+      leftOpenBtn: deviceType === "phone" ? true : leftOpenBtn,
+      // width: `${leftWidth}px`,
+      position: 'left',
+      panelHeadersControlVisible,
+      leftPanelHideable,
+      leftPanelVisible,
+      isResizing
+    }}>{leftNavContent}</PlacementContext.Provider>
+ // !props.guestUser && purposeArr && purposeArr.indexOf("navigation") !== -1 ? allParts.push(
+ // <div key="part1"
 
-  //Resizer
-//  if (purpose && purpose.length > 1 && (props.children.length === 2 || props.children.length === 3)) {
-//     allParts.push(
-//       <div key="resizer1" id="first" className="resizer column-resizer" />
+ // id="leftpanel"
+ // className="leftpanel"
+ // style={{
+ // width: `${leftWidth}px`,
+ // marginLeft: `${leftOpenBtn ? `-${leftWidth}px` : '0px'} `
+ // }} >
+ // {leftNav}</div> ): null;
 
-//     );
-//   }
+ //Resizer
+// if (purpose && purpose.length > 1 && (props.children.length === 2 || props.children.length === 3)) {
+// allParts.push(
+// <div key="resizer1" id="first" className="resizer column-resizer" />
 
-  //Props children[1]
-  let middleNav
-  // if (props.children[1] || (purposeArr && purposeArr.length<=2 && purposeArr.indexOf("main")!==-1)) {
-    if (purposeArr && purposeArr.indexOf("main")!==-1) {
-      let middleNavContent = '';
-      switch(purposeArr.length) {
-        case 1: middleNavContent = props.children ;break;
-        case 2: middleNavContent = purposeArr.indexOf("navigation") !== -1 ? props.children[1] : props.children[0];break;
-        case 3: middleNavContent = props.children[1];break;
-      }
-    middleNav = <PlacementContext.Provider value={{ splitPanel: props.splitPanel, rightOpenBtn, leftOpenBtn, position: 'middle', panelHeadersControlVisible, leftPanelVisible, rightPanelVisible, isResizing, leftWidth: leftWidth, guestUser: props.guestUser }}> {middleNavContent}</PlacementContext.Provider>
-    allParts.push(<div key="part2" id="middlepanel" className="middlepanel" style={{ width: `${middleWidth}px`, display: `${middleWidth === 0 ? "none" : "flex"} ` }} >  {middleNav}</div>);
-  }
+// );
+// }
 
-  //Resizer2
-  if (props.children.length >= 2) {
-    allParts.push(
-      <div key="resizer2" id="second" className="resizer column-resizer" />
+ //Props children[1]
+ let middleNav
+ // if (props.children[1] || (purposeArr && purposeArr.length<=2 && purposeArr.indexOf("main")!==-1)) {
+ if (purposeArr && purposeArr.indexOf("main")!==-1) {
+ // let middleNavContent = '';
+ let middleNavObj = Array.isArray(props.children) ? props.children.filter(obj=>obj.props.purpose === "main" || obj.props.purpose === undefined)[0] : props.children;
+ /*switch(purposeArr.length) {
+ case 1: middleNavContent = props.children ;break;
+ case 2: middleNavContent = purposeArr.indexOf("navigation") !== -1 ? props.children[1] : props.children[0];break;
+ case 3: middleNavContent = props.children[1];break;
+ }*/
+ middleNav = <PlacementContext.Provider value={{ splitPanel: props.splitPanel, rightOpenBtn, leftOpenBtn, position: 'middle', panelHeadersControlVisible, leftPanelVisible, rightPanelVisible, isResizing, leftWidth: leftWidth, guestUser: props.guestUser }}> {middleNavObj}</PlacementContext.Provider>
+ allParts.push(<div key="part2" id="middlepanel" className="middlepanel" style={{ width: `${middleWidth}px`, display: `${middleWidth === 0 ? "none" : "flex"} ` }} > {middleNav}</div>);
+ }
 
-    );
-  }
+ //Resizer2
+ if (props.children.length >= 2) {
+ allParts.push(
+ <div key="resizer2" id="second" className="resizer column-resizer" />
 
-  //Props children[2]
-  let rightNav
+ );
+ }
 
-  if(purposeArr && purposeArr.indexOf("support") !== -1) {
-    // allParts.push(
-    //   <div key="resizer2" id="second" className="resizer column-resizer" />
-    // );
-    let rightNavContent = '';
-    switch(purposeArr.length) {
-      case 1: rightNavContent = props.children[0];break;
-      case 2: rightNavContent = props.children[1];break;
-      case 3: rightNavContent = props.children[2];break;
-    }
-    rightNav = <PlacementContext.Provider value={{ rightCloseBtn, position: 'right', panelHeadersControlVisible, rightPanelHideable, isResizing }}>{rightNavContent}  </PlacementContext.Provider>
-    allParts.push(<div key="part3" id="rightpanel" className="rightpanel" style={{ width: `${rightWidth}px`, marginRight: `${rightOpenBtn ? `-${rightWidth}px` : '0px'}` }}>{rightNav}</div>);
-  }
-  const footerClass = props.children.length > 1 ? 'footer-on' : 'footer-off';
+ //Props children[2]
+ let rightNav
 
-  
+ if(purposeArr && purposeArr.indexOf("support") !== -1) {
+ // allParts.push(
+ // <div key="resizer2" id="second" className="resizer column-resizer" />
+ // );
+ let rightNavContent = props.children.filter(obj=>obj.props.purpose === "support")[0];
+ /*switch(purposeArr.length) {
+ case 1: rightNavContent = props.children[0];break;
+ case 2: rightNavContent = props.children[1];break;
+ case 3: rightNavContent = props.children[2];break;
+ }*/
+ rightNav = <PlacementContext.Provider value={{ rightCloseBtn, position: 'right', panelHeadersControlVisible, rightPanelHideable, isResizing }}>{rightNavContent} </PlacementContext.Provider>
+ allParts.push(<div key="part3" id="rightpanel" className="rightpanel" style={{ width: `${rightWidth}px`, marginRight: `${rightOpenBtn ? `-${rightWidth}px` : '0px'}` }}>{rightNav}</div>);
+ }
+ const footerClass = props.children.length > 1 ? 'footer-on' : 'footer-off';
+ const phonebuttoncontainer = {
+ display : 'flex',
+ width: leftCloseBtn ? totalWidthNoLeft : '100%',
+ bottom: '0.1px',
+ position: 'fixed',
+ zIndex:'5',
+ textAlign: 'center',
+ height:'30px',
+ }
+ if(!leftCloseBtn) {
+ phonebuttoncontainer.left = "0px";
+ }
+
+ const phonebutton = {
+ color: 'white',
+ backgroundColor: 'black',
+ width: leftCloseBtn ? phoneButtonsWidth/2 : '100%',
+ height:'30px',
+}
+
   //Show loading if profile if not loaded yet (loads each time)
   if (Object.keys(profile).length < 1) {
     return (<h1>Loading...</h1>)
   }
   return (
     <div style={{ display: "flex" }}>
-      
+
       {
         isLeftPanel && leftCloseBtn ?
           (
             <div
               style={{
-                width: leftWidth + "px"
+                width: leftWidth + "px",
+                minWidth: leftWidth + "px"
               }}
               // id="leftpanel"
               className="leftpanel"
@@ -579,25 +614,30 @@ else {
                 }}
               />
             </button>)}</div>}
-          {(phoneVisiblePanel === "middle" || allParts.length === 1 )&&
-            <div key="part2" id="middlepanel" className="middlepanel" >{middleNav} </div>}
-          {phoneVisiblePanel === "right" && allParts.length > 2 &&
-            <div key="part3" id="rightpanel" className="rightpanel" > {rightNav} </div>}
-        </div>
+          {
+                <div key="part2" id="phonePanels" className={showHideMiddlePanel ? "middlepanel" : "rightpanel"} >
+                  {showHideMiddlePanel ? middleNav : ""}
+                  {showHideRightPanel ? rightNav : ""}
+                </div>
+  }
+ {/* {showHideRightPanel && allParts.length > 2 &&
+ <div key="part3" id="rightpanel" className="rightpanel" > {rightNav} </div>} */}
+ </div>
 
         
 
       </div> : <Container ref={container} hideHeader={props.hideHeader}>{allParts}</Container>
 }
         </div>
-        {middleNav && rightNav && <div className={leftCloseBtn ? "phonebuttoncontainershrinked" : "phonebuttoncontainer"} >
-            <>
-           
-              {middleNav && purposeArr && purposeArr.length > 1 && purposeArr.indexOf("main") !== -1 && purposeArr.indexOf("support") !== -1 && (<button className="phonebutton"
-                onClick={() => setPhoneVisiblePanel("middle")}>{middleNav.props.children[1].props.panelName}</button>)}
-            </>
+        {deviceType === "phone" && middleNav && rightNav && <div style={phonebuttoncontainer} >
+          <>
+
+            {middleNav && purposeArr && purposeArr.length > 1 && purposeArr.indexOf("main") !== -1 && purposeArr.indexOf("support") !== -1 && (<button style={phonebutton}
+              onClick={() => setPhoneVisiblePanel("middle")}>{middleNav.props.children[1].props.panelName}</button>)}
+          </>
           {rightNav && purposeArr && purposeArr.length > 1 && purposeArr.indexOf("support") !== -1 &&
-            (<button className="phonebutton"
+            (<button
+              style={phonebutton}
               onClick={() => setPhoneVisiblePanel("right")}>{rightNav.props.children[0].props.panelName}</button>)}
         </div>}
       </div>
@@ -611,109 +651,44 @@ else {
 
 
 
-  //   <>
-  //     {!props.hideHeader && <DoenetHeader
-  //       profile={profile}
-  //       cookies={jwt}
-  //       isSignedIn={isSignedIn}
-  //       toolName={props.toolName}
-  //       headingTitle={props.headingTitle}
-  //       headerRoleFromLayout={props.headerRoleFromLayout}
-  //       headerChangesFromLayout={props.headerChangesFromLayout}
-  //       guestUser={props.guestUser}
-  //       onChange={showCollapseMenu} />}
-  //     {deviceType === "phone" ? <div ref={container} style={{width: '100%'}}>
-  //       <div className={footerClass}>
-  //         {/* {(phoneVisiblePanel === "left" || allParts.length === 1) && */}
-  //         {(phoneVisiblePanel === "left" ) &&
-  //           <div key="part1" id="leftpanel" className="leftpanel" >{leftNav}</div>}
-  //         {(phoneVisiblePanel === "middle" || allParts.length === 1 )&&
-  //           <div key="part2" id="middlepanel" className="middlepanel" >{middleNav} </div>}
-  //         {phoneVisiblePanel === "right" && allParts.length > 2 &&
-  //           <div key="part3" id="rightpanel" className="rightpanel" > {rightNav} </div>}
-  //       </div>
+ // <>
+ // {!props.hideHeader && <DoenetHeader
+ // profile={profile}
+ // cookies={jwt}
+ // isSignedIn={isSignedIn}
+ // toolName={props.toolName}
+ // headingTitle={props.headingTitle}
+ // headerRoleFromLayout={props.headerRoleFromLayout}
+ // headerChangesFromLayout={props.headerChangesFromLayout}
+ // guestUser={props.guestUser}
+ // onChange={showCollapseMenu} />}
+ // {deviceType === "phone" ? <div ref={container} style={{width: '100%'}}>
+ // <div className={footerClass}>
+ // {/* {(phoneVisiblePanel === "left" || allParts.length === 1) && */}
+ // {(phoneVisiblePanel === "left" ) &&
+ // <div key="part1" id="leftpanel" className="leftpanel" >{leftNav}</div>}
+ // {(phoneVisiblePanel === "middle" || allParts.length === 1 )&&
+ // <div key="part2" id="middlepanel" className="middlepanel" >{middleNav} </div>}
+ // {phoneVisiblePanel === "right" && allParts.length > 2 &&
+ // <div key="part3" id="rightpanel" className="rightpanel" > {rightNav} </div>}
+ // </div>
 
-  //       {props.children.length > 1 && <div className="phonebuttoncontainer" >
-  //         {leftNav && middleNav && leftNav.props.children.props && middleNav.props.children[1].props && (
-  //           <>
-  //             {!props.guestUser && <button className="phonebutton"
-  //               onClick={() => setPhoneVisiblePanel("left")}>{leftNav.props.children.props.panelName}</button>}
-  //             <button className="phonebutton"
-  //               onClick={() => setPhoneVisiblePanel("middle")}>{middleNav.props.children[1].props.panelName}</button>
-  //           </>)}
-  //         {rightNav && rightNav.props.children[0].props &&
-  //           <button className="phonebutton"
-  //             onClick={() => setPhoneVisiblePanel("right")}>{rightNav.props.children[0].props.panelName}</button>}
-  //       </div>}
-  //     </div>
-  //       :
-  //       <Container ref={container} hideHeader={props.hideHeader}>{allParts}</Container>
-  //     }
-  //   </>
-  );
+ // {props.children.length > 1 && <div className="phonebuttoncontainer" >
+ // {leftNav && middleNav && leftNav.props.children.props && middleNav.props.children[1].props && (
+ // <>
+ // {!props.guestUser && <button className="phonebutton"
+ // onClick={() => setPhoneVisiblePanel("left")}>{leftNav.props.children.props.panelName}</button>}
+ // <button className="phonebutton"
+ // onClick={() => setPhoneVisiblePanel("middle")}>{middleNav.props.children[1].props.panelName}</button>
+ // </>)}
+ // {rightNav && rightNav.props.children[0].props &&
+ // <button className="phonebutton"
+ // onClick={() => setPhoneVisiblePanel("right")}>{rightNav.props.children[0].props.panelName}</button>}
+ // </div>}
+ // </div>
+ // :
+ // <Container ref={container} hideHeader={props.hideHeader}>{allParts}</Container>
+ // }
+ // </>
+ );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// return (
-//   <>
-//     {!props.hideHeader && <DoenetHeader
-//       profile={profile}
-//       cookies={jwt}
-//       isSignedIn={isSignedIn}
-//       toolName={props.toolName}
-//       headingTitle={props.headingTitle}
-//       headerRoleFromLayout={props.headerRoleFromLayout}
-//       headerChangesFromLayout={props.headerChangesFromLayout}
-//       guestUser={props.guestUser}
-//       onChange={showCollapseMenu} />}
-//     {deviceType === "phone" ? <div ref={container} style={{width: '100%'}}>
-//       <div className={footerClass}>
-//         {(phoneVisiblePanel === "left" || allParts.length === 1) &&
-//           <div key="part1" id="leftpanel" className="leftpanel" >{leftNav}</div>}
-//         {phoneVisiblePanel === "middle" &&
-//           <div key="part2" id="middlepanel" className="middlepanel" >{middleNav} </div>}
-//         {phoneVisiblePanel === "right" && allParts.length > 2 &&
-//           <div key="part3" id="rightpanel" className="rightpanel" > {rightNav} </div>}
-//       </div>
-
-//       {props.children.length > 1 && <div className="phonebuttoncontainer" >
-//         {leftNav && middleNav && leftNav.props.children.props && middleNav.props.children[1].props && (
-//           <>
-//             {!props.guestUser && <button className="phonebutton"
-//               onClick={() => setPhoneVisiblePanel("left")}>{leftNav.props.children.props.panelName}</button>}
-//             <button className="phonebutton"
-//               onClick={() => setPhoneVisiblePanel("middle")}>{middleNav.props.children[1].props.panelName}</button>
-//           </>)}
-//         {rightNav && rightNav.props.children[0].props &&
-//           <button className="phonebutton"
-//             onClick={() => setPhoneVisiblePanel("right")}>{rightNav.props.children[0].props.panelName}</button>}
-//       </div>}
-//     </div>
-//       :
-//       <Container ref={container} hideHeader={props.hideHeader}>{allParts}</Container>
-//     }
-//   </>
-// );
-// }

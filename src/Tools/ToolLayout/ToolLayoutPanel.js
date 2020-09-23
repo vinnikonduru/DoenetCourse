@@ -45,13 +45,20 @@ const SplitPanelContent = styled.div`
 
 export default class ToolLayoutPanel extends Component {
   static contextType = PlacementContext;
-
-
+  componentDidMount() {
+    console.log("mounted");
+  }
   render() {
+  const userAgent = window.navigator.userAgent;
+
     const deviceType = this.context && this.context.panelHeadersControlVisible && this.context.panelHeadersControlVisible.deviceTypeToPanels ? this.context.panelHeadersControlVisible.deviceTypeToPanels : ""; 
 // console.log("panel device type", this.context.panelHeadersControlVisible.deviceTypeToPanels);
-let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ? ((this.context.panelHeadersControlVisible.headerSectionCount + 1) * 50 + 95 + 30) + 'px' : '175px';
-    
+// let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ?
+//  ((this.context.panelHeadersControlVisible.headerSectionCount + 1) * 50 + 95 + 30) + 'px' : '175px';
+let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ? 
+((this.context.panelHeadersControlVisible.headingTitle 
+  && this.context.panelHeadersControlVisible.headingTitle.length > 0  ? 3 : 2) * 50 + 95 + 30) + 'px' : '175px';
+
     if(!this.context.panelHeadersControlVisible.phoneButtonsDisplay) {
       let existingHeight = mainHeight.replace(/[a-z]/g , '');
       existingHeight = Number.parseInt(existingHeight);
@@ -63,6 +70,16 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ? ((this.
       existingHeight = Number.parseInt(existingHeight);
       mainHeight = (existingHeight - 95) + 'px';
     }
+    // debugger;
+    // if(this.context.panelHeadersControlVisible.headingTitle 
+    //   && this.context.panelHeadersControlVisible.headingTitle.length > 0 
+    //   && this.context.panelHeadersControlVisible.sliderVisible 
+    //   && this.context.panelHeadersControlVisible.purpose.length > 1
+    //   ) {
+    //   let existingHeight = mainHeight.replace(/[a-z]/g , '');
+    //   existingHeight = Number.parseInt(existingHeight);
+    //   mainHeight = (existingHeight + 50) + 'px';
+    // }
 
     if(this.props.isLeftPanel) {
       mainHeight = "0px";
@@ -71,7 +88,9 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ? ((this.
     let splitLayoutPanel = null;
     let filteredChildren = [];
     let panelHeader = null;
-    // console.log("props" , this.props[1])
+    // console.log("props" , this.props)
+    // console.log("Refresh component", this.props.children)
+    
     if (Array.isArray(this.props.children)) {
       for (let component of this.props.children) {
         if (component.type == SplitLayoutPanel) {
@@ -130,6 +149,36 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ? ((this.
         </>
       );
     };
+
+    const returnPanelLayout = () => {
+      return (
+        <div className="panels-header-content">
+          <div className="panels-header-controls">
+            {!this.context.panelHeadersControlVisible.hideCollapse ? this.context.position === 'left' ? leftPanelCloseButton() :
+              this.context.position === 'middle' ? middleOpenLeftRightButton() :
+              // this.context.position === 'right' ? rightPanelCloseButton() : '' : ''}
+
+                 this.context.position === 'right' ? rightPanelCloseButton() : middleOpenLeftRightButton() : ''} 
+
+            {!this.props.splitPanel ?
+             
+              <SplitPanelHeader width={100}>{panelHeader}</SplitPanelHeader>
+              : <>
+                {<SplitPanelHeader>
+                  {panelHeader.map((p,i)=>{
+                    return i < (panelHeader.length-1) ? [panelHeader[i]] : ''
+                  })}
+                </SplitPanelHeader>}
+                <SplitDivider></SplitDivider>
+                {<SplitPanelHeader justifyContent="flex-end">
+                  {splitPanelProps.panelHeaderControls}
+                </SplitPanelHeader>}</>
+            }
+          </div>
+        </div> 
+      )
+    };
+
     const middleOpenLeftRightButton = () => {
       return (
         <>
@@ -164,34 +213,13 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ? ((this.
     return (
       <>
         {!this.context.panelHeadersControlVisible.hideMenu  
-          && this.props.isLeftPanel === undefined  
-        ? <div className="panels-header-content">
-          <div className="panels-header-controls">
-            {!this.context.panelHeadersControlVisible.hideCollapse ? this.context.position === 'left' ? leftPanelCloseButton() :
-              this.context.position === 'middle' ? middleOpenLeftRightButton() :
-              // this.context.position === 'right' ? rightPanelCloseButton() : '' : ''}
-
-                 this.context.position === 'right' ? rightPanelCloseButton() : middleOpenLeftRightButton() : ''} 
-
-            {!this.props.splitPanel ?
-             
-              <SplitPanelHeader width={100}>{panelHeader}</SplitPanelHeader>
-              : <>
-                {<SplitPanelHeader>
-                  {panelHeader.map((p,i)=>{
-                    return i < (panelHeader.length-1) ? [panelHeader[i]] : ''
-                  })}
-                </SplitPanelHeader>}
-                <SplitDivider></SplitDivider>
-                {<SplitPanelHeader justifyContent="flex-end">
-                  {splitPanelProps.panelHeaderControls}
-                </SplitPanelHeader>}</>
-            }
-          </div>
-        </div> : ''}
+          && this.props.isLeftPanel === undefined && userAgent.indexOf("Mobile") === -1
+        ? returnPanelLayout() : ''}
 
         {this.props.isLeftPanel ? <div className="panels-header-controls">
             { this.context.position === 'left'  && this.context.panelHeadersControlVisible.deviceTypeToPanels === "computer" ? leftPanelCloseButton() : defaultLeftClose() } </div> : null }
+       
+       
         <MainContent height={mainHeight} isResizing={this.context.isResizing}>
        
           {!this.props.splitPanel ?
@@ -202,6 +230,10 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ? ((this.
               <SplitPanelContent disableScroll={this.props.disableSplitPanelScroll[1]}>{splitLayoutPanel}</SplitPanelContent></>)}
           {this.context.panelHeadersControlVisible.showFooter }
         </MainContent>
+
+        {!this.context.panelHeadersControlVisible.hideMenu  
+          && this.props.isLeftPanel === undefined && userAgent.indexOf("Mobile") !== -1
+        ? returnPanelLayout() : ''}
 
       </>
     );
