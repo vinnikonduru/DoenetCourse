@@ -26,7 +26,9 @@ const SplitPanelHeader = styled.div`
     height: 100%;
     display: flex;
     padding:3px;
-    justify-content: ${props => props.justifyContent || 'space-between'};
+    justify-content: ${props => props.justifyContent };
+
+    // justify-content: ${props => props.justifyContent || 'space-between'};
 `;
 const SplitDivider = styled.div`
     width:1px;

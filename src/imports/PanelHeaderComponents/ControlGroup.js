@@ -11,10 +11,7 @@ export default function ControlGroup(props){
       <React.Fragment>
       <ControlGroupParent>
         {props.children}
-        <p>Test Group Controls</p>
-    
-       
-      </ControlGroupParent>
+       </ControlGroupParent>
       </React.Fragment>
     );
   }
