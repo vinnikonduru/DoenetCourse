@@ -10,6 +10,7 @@ import {
 import './toollayout.css';
 import styled from 'styled-components';
 import SplitLayoutPanel from './SplitLayoutPanel';
+import ControlGroupWrapper from "../../imports/PanelHeaderComponents/ControlGroupWrapper"
 
 
 const MainContent = styled.div`
@@ -26,9 +27,9 @@ const SplitPanelHeader = styled.div`
     height: 100%;
     display: flex;
     padding:3px;
-    justify-content: ${props => props.justifyContent };
+    // justify-content: ${props => props.justifyContent };
 
-    // justify-content: ${props => props.justifyContent || 'space-between'};
+    justify-content: ${props => props.justifyContent || 'flex-start'};
 `;
 const SplitDivider = styled.div`
     width:1px;
@@ -49,12 +50,14 @@ const SplitPanelContent = styled.div`
 export default class ToolLayoutPanel extends Component {
   static contextType = PlacementContext;
   componentDidMount() {
-    console.log("mounted");
+    // console.log("mounted");
   }
   render() {
   const userAgent = window.navigator.userAgent;
+  const mainPanelWidth = this.context && this.context.panelHeadersControlVisible.mainPanelWidth;
+  // console.log(mainPanelWidth);
 
-    const deviceType = this.context && this.context.panelHeadersControlVisible && this.context.panelHeadersControlVisible.deviceTypeToPanels ? this.context.panelHeadersControlVisible.deviceTypeToPanels : ""; 
+  const deviceType = this.context && this.context.panelHeadersControlVisible && this.context.panelHeadersControlVisible.deviceTypeToPanels ? this.context.panelHeadersControlVisible.deviceTypeToPanels : ""; 
 // console.log("panel device type", this.context.panelHeadersControlVisible.deviceTypeToPanels);
 // let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ?
 //  ((this.context.panelHeadersControlVisible.headerSectionCount + 1) * 50 + 95 + 30) + 'px' : '175px';
@@ -73,16 +76,7 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ?
       existingHeight = Number.parseInt(existingHeight);
       mainHeight = (existingHeight - 95) + 'px';
     }
-    // debugger;
-    // if(this.context.panelHeadersControlVisible.headingTitle 
-    //   && this.context.panelHeadersControlVisible.headingTitle.length > 0 
-    //   && this.context.panelHeadersControlVisible.sliderVisible 
-    //   && this.context.panelHeadersControlVisible.purpose.length > 1
-    //   ) {
-    //   let existingHeight = mainHeight.replace(/[a-z]/g , '');
-    //   existingHeight = Number.parseInt(existingHeight);
-    //   mainHeight = (existingHeight + 50) + 'px';
-    // }
+
 
     if(this.props.isLeftPanel) {
       mainHeight = "0px";
@@ -90,7 +84,7 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ?
     
     let splitLayoutPanel = null;
     let filteredChildren = [];
-    let panelHeader = null;
+    let panelHeader = [];
     // console.log("props" , this.props)
     // console.log("Refresh component", this.props.children)
     
@@ -107,6 +101,13 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ?
       filteredChildren.push(this.props.children);
     }
 
+    const WindowResizeHandlerForPanelHeaders = () => {
+       if(this.props.panelHeaderControls) {
+         let totalCtrlGroups = this.props.panelHeaderControls.length;
+       }
+    }
+
+    window.addEventListener("resize", WindowResizeHandlerForPanelHeaders);
 
     if (this.props.panelHeaderControls) {
       panelHeader = [...this.props.panelHeaderControls];
@@ -165,7 +166,13 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ?
 
             {!this.props.splitPanel ?
              
-              <SplitPanelHeader width={100}>{panelHeader}</SplitPanelHeader>
+              <SplitPanelHeader width={100}>
+                <ControlGroupWrapper
+                  deviceType={this.context.panelHeadersControlVisible.deviceTypeToPanels}
+                  mainPanelWidth={mainPanelWidth} ctrlGrpLength={Array.isArray(panelHeader) ? panelHeader.length : 1}>
+                  {panelHeader}
+                </ControlGroupWrapper>
+              </SplitPanelHeader>
               : <>
                 {<SplitPanelHeader>
                   {panelHeader.map((p,i)=>{

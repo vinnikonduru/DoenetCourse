@@ -459,6 +459,7 @@ else {
   panelHeadersControlVisible.purpose = purposeArr;
   panelHeadersControlVisible.deviceTypeToPanels = deviceType;
   panelHeadersControlVisible.headingTitle = props.headingTitle;
+  panelHeadersControlVisible.mainPanelWidth = middleW;
 
   let leftNav = <PlacementContext.Provider
     value={{
