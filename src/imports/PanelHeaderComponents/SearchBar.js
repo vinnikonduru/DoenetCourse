@@ -34,7 +34,7 @@ export default function Searchbar() {
         document.getElementById('search').value = '';
     }
     return (
-        <div style={{display: "inline"}}>
+        <div style={{display: "flex"}}>
             <FontAwesomeIcon icon={faSearch} style={searchIcon}/>
             <button style={cancelButton} onClick={() => { handleClick() }} ><FontAwesomeIcon icon={faTimes}/></button>
             <input id="search" type="text" defaultValue="Search..." style={searchBar} onKeyUp={() => { console.log(value) }}/>

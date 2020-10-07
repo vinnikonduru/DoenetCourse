@@ -26,9 +26,7 @@ const SplitPanelHeader = styled.div`
     width: ${props => props.width || '50'}%;
     height: 100%;
     display: flex;
-    padding:3px;
     // justify-content: ${props => props.justifyContent };
-
     justify-content: ${props => props.justifyContent || 'flex-start'};
 `;
 const SplitDivider = styled.div`

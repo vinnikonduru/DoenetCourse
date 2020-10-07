@@ -13,33 +13,29 @@ const CtrlGroup = styled.div`
 `;
 
 export default function ControlGroup(props){
-  var elementsArray = [];
+  // var elementsArray = [];
   var ctrlGrpRef = useRef();
   var minimizedIcon = props.icon;
 
   useEffect(()=> {
     if(ctrlGrpRef.current) {
-      props.getControlGroupsWidth(ctrlGrpRef.current.getBoundingClientRect().width);
+      if(props.fromMaximize === undefined){
+        props.getControlGroupsWidth(ctrlGrpRef.current.getBoundingClientRect().width);
+      }
     }
   },[]);
 
-  props.children.forEach(grpElement=> {
-    elementsArray.push(<div style={{margin: "3.5px"}}>
-      {grpElement}
-    </div>)
-  });
+  // props.children.forEach(grpElement=> {
+  //   elementsArray.push(grpElement)
+  // });
   
   return (
     <React.Fragment>
     <ControlGroupParent ref={ctrlGrpRef}>   
       <CtrlGroup>
-        {elementsArray}   
+        {props.children}   
       </CtrlGroup>
       </ControlGroupParent>
     </React.Fragment>
     );
   }
-
-
-
-        {/* {props.type === "fontFunctions" ? <FontFunctionsCtrlGroup>{props.children}</FontFunctionsCtrlGroup> : ""}    */}
