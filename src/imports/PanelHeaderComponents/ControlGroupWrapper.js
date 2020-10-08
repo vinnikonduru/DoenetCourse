@@ -44,8 +44,6 @@ export default function ControlGroupWrapper(props){
   }
 //////// render collapse/expand
   useEffect(()=> {
-    // console.log("ctrlGrpWidthsArray" , ctrlGrpWidthsArray);
-
     // on render detects width of main panel and checks,which control groups should collapse
     //while change in ctrlGrpWidthsArray
     if(ctrlGrpWidthsArray.length > 0) {
@@ -122,10 +120,9 @@ export default function ControlGroupWrapper(props){
       }
     });
     if(window.innerWidth > innerWidth && wrappedChildrens.length !== 0) {
-      if(props.mainPanelWidth > unwrappedChildrenWidth + ctrlGrpWidthsArray[wrappedChildrenIndexes[0]]) {
+      if(props.mainPanelWidth > unwrappedChildrenWidth + ctrlGrpWidthsArray[wrappedChildrenIndexes[0]] + (wrappedChildrenIndexes.length * WRAPPED_CONTROL_GROUP_WIDTH)) {
           let children = [...tobeRenderedChildren];
           children[wrappedChildrenIndexes[0]] = React.cloneElement(defaultChildrens[wrappedChildrenIndexes[0]], {fromMaximize: true});
-          // console.log(children);
           setToBeRenderedChildren(children);
        }
     }
@@ -160,84 +157,11 @@ export default function ControlGroupWrapper(props){
     return width;
   }
 
-  // useEffect(()=> {
-  //   let totalGrpsWidth = ctrlGrpWidthsArray.reduce((a,b)=> a+b,0);
-  //   let collapsedChildren = wrappedCtrlGrpChildren.filter(obj=> (obj && obj.type && obj.type==="wrappedCtrlGrp"));
-  //   let childrenArray = [...tobeRenderedChildren];
-  //   if(collapsedChildren.length !== tobeRenderedChildren.length){ // if all groups collapsed and still minimizing window
-  //     if(props.mainPanelWidth < totalGrpsWidth && wrappedCtrlGrpChildren.length === 0 && unWrapGroupChildren.length === 0) {
-  //       //If we need to collapse and we can collase control groups then collapse the one on the right
-  //       setWindowMinimizeFlag(true);
-  //       setWindowMaximizeFlag(false);
-  //       let indexLength = ctrlGrpWidthsArray.length-1;
-  //       var propsEl =createWrappedEl(childrenArray,indexLength);
-  //       childrenArray.splice(indexLength,1);
-  //       childrenArray.push(propsEl);
-  //       setWrappedCtrlGroupChildren(childrenArray);
-
-  //     }
-
-  //     // else if(windowMinimizeFlag) {
-  //     else if(collapsedChildren.length > 0 && unWrapGroupChildren.length === 0) {
-  //       //If all the control groups are collapsed then
-  //       let indexArrray =[];
-  //       let wrappedTotalGrpWidth = collapsedChildren.length * WRAPPED_CONTROL_GROUP_WIDTH;
-  //       wrappedCtrlGrpChildren.map((obj,index)=> {
-  //         if(typeof(obj.type)==="function") {
-  //           indexArrray.push(index);
-  //       }});
-  //       let unWrappedGroupTotalWidth = 0;
-  //       indexArrray.forEach(obj=>{
-  //         if(unWrappedGroupTotalWidth === 0) {
-  //           unWrappedGroupTotalWidth = ctrlGrpWidthsArray[obj];
-  //         }
-  //         else {
-  //           unWrappedGroupTotalWidth = unWrappedGroupTotalWidth + ctrlGrpWidthsArray[obj];
-  //         }
-  //       });
-        
-  //       if(props.mainPanelWidth < (wrappedTotalGrpWidth + unWrappedGroupTotalWidth)){
-  //         let toBeUpdatedChildrenArray = wrappedCtrlGrpChildren;
-  //         toBeUpdatedChildrenArray[indexArrray[indexArrray.length-1]] = <wrappedCtrlGrp onClick={()=>{showMinimizedVersion(indexArrray[indexArrray.length-1])}}>{toBeUpdatedChildrenArray[indexArrray[indexArrray.length-1]]["props"].icon}</wrappedCtrlGrp>;
-  //         setWrappedCtrlGroupChildren(toBeUpdatedChildrenArray);
-  //       }
-  //     }
-  //   }
-
-  //   //// expanding groups after collapse
-  //   if(collapsedChildren.length === tobeRenderedChildren.length) {
-  //     setWindowMaximizeFlag(true);
-  //     setWindowMinimizeFlag(false);
-  //     let maxmizingChildrenArray = [...wrappedCtrlGrpChildren];
-  //     if(props.mainPanelWidth >= (ctrlGrpWidthsArray[0] + collapsedChildren.length * WRAPPED_CONTROL_GROUP_WIDTH)) {
-  //       maxmizingChildrenArray[0] = tobeRenderedChildren[0];
-  //       setWrappedCtrlGroupChildren([]);
-  //       setUnWrapGroupChildren(maxmizingChildrenArray)
-  //     }
-  //   }
-
-  //   else if(windowMaximizeFlag) {
-  //     let unWrapGroupChildrenCopy = [...unWrapGroupChildren];
-  //     let indexArray = [];
-  //     unWrapGroupChildrenCopy.map((obj,index)=> {
-  //       if(typeof(obj.type)==="function") {
-  //         indexArray.push(index);
-  //     }});
-  //     if(props.mainPanelWidth > expandedGroupWidth(indexArray) + ctrlGrpWidthsArray[indexArray.length]) {
-  //       unWrapGroupChildrenCopy[indexArray.length] = tobeRenderedChildren[indexArray.length];
-  //     }
-  //     setUnWrapGroupChildren(unWrapGroupChildrenCopy);
-  //   }
-  //   setMinimized(-1);
-  //   setMinimizedProps({});
-  // },[props.mainPanelWidth]);
 
 
   return (
     <React.Fragment>
       {tobeRenderedChildren}
-      {/* {wrappedCtrlGrpChildren.length > 0 ? wrappedCtrlGrpChildren : unWrapGroupChildren.length > 0 ? unWrapGroupChildren : tobeRenderedChildren} */}
-      {/* {minimized !== -1 ? <MinimizedSectionMenu minimizedChildren = {minimizedProps}/> : ""} */}
     </React.Fragment>
   );
 }
