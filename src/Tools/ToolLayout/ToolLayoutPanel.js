@@ -45,8 +45,29 @@ const SplitPanelContent = styled.div`
     
 `;
 
+const MinimizedSection = styled.div`
+height:'100px',
+opacity: 1;
+display: block;
+background-color: white;
+width: max-content;
+border: 1px solid #E2E2E2;
+z-index: 9999;
+color: black;
+position: absolute;
+left: unset;
+right: 0;
+top:50px;
+`;
+
 export default class ToolLayoutPanel extends Component {
   static contextType = PlacementContext;
+  constructor(props) {
+    super(props);
+    this.state = {
+      minimizedProps : {},
+    }
+  }
   componentDidMount() {
     // console.log("mounted");
   }
@@ -56,7 +77,6 @@ export default class ToolLayoutPanel extends Component {
   // console.log(mainPanelWidth);
 
   const deviceType = this.context && this.context.panelHeadersControlVisible && this.context.panelHeadersControlVisible.deviceTypeToPanels ? this.context.panelHeadersControlVisible.deviceTypeToPanels : ""; 
-// console.log("panel device type", this.context.panelHeadersControlVisible.deviceTypeToPanels);
 // let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ?
 //  ((this.context.panelHeadersControlVisible.headerSectionCount + 1) * 50 + 95 + 30) + 'px' : '175px';
 let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ? 
@@ -83,8 +103,7 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ?
     let splitLayoutPanel = null;
     let filteredChildren = [];
     let panelHeader = [];
-    // console.log("props" , this.props)
-    // console.log("Refresh component", this.props.children)
+
     
     if (Array.isArray(this.props.children)) {
       for (let component of this.props.children) {
@@ -152,6 +171,10 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ?
       );
     };
 
+    var setMinimizedProps = (minimizedPropsObjIndex) => {
+      this.setState({minimizedProps: minimizedPropsObjIndex !== -1 ? panelHeader[minimizedPropsObjIndex] : {}})
+    }
+
     const returnPanelLayout = () => {
       return (
         <div className="panels-header-content">
@@ -166,8 +189,10 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ?
              
               <SplitPanelHeader width={100}>
                 <ControlGroupWrapper
+                  setMinimizedPropIndex={setMinimizedProps}
                   deviceType={this.context.panelHeadersControlVisible.deviceTypeToPanels}
-                  mainPanelWidth={mainPanelWidth} ctrlGrpLength={Array.isArray(panelHeader) ? panelHeader.length : 1}>
+                  mainPanelWidth={mainPanelWidth} 
+                  ctrlGrpLength={Array.isArray(panelHeader) ? panelHeader.length : 1}>
                   {panelHeader}
                 </ControlGroupWrapper>
               </SplitPanelHeader>
@@ -220,6 +245,7 @@ let mainHeight = this.context.panelHeadersControlVisible.sliderVisible ?
     const splitPanelProps = splitLayoutPanel && splitLayoutPanel.props;
     return (
       <>
+        {/* <MinimizedSection>{Object.keys(this.state.minimizedProps).length !== 0 ? this.state.minimizedProps : ""}</MinimizedSection> */}
         {!this.context.panelHeadersControlVisible.hideMenu  
           && this.props.isLeftPanel === undefined && userAgent.indexOf("Mobile") === -1
         ? returnPanelLayout() : ''}

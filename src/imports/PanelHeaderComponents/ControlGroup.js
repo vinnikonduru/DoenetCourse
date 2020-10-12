@@ -19,7 +19,7 @@ export default function ControlGroup(props){
 
   useEffect(()=> {
     if(ctrlGrpRef.current) {
-      if(props.fromMaximize === undefined){
+      if(props.fromMaximize === undefined && props.getControlGroupsWidth){
         props.getControlGroupsWidth(ctrlGrpRef.current.getBoundingClientRect().width);
       }
     }

@@ -14,6 +14,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
 faWaveSquare, faDatabase, faServer
 } from "@fortawesome/free-solid-svg-icons"; 
+import Overlay from "../imports/Overlay";
+
 const alphabet =
   "a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z ";
 
@@ -22,10 +24,10 @@ const alphabet =
   style={{
     width:"30px",
     padding:"10px",
-    backgroundColor:"yellow",
+    backgroundColor:"#e2e2e2",
     alignSelf: "center",
     fontSize: '34px',
-    color:'#288ae9'
+    color:'grey'
   }}/>;
   const finalIcon2 = <FontAwesomeIcon
   icon={faDatabase}
@@ -35,30 +37,33 @@ const alphabet =
     backgroundColor:"#e2e2e2",
     alignSelf: "center",
     fontSize: '34px',
-    color:'#288ae9'
+    color:'grey'
   }}/>;
   const finalIcon3 = <FontAwesomeIcon
   icon={faWaveSquare}
   style={{
     width:"30px",
     padding:"10px",
-    backgroundColor:"skyblue",
+    backgroundColor:"#e2e2e2",
     alignSelf: "center",
     fontSize: '34px',
-    color:'#288ae9'
+    color:'grey'
   }}/>;
 
 export default function DoenetExampleTool(props) {
   const mainControls = [
-    <ControlGroup icon={finalIcon1}> 
+    <ControlGroup icon={finalIcon1} isOpen={true} isIcon={true}> 
       <Button text="Button1"/> <ActionButton text="test"/><SearchBar/><ToggleButton text="test"/><Button text="Button1a"/>
-    </ControlGroup> , 
-    <ControlGroup icon={finalIcon2}> 
-      <Button  text="Button2" /> <ActionButton text="test"/><ToggleButton text="test"/><Button text="Button2a"/>
-    </ControlGroup>,
-    <ControlGroup icon={finalIcon3}>
-       <Button  text="Button3" /> <ActionButton text="test"/><ToggleButton text="test"/> <Button text="Button3a"/> 
-    </ControlGroup>
+    </ControlGroup> 
+    // , 
+
+    // <ControlGroup icon={finalIcon2} isOpen={false}> 
+    //   <Button  text="Button2" /> <ActionButton text="test"/><ToggleButton text="test"/><Button text="Button2a"/>
+    // </ControlGroup>,
+
+    // <ControlGroup icon={finalIcon3} isOpen={false}>
+    //    <Button  text="Button3" /> <ActionButton text="test"/><ToggleButton text="test"/> <Button text="Button3a"/>
+    // </ControlGroup>
   ];
 
   return (
