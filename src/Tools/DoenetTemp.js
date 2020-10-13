@@ -55,15 +55,15 @@ export default function DoenetExampleTool(props) {
     <ControlGroup icon={finalIcon1} isOpen={true} isIcon={true}> 
       <Button text="Button1"/> <ActionButton text="test"/><SearchBar/><ToggleButton text="test"/><Button text="Button1a"/>
     </ControlGroup> 
-    // , 
+    , 
 
-    // <ControlGroup icon={finalIcon2} isOpen={false}> 
-    //   <Button  text="Button2" /> <ActionButton text="test"/><ToggleButton text="test"/><Button text="Button2a"/>
-    // </ControlGroup>,
+    <ControlGroup icon={finalIcon2} isOpen={false}> 
+      <Button  text="Button2" /> <ActionButton text="test"/><ToggleButton text="test"/><Button text="Button2a"/>
+    </ControlGroup>,
 
-    // <ControlGroup icon={finalIcon3} isOpen={false}>
-    //    <Button  text="Button3" /> <ActionButton text="test"/><ToggleButton text="test"/> <Button text="Button3a"/>
-    // </ControlGroup>
+    <ControlGroup icon={finalIcon3} isOpen={false}>
+       <Button  text="Button3" /> <ActionButton text="test"/><ToggleButton text="test"/> <Button text="Button3a"/>
+    </ControlGroup>
   ];
 
   return (
