@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import DoenetViewer from './DoenetViewer';
-import doenetDefaultML from '../defaultCode.doenet';
+// import doenetDefaultML from '../defaultCode.doenet';
 import axios from 'axios';
 
 class DoenetTest extends Component {

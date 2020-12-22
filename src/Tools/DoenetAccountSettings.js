@@ -209,6 +209,7 @@ export default function DoenetProfile(props) {
     }
     axios.get(phpUrl, payload)
       .then(resp => {
+        console.log("resp in account settings", resp)
         if (resp.data.success === "1") {
           setProfile(resp.data.profile);
         }

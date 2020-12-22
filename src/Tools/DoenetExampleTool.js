@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -20,6 +20,9 @@ import ActionButton from "../imports/PanelHeaderComponents/ActionButton";
 import MenuItem from "../imports/PanelHeaderComponents/MenuItem";
 import Menu from "../imports/PanelHeaderComponents/Menu";
 import SectionDivider from "../imports/PanelHeaderComponents/SectionDivider";
+import axios from "axios";
+
+
 
 const alphabet =
   "a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z a b c d e f g h i j k l m n o p q r s t u v w x y z ";
@@ -65,6 +68,7 @@ const finalIcon3 = (
 );
 
 export default function DoenetExampleTool(props) {
+
   const [showHideNewOverLay, setShowHideNewOverLay] = useState(false);
 
   const showHideOverNewOverlayOnClick = () => {
