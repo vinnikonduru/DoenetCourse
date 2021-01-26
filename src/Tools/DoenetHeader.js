@@ -60,7 +60,6 @@ const ProfilePicture = styled.button`
   border-style:none;
   
 `;
-
 const ProfilePictureLrg = styled.div`
   background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)),
     url("/profile_pictures/${props => props.pic}.jpg");
@@ -188,18 +187,7 @@ class DoenetHeader extends Component {
     this.profilePicture = this.props.profile.profilePicture;
     this.prepareProfileDropDown(this.profilePicture);
 
-
     
-
-    this.extraMenus = [];
-    if (this.props.extraMenus){
-      this.extraMenus = this.props.extraMenus
-    }
-
-    
-  
-
-
   }
 
   populateMenuToolbox(tools){
@@ -264,6 +252,7 @@ class DoenetHeader extends Component {
     }
   }  
 
+
   componentWillReceiveProps(props) {
     if (props.headerChangesFromLayout && props.headerChangesFromLayout.toolAccess){
       this.populateMenuToolbox(props.headerChangesFromLayout.toolAccess);
@@ -271,6 +260,8 @@ class DoenetHeader extends Component {
       this.prepareProfileDropDown(this.profilePicture);
   }
   }
+    
+
 
   componentWillUnmount() {
     this.select = undefined
@@ -316,6 +307,7 @@ class DoenetHeader extends Component {
     this.props.onChange(!this.state.sliderVisible, this.headerSectionCount);
   }
 
+
   render() {
     const sliderClass = this.state.sliderVisible ? 'on' : 'off';
     if (!!this.refs.extendedHeader) {
@@ -331,14 +323,14 @@ class DoenetHeader extends Component {
     const isSingleRole = !!this.state.myRoles && !!this.state.myRoles.permissionRoles ? this.state.myRoles.permissionRoles.length === 1 : false;
     return (
       <React.Fragment>
-        <div className="headingContainer">
+        {this.props.showProfileOnly ? <div>{profileMenu}</div> : <div className="headingContainer">
           <div className="headerPlayBtn" onClick={this.toggleSlider}>
             <FontAwesomeIcon id='headerPlayBtn-icon' fontSize='16px' icon={this.state.sliderVisible ? faCaretDown : faCaretRight} />
           </div>
-          <div className="toolName">
+          {this.props.toolName && <div className="toolName">
             <img id="doenetLogo"  src={doenetImage} height='40px' />
             <span>{this.props.toolName}</span>
-          </div>
+          </div>}
 
           {this.props.headingTitle && <div className="headingTitle">
             <span>{this.props.headingTitle}</span>
@@ -349,16 +341,10 @@ class DoenetHeader extends Component {
               alignItems: "center",
               borderRadius: "5px",
             }}>{this.state.myRoles.permissionRoles[0].label}</button>}
-            {this.extraMenus}
             {menuToolBox}
             {profileMenu}
-
-
-
           </div>}
-
-
-        </div>
+        </div>}
 
         <ExtendedHeader className={sliderClass} ref='extendedHeader' extendedMarginOffTop={extendedMarginOffTop}>
           {this.props.headingTitle && <div className="extended-header">
@@ -373,7 +359,6 @@ class DoenetHeader extends Component {
                 alignItems: "center",
                 borderRadius: "5px",
               }}>{this.state.myRoles.permissionRoles[Object.keys(this.state.myRoles.permissionRoles)[0]].showText}</button>}
-              {this.extraMenus}
               {menuToolBox}
               {profileMenu}
 
