@@ -1,5 +1,6 @@
 import InlineComponent from './abstract/InlineComponent';
 import me from 'math-expressions';
+import { normalizeMathExpression } from '../utils/math';
 
 export default class Function extends InlineComponent {
   static componentType = "function";
@@ -10,6 +11,16 @@ export default class Function extends InlineComponent {
   static createPropertiesObject(args) {
     let properties = super.createPropertiesObject(args);
     properties.symbolic = { default: false };
+    // let simply==="" be full simplify so that can simplify <math simplify /> to get full simplification
+    // TODO: do we want to support simplify===""?
+    properties.simplify = {
+      default: "none",
+      toLowerCase: true,
+      valueTransformations: { "": "full", "true": "full" },
+      validValues: ["none", "full", "numbers", "numberspreserveorder"]
+    };
+    properties.expand = { default: false };
+
     properties.xscale = { default: 1, propagateToDescendants: true };
     properties.yscale = { default: 1, propagateToDescendants: true };
     // include properties of graphical components
@@ -530,6 +541,14 @@ export default class Function extends InlineComponent {
               childLogicName: "atMostOneFunction",
               variableNames: ["f"],
             },
+            simplify: {
+              dependencyType: "stateVariable",
+              variableName: "simplify"
+            },
+            expand: {
+              dependencyType: "stateVariable",
+              variableName: "expand"
+            },
             isInterpolatedFunction: {
               dependencyType: "stateVariable",
               variableName: "isInterpolatedFunction"
@@ -597,39 +616,140 @@ export default class Function extends InlineComponent {
               f: dependencyValues.functionChild[0].stateValues.f
             }
           }
+        } else if (dependencyValues.symbolic) {
+          return {
+            newValues: {
+              f: returnSymbolicFunction({ dependencyValues })
+            }
+          }
         } else {
+          return {
+            newValues: {
+              f: returnNumericalFunction({ dependencyValues })
+            }
+          }
+        }
+      }
+    }
 
-          if (dependencyValues.symbolic) {
-            let formula = dependencyValues.formula;
-            let varString = dependencyValues.variable.tree;
-            return {
-              newValues: {
-                f: (x) => formula.substitute({ [varString]: x })
+
+    stateVariableDefinitions.symbolicf = {
+      returnDependencies() {
+        return {
+          isInterpolatedFunction: {
+            dependencyType: "stateVariable",
+            variableName: "isInterpolatedFunction"
+          },
+          symbolic: {
+            dependencyType: "stateVariable",
+            variableName: "symbolic",
+          },
+          f: {
+            dependencyType: "stateVariable",
+            variableName: "f",
+          },
+          formula: {
+            dependencyType: "stateVariable",
+            variableName: "formula",
+          },
+          variable: {
+            dependencyType: "stateVariable",
+            variableName: "variable",
+          },
+          functionChild: {
+            dependencyType: "child",
+            childLogicName: "atMostOneFunction",
+            variableNames: ["symbolicf"],
+          },
+          simplify: {
+            dependencyType: "stateVariable",
+            variableName: "simplify"
+          },
+          expand: {
+            dependencyType: "stateVariable",
+            variableName: "expand"
+          },
+        }
+      },
+      definition: function ({ dependencyValues }) {
+
+        if (dependencyValues.isInterpolatedFunction) {
+          return {
+            newValues: {
+              symbolicf: function (x) {
+                me.fromAst(dependencyValues.f(x.evaluate_to_constant()))
               }
             }
-          } else {
-
-            let formula_f;
-            try {
-              formula_f = dependencyValues.formula.f();
-            } catch (e) {
-              formula_f = () => NaN;
-            }
-            let varString = dependencyValues.variable.tree;
-            return {
-              newValues: {
-                f: function (x) {
-                  try {
-                    return formula_f({ [varString]: x });
-                  } catch (e) {
-                    return NaN;
-                  }
-                }
-              }
-            }
-
           }
 
+        } else if (dependencyValues.functionChild.length === 1) {
+          return {
+            newValues: {
+              symbolicf: dependencyValues.functionChild[0].stateValues.symbolicf
+            }
+          }
+        } else if (dependencyValues.symbolic) {
+          return { newValues: { symbolicf: dependencyValues.f } }
+        } else {
+
+          return {
+            newValues: {
+              symbolicf: returnSymbolicFunction({ dependencyValues })
+            }
+          }
+
+        }
+
+      }
+    }
+
+
+    stateVariableDefinitions.numericalf = {
+      returnDependencies() {
+        return {
+          isInterpolatedFunction: {
+            dependencyType: "stateVariable",
+            variableName: "isInterpolatedFunction"
+          },
+          symbolic: {
+            dependencyType: "stateVariable",
+            variableName: "symbolic",
+          },
+          f: {
+            dependencyType: "stateVariable",
+            variableName: "f",
+          },
+          formula: {
+            dependencyType: "stateVariable",
+            variableName: "formula",
+          },
+          variable: {
+            dependencyType: "stateVariable",
+            variableName: "variable",
+          },
+          functionChild: {
+            dependencyType: "child",
+            childLogicName: "atMostOneFunction",
+            variableNames: ["numericalf"],
+          },
+        }
+      },
+      definition: function ({ dependencyValues }) {
+
+        if (dependencyValues.isInterpolatedFunction || !dependencyValues.symbolic) {
+          return { newValues: { numericalf: dependencyValues.f } }
+        } else if (dependencyValues.functionChild.length === 1) {
+          return {
+            newValues: {
+              numericalf: dependencyValues.functionChild[0].stateValues.numericalf
+            }
+          }
+        } else {
+          return {
+            newValues: {
+              numericalf: returnNumericalFunction({ dependencyValues })
+            }
+          }
         }
       }
     }
@@ -1628,7 +1748,7 @@ export default class Function extends InlineComponent {
   }
 
   adapters = [{
-    stateVariable: "f",
+    stateVariable: "numericalf",
     componentType: "curve"
   },
   {
@@ -1639,6 +1759,37 @@ export default class Function extends InlineComponent {
 }
 
 
+function returnSymbolicFunction({ dependencyValues }) {
+
+  let formula = dependencyValues.formula;
+  let varString = dependencyValues.variable.tree;
+  let simplify = dependencyValues.simplify;
+  let expand = dependencyValues.expand;
+  return (x) => normalizeMathExpression({
+    value: formula.substitute({ [varString]: x }),
+    simplify,
+    expand
+  })
+}
+
+function returnNumericalFunction({ dependencyValues }) {
+
+  let formula_f;
+  try {
+    formula_f = dependencyValues.formula.f();
+  } catch (e) {
+    formula_f = () => NaN;
+  }
+  let varString = dependencyValues.variable.tree;
+  return function (x) {
+    try {
+      return formula_f({ [varString]: x });
+    } catch (e) {
+      return NaN;
+    }
+  }
+
+}
 
 function calculateInterpolationPoints({ dependencyValues, numerics }) {
 

@@ -2305,7 +2305,7 @@ export default class Core {
               success: true,
               instructions: [{
                 setStateVariable: property,
-                desiredValue: desiredStateVariableValues[property],
+                value: desiredStateVariableValues[property],
               }]
             };
           }
@@ -2442,6 +2442,9 @@ export default class Core {
         defaultValue,
         returnDependencies: () => thisDependencies,
         definition: function ({ dependencyValues, usedDefault }) {
+          // console.log(`definition of property ${property} of ${componentName}`)
+          // console.log(dependencyValues)
+          // console.log(usedDefault)
 
           if (dependencyValues.compositeComponentVariable !== undefined && (
             !usedDefault.compositeComponentVariable
@@ -2506,6 +2509,11 @@ export default class Core {
         },
         inverseDefinition: function ({ desiredStateVariableValues, dependencyValues, usedDefault }) {
 
+          // console.log(`inverse definition of property ${property} of ${componentName}`)
+          // console.log(desiredStateVariableValues)
+          // console.log(dependencyValues)
+          // console.log(usedDefault)
+
           if (dependencyValues.compositeComponentVariable !== undefined && !usedDefault.compositeComponentVariable) {
             // if value of property was specified on copy component itself
             // then set that value
@@ -2537,12 +2545,28 @@ export default class Core {
 
             if ("ancestorProp" in usedDefault) {
               // value is essential; give it the desired value
+              let instructions = [{
+                setStateVariable: property,
+                value: desiredStateVariableValues[property]
+              }];
+
+              // target variable may have used default,
+              // in this case, change it to the new value
+              if (dependencyValues.targetVariable !== undefined
+                && !(
+                  dependencyValues.targetPropertiesToIgnore &&
+                  dependencyValues.targetPropertiesToIgnore.map(x => x.toLowerCase()).includes(property.toLowerCase())
+                )
+              ) {
+                instructions.push({
+                  setDependency: "targetVariable",
+                  desiredValue: desiredStateVariableValues[property],
+                })
+              }
+
               return {
                 success: true,
-                instructions: [{
-                  setStateVariable: property,
-                  value: desiredStateVariableValues[property]
-                }]
+                instructions
               };
             }
             else {
@@ -2556,13 +2580,30 @@ export default class Core {
               };
             }
           } else {
+
             // else used default value or essential, so set to desired value
+            let instructions = [{
+              setStateVariable: property,
+              value: desiredStateVariableValues[property]
+            }];
+
+            // target variable may have used default,
+            // in this case, change it to the new value
+            if (dependencyValues.targetVariable !== undefined
+              && !(
+                dependencyValues.targetPropertiesToIgnore &&
+                dependencyValues.targetPropertiesToIgnore.map(x => x.toLowerCase()).includes(property.toLowerCase())
+              )
+            ) {
+              instructions.push({
+                setDependency: "targetVariable",
+                desiredValue: desiredStateVariableValues[property],
+              })
+            }
+
             return {
               success: true,
-              instructions: [{
-                setStateVariable: property,
-                desiredValue: desiredStateVariableValues[property],
-              }]
+              instructions
             };
           }
 
@@ -3610,11 +3651,23 @@ export default class Core {
 
         let result = stateVarObj.entireArrayDefinition(args);
 
-        let newArrayValues = result.newValues[stateVariable];
 
-        let arraySize = getSubArraySize(newArrayValues, stateVarObj.nDimensions);
+        if (result.newValues) {
+          let newArrayValues = result.newValues[stateVariable];
+          let arraySize = getSubArraySize(newArrayValues, stateVarObj.nDimensions);
+          result.newValues[stateVarObj.arraySizeStateVariable] = arraySize;
+        } else if (result.useEssentialOrDefaultValue) {
+          if (!stateVarObj._previousValue) {
+            let defaultValue = result.defaultValue;
+            if (defaultValue === undefined) {
+              defaultValue = stateVarObj.defaultValue;
+            }
+            let arraySize = getSubArraySize(defaultValue, stateVarObj.nDimensions);
 
-        result.newValues[stateVarObj.arraySizeStateVariable] = arraySize;
+            result.newValues = { [stateVarObj.arraySizeStateVariable]: arraySize };
+
+          }
+        }
 
         if (!result.checkForActualChange) {
           result.checkForActualChange = {};
@@ -7857,13 +7910,15 @@ export default class Core {
 
     for (let instruction of updateInstructions) {
 
-      let componentSourceInformation = sourceInformation[instruction.componentName];
-      if (!componentSourceInformation) {
-        componentSourceInformation = sourceInformation[instruction.componentName] = {};
-      }
+      if (instruction.componentName) {
+        let componentSourceInformation = sourceInformation[instruction.componentName];
+        if (!componentSourceInformation) {
+          componentSourceInformation = sourceInformation[instruction.componentName] = {};
+        }
 
-      if (instruction.sourceInformation) {
-        Object.assign(componentSourceInformation, instruction.sourceInformation);
+        if (instruction.sourceInformation) {
+          Object.assign(componentSourceInformation, instruction.sourceInformation);
+        }
       }
 
       if (instruction.updateType === "updateValue") {
@@ -8339,6 +8394,9 @@ export default class Core {
           } else {
             compStateObj.value = newComponentStateVariables[vName];
           }
+
+          delete compStateObj.usedDefault;
+
         }
         this.markUpstreamDependentsStale({
           component: comp, varName: vName, updatesNeeded
@@ -8604,6 +8662,10 @@ export default class Core {
         // if (!(component.state[stateVariable].essential || newInstruction.allowNonEssential)) {
         //   throw Error(`Invalid inverse definition of ${stateVariable} of ${component.componentName}: can't set its value if it is not essential.`);
         // }
+
+        if (!("value" in newInstruction)) {
+          throw Error(`Invalid inverse definition of ${stateVariable} of ${component.componentName}: setStateVariable must specify a value`);
+        }
 
         if (!newStateVariableValues[component.componentName]) {
           newStateVariableValues[component.componentName] = {};
