@@ -1,0 +1,34 @@
+{
+  "courseSeeds" : {
+      "driveId": ["testCourseDriveId","testCourseDriveId2"],
+      "label": ["testCourselabel1","testCourselabel2"],
+      "type": ["course","course"],
+      "courseId":["testCourseCourseId","testCourseCourseId2"],
+      "isShared":[0,0],
+     "isDeleted":[0,0]
+  },
+    "folderSeeds" : {
+        "driveId" : ["testCourseDriveId"],
+        "itemId" : ["testCourseitemId"],
+        "parentFolderId" : ["testCourseparentFolderId"],
+        "label" : ["testCourselabel"],
+        "type" : ["testCoursetype"],
+        "sortOrder":["testCourseSortOrder"]
+    },
+    "UrlSeeds" : {
+      "driveId" : ["testCourseDriveId"],
+      "itemId" : ["testCourseitemId"],
+      "parentFolderId" : ["testCourseparentFolderId"],
+      "label" : ["testCourselabel"],
+      "type" : ["testCoursetype"],
+      "sortOrder":["testCourseSortOrder"]
+  },
+  "DoenetMLSeeds" : {
+    "driveId" : ["testCourseDriveId"],
+    "itemId" : ["testCourseitemId"],
+    "parentFolderId" : ["testCourseparentFolderId"],
+    "label" : ["testCourselabel"],
+    "type" : ["testCoursetype"],
+    "sortOrder":["testCoursBranchId"]
+  }
+}

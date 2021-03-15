@@ -1,0 +1,28 @@
+<?php
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: access");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Credentials: true");
+//header('Content-Type: application/json');
+
+include "db_connection.php";
+
+$_POST = json_decode(file_get_contents("php://input"),true);
+$number_content = count($_POST["courseSeeds"]["driveId"]);
+
+for ($i = 0; $i < $number_content; $i++){
+  $driveId = mysqli_real_escape_string($conn,$_POST["courseSeeds"]["driveId"][$i]);
+  $sql = "
+  DELETE FROM drive
+  WHERE driveId = '$driveId'
+  ";
+  echo $sql;
+  $result = $conn->query($sql); 
+  if ($result === TRUE) {
+    // set response code - 200 OK
+    http_response_code(200);
+  }else {
+    echo "Error: " . $sql . "<br>" . $conn->error;
+  }
+}
+?>
