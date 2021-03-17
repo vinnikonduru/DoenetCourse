@@ -1,14 +1,15 @@
 {
   "courseSeeds" : {
-      "driveId": ["testCourseDriveId","testCourseDriveId2"],
-      "label": ["testCourselabel1","testCourselabel2"],
-      "type": ["course","course"],
-      "courseId":["testCourseCourseId","testCourseCourseId2"],
-      "isShared":[0,0],
-     "isDeleted":[0,0]
+      "driveId": ["testCourseDriveId1","testCourseDriveId2","testCourseDriveId3"],
+      "label": ["testCourselabel1","testCourselabel2","testCourselabel3"],
+      "type": ["course","course","course"],
+      "courseId":["testCourseCourseId1","testCourseCourseId2","testCourseCourseId3"],
+      "isShared":[0,0,0],
+      "color":["808080","800080","808080"],
+     "isDeleted":[0,0,0]
   },
     "folderSeeds" : {
-        "driveId" : ["testCourseDriveId"],
+        "driveId" : ["testCourseDriveId1"],
         "itemId" : ["testCourseitemId"],
         "parentFolderId" : ["testCourseparentFolderId"],
         "label" : ["testCourselabel"],
@@ -16,7 +17,7 @@
         "sortOrder":["testCourseSortOrder"]
     },
     "UrlSeeds" : {
-      "driveId" : ["testCourseDriveId"],
+      "driveId" : ["testCourseDriveId1"],
       "itemId" : ["testCourseitemId"],
       "parentFolderId" : ["testCourseparentFolderId"],
       "label" : ["testCourselabel"],
@@ -24,7 +25,7 @@
       "sortOrder":["testCourseSortOrder"]
   },
   "DoenetMLSeeds" : {
-    "driveId" : ["testCourseDriveId"],
+    "driveId" : ["testCourseDriveId1"],
     "itemId" : ["testCourseitemId"],
     "parentFolderId" : ["testCourseparentFolderId"],
     "label" : ["testCourselabel"],

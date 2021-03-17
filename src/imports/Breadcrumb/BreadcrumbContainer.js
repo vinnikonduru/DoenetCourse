@@ -59,5 +59,5 @@ export const BreadcrumbContainer = ({ divider = <FontAwesomeIcon icon={faAngleRi
   
   }
 
-  return (<ol style={breadcrumbContainerStyle}>{<div onClick={leftmostBreadcrumb} style={{marginLeft:'10px',marginRight:'10px'}} >{<FontAwesomeIcon icon={faTh}/>}</div>}{children}</ol>);
+  return (<ol style={breadcrumbContainerStyle}>{<div data-cy="driveCardsView" onClick={leftmostBreadcrumb} style={{marginLeft:'10px',marginRight:'10px'}} >{<FontAwesomeIcon icon={faTh}/>}</div>}{children}</ol>);
 };

@@ -94,7 +94,7 @@ export default function HeaderPanel({ title, children }) {
           // onChange={showCollapseMenu}
         />
       ) : (
-        <ExitOverlayButton onClick={close}>
+        <ExitOverlayButton data-cy="closeOverlay" onClick={close}>
           <FontAwesomeIcon icon={faTimes} />
         </ExitOverlayButton>
       )}

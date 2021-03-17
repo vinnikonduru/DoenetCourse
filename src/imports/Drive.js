@@ -1446,7 +1446,7 @@ function Folder(props){
   if (!props.driveObj){
 
 
-  folder = <div
+  folder = <div data-cy={`directFolderClick`}
       data-doenet-driveinstanceid={props.driveInstanceId}
       tabIndex={0}
       className="noselect nooutline" 
@@ -1559,7 +1559,7 @@ function Folder(props){
     }
     >{driveIcon} {label}</div></>
     if (props.rootCollapsible){
-      folder = <div
+      folder = <div data-cy={`folderclick`}
         data-doenet-driveinstanceid={props.driveInstanceId}
         tabIndex={0}
         className="noselect nooutline" 
@@ -2007,7 +2007,7 @@ const DoenetML = React.memo((props)=>{
     onDragEnd();
   }
 
-  let doenetMLJSX = <div
+  let doenetMLJSX = <div data-cy={'doenetMLClick'}
       data-doenet-driveinstanceid={props.driveInstanceId}
       tabIndex={0}
       className="noselect nooutline" 

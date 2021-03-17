@@ -397,7 +397,7 @@ const DriveInfoPanel = function(props){
 
   return <>
   <h2>{dIcon} {panelDriveLabel}</h2>
-  <label>Course Name<input type="text" 
+  <label>Course Name<input type="text" data-cy="coursenameInput"
   value={driveLabel} 
   onChange={(e)=>setDriveLabel(e.target.value)} 
   onKeyDown={(e)=>{
@@ -465,7 +465,7 @@ const FolderInfoPanel = function(props){
   return <>
   <h2>{fIcon} {itemInfo.label}</h2>
 
-  <label>Folder Label<input type="text" 
+  <label>Folder Label<input type="text" data-cy="folderNameInput"
   value={label} 
   onChange={(e)=>setLabel(e.target.value)} 
   onKeyDown={(e)=>{
@@ -515,7 +515,7 @@ const DoenetMLInfoPanel = function(props){
   return <>
   <h2>{dIcon} {itemInfo.label}</h2>
 
-  <label>DoenetML Label<input type="text" 
+  <label>DoenetML Label<input data-cy="doenetMLInput" type="text" 
   value={label} 
   onChange={(e)=>setLabel(e.target.value)} 
   onKeyDown={(e)=>{
@@ -675,7 +675,7 @@ function AddCourseDriveButton(props){
     toast(`Course not created. ${errorMessage}`, 2, null, 6000);
   }
 
-  return <Button value="Create a New Course" callback={()=>{
+  return <Button data-cy="createNewCourse" className="createNewCourse" value="Create a New Course" callback={()=>{
     let driveId = null;
     let newDriveId = nanoid();
     let label = "Untitled";
@@ -722,7 +722,7 @@ function AddMenuPanel(props){
   <h3>Course</h3>
    {addDrives}
   <h3>Folder</h3>
-  <Button value="Add Folder" callback={()=>{
+  <Button data-cy="addFolder" value="Add Folder" callback={()=>{
     setFolderInfo({instructionType: folderInfoSelectorActions.ADD_ITEM,
     label:"Untitled",
     itemType:"Folder"
@@ -731,7 +731,7 @@ function AddMenuPanel(props){
   } />
 
   <h3>DoenetML</h3>
-  <Button value="Add DoenetML" callback={()=>{
+  <Button data-cy="addDoenetML" value="Add DoenetML" callback={()=>{
     setFolderInfo({instructionType: folderInfoSelectorActions.ADD_ITEM,
     label:"Untitled",
     itemType:"DoenetML"
@@ -855,6 +855,7 @@ export default function DoenetLibraryTool(props) {
         onClick={()=>{
           clearSelections()
         }}
+        data-cy={routePathDriveId ? 'mainPanelStyle' : ''}
         className={routePathDriveId ? 'mainPanelStyle' : ''}
         >
         <Drive types={['content','course']}  urlClickBehavior="select" 

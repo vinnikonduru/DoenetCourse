@@ -252,6 +252,7 @@ const DriveCardWrapper = (props) => {
           return (
             <animated.div
               key={index}
+              data-cy={`driveCard${index}`}
               className={`adiv ${selectedCard ? "borderselection" : ""}`}
               style={{
                 transform: props.xy.interpolate((x, y) => {

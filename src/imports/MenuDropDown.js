@@ -217,6 +217,7 @@ const MenuDropDown = ({
       >
         {options.map((o, i) => (
           <DropDownContentItem
+            data-cy={`signinasdevuser${i}`}
             key={i}
             onClick={() => {
               if (o["url"]) {

@@ -109,7 +109,7 @@ function ReturnToEditingButton(props){
 
   if (selectedVersionId === ""){ return null; }
 
-  return <Button callback={()=> returnToEditing() } value="Return to editing" />
+  return <Button data-cy="returnToEdit" callback={()=> returnToEditing() } value="Return to editing" />
 }
 
 function VersionHistoryPanel(props){
@@ -198,7 +198,7 @@ function VersionHistoryPanel(props){
           setEditingTitleText(titleText);
         }
       }} 
-      style={titleStyle}>{titleText}</b></div>
+      style={titleStyle} data-cy="vesrionHistoryClickTest">{titleText}</b></div>
 
       if (editingVersionId === version.versionId){
         title = <div><input 
@@ -431,7 +431,7 @@ function DoenetViewerUpdateButton(){
   const selectedVersionId = useRecoilValue(versionHistorySelectedAtom);
   if (selectedVersionId !== "") {return null;}
 
-  return <Button value="Update" callback={()=>{setViewerDoenetML((old)=>{
+  return <Button data-cy="updateDoenetML" value="Update" callback={()=>{setViewerDoenetML((old)=>{
     let newInfo = {...old};
     newInfo.doenetML = editorDoenetML;
     newInfo.updateNumber = old.updateNumber+1;
@@ -471,7 +471,7 @@ function NameCurrentVersionControl(props){
   const selectedVersionId = useRecoilValue(versionHistorySelectedAtom);
   if (selectedVersionId !== "") {return null;}
 
-  return <Button value="Save Version" callback={()=>saveVersion(props.branchId)} />
+  return <Button data-cy="saveVersion" value="Save Version" callback={()=>saveVersion(props.branchId)} />
 }
 
 function TempEditorHeaderBar(props){

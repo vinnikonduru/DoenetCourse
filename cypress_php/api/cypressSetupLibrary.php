@@ -17,11 +17,12 @@ for ($i = 0; $i < $number_content; $i++){
   $courseId = mysqli_real_escape_string($conn,$_POST["courseSeeds"]["courseId"][$i]);
   $isShared = mysqli_real_escape_string($conn,$_POST["courseSeeds"]["isShared"][$i]);
   $isDeleted = mysqli_real_escape_string($conn,$_POST["courseSeeds"]["isDeleted"][$i]);
+  $color = mysqli_real_escape_string($conn,$_POST["courseSeeds"]["color"][$i]);
   $sql = "
   INSERT INTO drive
-  (driveId,label,driveType,courseId,isShared,isDeleted)
+  (driveId,label,driveType,courseId,isShared,isDeleted,color)
   VALUES
-  ('$driveId','$label','$type','$courseId','$isShared','$isDeleted')
+  ('$driveId','$label','$type','$courseId','$isShared','$isDeleted',$color)
   ";
 
   echo $sql;
@@ -38,7 +39,7 @@ INSERT INTO drive_user
 canDeleteItemsAndFolders,canMoveItemsAndFolders,canRenameItemsAndFolders,
 canPublishItemsAndFolders,canViewUnpublishItemsAndFolders,canChangeAllDriveSettings)
 VALUES
-('','$driveId','1','1','1','1','1','1','1','1','1','1')
+('devuserid','$driveId','1','1','1','1','1','1','1','1','1','1')
 ";
 $result = $conn->query($sql); 
   if ($result === TRUE) {

@@ -363,6 +363,7 @@ class DoenetHeader extends Component {
     );
     const profilePicture = (
       <ProfilePicture
+        data-cy="profileMenuButton"
         position={"left"}
         pic={this.profilePicture}
         name="changeProfilePicture"

@@ -1,42 +1,31 @@
-Cypress.on('uncaught:exception', (err, runnable) => {
-  return false;
-});
-Cypress.Commands.add("clearThenType", { prevSubject: true }, (subject, text) => {
-  cy.wrap(subject).clear().type(text);
-}
-);
-
 describe('DoenetLibrary tests', function () {
-
-  /*
-  1. Check if courses and content creates properly with title change and content creation
-  2. Check Drag and Drop files and selections  
-  */
+  Cypress.on('uncaught:exception', (err, runnable) => {
+    return false;
+  });
+  Cypress.Commands.add("clearThenType", { prevSubject: true }, (subject, text) => {
+    cy.wrap(subject).clear().type(text);
+  }
+);
   beforeEach(() => {
-    // signed in as devuser
-    cy.visit('http://localhost')
-    cy.get('[data-cy=profileMenuButton]').click()
-    cy.get('[data-cy=signinasdevuser7]').click()
-    cy.get('[data-cy=profileMenuButton]').click()
-    cy.get('[data-cy=signinasdevuser2]').click()
-    
-    cy.fixture('libraryseed').then((seed) => {
+   
+     cy.fixture('libraryseed').then((seed) => {
       this.seed = seed;
       cy.request('POST', 'api/cypressCleanupLibrary.php', this.seed).then((response) => {
         cy.log(response);
         cy.request('POST', 'api/cypressSetupLibrary.php', this.seed).then((response) => {
           cy.log(response);
+          cy.visit('http://localhost/library/#/')
         })
       })
     })
   })
- 
-  it('create new course', function() {
-    // Course should be selected when clicked
+  it('loaded successfully', function() {
+    cy.visit('/library')
+    cy.wait(500)
     cy.get('[data-cy=createNewCourse]').click();
     cy.wait(500)
-    // Edit selected course name
-    cy.get('[data-cy=driveCard0]').click(); 
+    cy.get('[data-cy=driveCard0]').click();
+     
     cy.get('[data-cy=coursenameInput]')
     .should('have.value','Untitled');
 
@@ -55,7 +44,7 @@ describe('DoenetLibrary tests', function () {
     cy.get('[data-cy=addDoenetML]').click();
     cy.get('[data-cy=mainPanelStyle]').find('[data-cy=directFolderClick]').first().click();
 
-// //Rename folder
+//Rename folder
 
       cy.get('[data-cy=mainPanelStyle]').find('[data-cy=directFolderClick]').first().invoke('attr','data-doenet-driveinstanceid')
     .then((itemTitle) => {
@@ -91,7 +80,28 @@ describe('DoenetLibrary tests', function () {
       cy.get('[data-cy=driveCardsView]').click();
 
 
+      cy.get('[data-cy=createNewCourse]').click();
+      cy.get('[data-cy=createNewCourse]').click();
+      cy.get('[data-cy=createNewCourse]').click();
+      
+      multiple selection
+      cy.get('.adiv').click({multple:true , shiftKey:true})
+
+
     })
+
+ 
+    
+
+
+
+
+
+
+
+
+
+
 })
 
 })
