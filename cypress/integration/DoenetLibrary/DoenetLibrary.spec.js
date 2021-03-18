@@ -21,7 +21,7 @@ describe('DoenetLibrary tests', function () {
     // })
   })
   it('loaded successfully', function() {
-    cy.visit('/library')
+    cy.visit('http://localhost:8080/library/#/')
     cy.get('[data-cy=createNewCourse]').click();
     cy.wait(500)
     // cy.get('[data-cy=driveCard0]').trigger('click').invoke('attr','data-driveId').then((driveId)=>{ 

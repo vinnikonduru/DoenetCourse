@@ -39,7 +39,7 @@ INSERT INTO drive_user
 canDeleteItemsAndFolders,canMoveItemsAndFolders,canRenameItemsAndFolders,
 canPublishItemsAndFolders,canViewUnpublishItemsAndFolders,canChangeAllDriveSettings)
 VALUES
-('devuserid','$driveId','1','1','1','1','1','1','1','1','1','1')
+('','$driveId','1','1','1','1','1','1','1','1','1','1')
 ";
 $result = $conn->query($sql); 
   if ($result === TRUE) {
