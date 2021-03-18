@@ -6,7 +6,7 @@ import { BreadcrumbContext } from "./BreadcrumbProvider";
 import {
   useHistory
 } from "react-router-dom";
-import { faChevronLeft} from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft,faTh} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export const BreadcrumbContainer = ({ divider = '/', ...props }) => {
