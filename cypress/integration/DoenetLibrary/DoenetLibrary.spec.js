@@ -4,9 +4,31 @@ describe('DoenetLibrary tests', function () {
   });
   Cypress.Commands.add("clearThenType", { prevSubject: true }, (subject, text) => {
     cy.wrap(subject).clear().type(text);
-  }
-);
+  });
+
+  // before(() => {
+  //   // called before any tests are run
+  //   const e = window.onerror;
+  //   window.onerror = function(err) {
+  //     if(err === 'ResizeObserver loop limit exceeded') {
+  //       console.warn('Ignored: ResizeObserver loop limit exceeded');
+  //       return false;
+  //     } else {
+  //       return e(...arguments);
+  //     }
+  //   }
+  // });
+
+  // const resizeObserverLoopErrRe = /^[^(ResizeObserver loop limit exceeded)]/
+  // Cypress.on('uncaught:exception', (err) => {
+  //     /* returning false here prevents Cypress from failing the test */
+  //     if (resizeObserverLoopErrRe.test(err.message)) {
+  //         return false
+  //     }
+  // })
+
   beforeEach(() => {
+  
     // cy.visit('/library')
 
     //  cy.fixture('libraryseed').then((seed) => {
@@ -20,6 +42,8 @@ describe('DoenetLibrary tests', function () {
     //   })
     // })
   })
+
+
   it('loaded successfully', function() {
     cy.visit('http://localhost:8080/library/#/')
     cy.get('[data-cy=createNewCourse]').click();
