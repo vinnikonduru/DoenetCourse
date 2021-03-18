@@ -1,4 +1,7 @@
 import React, { useRef, useState } from "react";
+import { useToolControlHelper } from "../imports/Tool/ToolRoot"
+import Tool from "../imports/Tool/Tool"
+import Button from "../imports/PanelHeaderComponents/Button";
 
 // import { DateInput } from "@blueprintjs/datetime";
 
@@ -10,46 +13,29 @@ import React, { useRef, useState } from "react";
 
 
 export default function DoenetTemp(props){
-  const wrapperRef = useRef(null);
-  const [height,setHeight] = useState(0)
-  const wheight = useRef(0)
-
-  let tall = [];
-  for (let i = 1; i < 100; i++){
-      tall.push(<p key={`p${i}`}>{i}</p>)
-  }
+    const { openOverlay } = useToolControlHelper();
 
     return (<>
-    <div style={{position:"sticky",top:"0px"}}>
-    <button
-    onClick={()=>{
-        console.log("Sample")
-        let top = document.documentElement.scrollTop;
-        let left = document.documentElement.scrollLeft;
-        setHeight(top)
-        console.log(`Top ${top}`)
-    }}>sample height</button>
-       <button
-    onClick={()=>{
-        window.scrollTo(0,height)
-    }}>return to sampled height</button>
-     <button
-    onClick={()=>{
-        console.log("Wrapper")
-        let ref = wrapperRef.current;
-        let top = ref.scrollTop;
-        console.log(wrapperRef.current.scrollTop)
-        console.log(100)
-        ref.scrollTo(0,100)
+      <Tool>
+          <headerPanel title="Temp">
 
-        // let left = document.documentElement.scrollLeft;
-        // setHeight(top)
-        console.log(`Top ${top}`)
-    }}>sample wrapper</button>
-    </div>
-        <div ref={wrapperRef}>
-            {tall}
-        </div>
+          </headerPanel>
+          <navPanel>
+
+          </navPanel>
+          <mainPanel>
+            <Button value="content Overlay" callback={()=>{
+                openOverlay({type:"overlay",branchId:"branch213werfghbfdvcsd",title:"content overlay"}) }}></Button>
+          </mainPanel>
+          <supportPanel>
+          <Button value="support Overlay" callback={()=>{
+                openOverlay({type:"overlay",branchId:"branch213werfghbfdvcsd",title:"support overlay"}) }}></Button>
+          </supportPanel>
+          <menuPanel title="content Info">
+
+          </menuPanel>
+      </Tool>
+
         </>
        
     )
