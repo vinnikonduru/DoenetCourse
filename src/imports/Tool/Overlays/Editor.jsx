@@ -31,7 +31,7 @@ import 'codemirror/theme/xq-light.css';
 
 import './editor.css';
 
-const fileByContentId = atomFamily({
+export const fileByContentId = atomFamily({
   key:"fileByContentId",
   default: selectorFamily({
     key:"fileByContentId/Default",
@@ -45,12 +45,12 @@ const fileByContentId = atomFamily({
   
 })
 
-const editorDoenetMLAtom = atom({
+export const editorDoenetMLAtom = atom({
   key:"editorDoenetMLAtom",
   default:""
 })
 
-const viewerDoenetMLAtom = atom({
+export const viewerDoenetMLAtom = atom({
   key:"viewerDoenetMLAtom",
   default:{updateNumber:0,doenetML:""}
 })
@@ -508,7 +508,7 @@ function DoenetViewerPanel(){
       /> 
 }
 
-const editorInitAtom = atom({
+export const editorInitAtom = atom({
   key:"editorInit",
   default:false
 })
