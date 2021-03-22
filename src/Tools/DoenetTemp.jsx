@@ -14,12 +14,25 @@ import Drive, {
   fetchDrivesQuery
 } from "../imports/Drive";// import { DateInput } from "@blueprintjs/datetime";
 
-// import "@blueprintjs/datetime/lib/css/blueprint-datetime.css";
-// import "@blueprintjs/core/lib/css/blueprint.css";
-// import "./dateTime.css";
+  function Container(props){
+    return <div
+    style={{
+        maxWidth: "850px",
+        // border: "1px red solid",
+        margin: "20px",
+    }
+    }
+    >
+        {props.children}
+    </div>
+  }
 
-//Passes up the selected date through a onDateChange(selectedDate: Date) prop
+export default function DoenetExampleTool(props) {
+  // console.log("=== DoenetExampleTool");
 
+  const { openOverlay, activateMenuPanel } = useToolControlHelper();
+  const toast = useToast();
+  const history = useHistory();
 
 export default function DoenetTemp(props){
     const { openOverlay } = useToolControlHelper();
@@ -56,5 +69,7 @@ export default function DoenetTemp(props){
        
     )
 }
+
+
 
 
