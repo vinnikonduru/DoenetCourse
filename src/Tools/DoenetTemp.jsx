@@ -27,12 +27,7 @@ import Drive, {
     </div>
   }
 
-export default function DoenetExampleTool(props) {
-  // console.log("=== DoenetExampleTool");
 
-  const { openOverlay, activateMenuPanel } = useToolControlHelper();
-  const toast = useToast();
-  const history = useHistory();
 
 export default function DoenetTemp(props){
     const { openOverlay } = useToolControlHelper();
