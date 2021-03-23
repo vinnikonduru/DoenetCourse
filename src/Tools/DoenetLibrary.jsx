@@ -59,6 +59,20 @@ import 'codemirror/theme/material.css';
 import "../imports/drivecard.css";
 import DriveCards from "../imports/DriveCards";
 
+
+function Container(props){
+  return <div
+  style={{
+      maxWidth: "850px",
+      // border: "1px red solid",
+      margin: "20px",
+  }
+  }
+  >
+      {props.children}
+  </div>
+}
+
 export const drivecardSelectedNodesAtom = atom({
   key:'drivecardSelectedNodesAtom',
   default:[]
@@ -857,10 +871,13 @@ export default function DoenetLibraryTool(props) {
         data-cy={routePathDriveId ? 'mainPanelStyle' : ''}
         className={routePathDriveId ? 'mainPanelStyle' : ''}
         >
-        <Drive types={['content','course']}  urlClickBehavior="select" 
+          <Container>
+          <Drive types={['content','course']}  urlClickBehavior="select" 
         doenetMLDoubleClickCallback={(info)=>{
           openOverlay({type:"editor",branchId: info.item.branchId,title: info.item.label});
           }}/>
+          </Container>
+        
 
         </div>
        
