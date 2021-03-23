@@ -45,12 +45,12 @@ export const fileByContentId = atomFamily({
   
 })
 
-export const editorDoenetMLAtom = atom({
+const editorDoenetMLAtom = atom({
   key:"editorDoenetMLAtom",
   default:""
 })
 
-export const viewerDoenetMLAtom = atom({
+const viewerDoenetMLAtom = atom({
   key:"viewerDoenetMLAtom",
   default:{updateNumber:0,doenetML:""}
 })
@@ -527,7 +527,7 @@ function DoenetViewerPanel(props){
       /> 
 }
 
-export const editorInitAtom = atom({
+const editorInitAtom = atom({
   key:"editorInit",
   default:false
 })
