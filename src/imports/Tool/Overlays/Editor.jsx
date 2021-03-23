@@ -435,7 +435,7 @@ function DoenetViewerUpdateButton(){
   if (selectedVersionId !== "") {return null;}
   
 
-  return <Button value="Update" callback={()=>{
+  return <Button value="Update" data-cy="updateDoenetML" callback={()=>{
     setLastHeight();
     setViewerDoenetML((old)=>{
     let newInfo = {...old};
