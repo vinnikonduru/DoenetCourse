@@ -52,7 +52,7 @@ export const useToolControlHelper = () => {
             branchId={branchId}
             contentId={contentId}
             title={title}
-            key={`EditorLayer${old.length + 1}`}
+            key={`OverLayLayer${old.length + 1}`}
           />,
         ]);
         break;
