@@ -48,7 +48,7 @@ export default function DoenetTemp(props){
       <Drive types={['content','course']}  urlClickBehavior="select" 
         doenetMLDoubleClickCallback={(info)=>{
           console.log("contentId temp" ,info.item );
-          openOverlay({type:"overlay",branchId:info.item.branchId,contentId:info.item.contentId,title:"content overlay"});
+          openOverlay({type:"overlay",branchId:info.item.branchId,contentId:"8ccc4ce815c5c78421cfcbb3135311bcad2e7dc9e8f6905f0e7d615fea479c62",title:"content overlay"});
           }}/>
           </mainPanel>
           <supportPanel>
