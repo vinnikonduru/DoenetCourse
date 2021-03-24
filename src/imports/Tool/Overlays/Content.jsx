@@ -4,13 +4,6 @@ import Tool from "../Tool";
 import { 
   useRecoilValue, 
   atom, 
-  atomFamily,
-  selector,
-  selectorFamily,
-  useSetRecoilState,
-  useRecoilState,
-  useRecoilValueLoadable,
-  useRecoilStateLoadable, 
   useRecoilCallback
 } from "recoil";
 import DoenetViewer from '../../../Tools/DoenetViewer';
@@ -31,17 +24,7 @@ export default function Content({ branchId = '',contentId ='',title }) {
   })
 
   useEffect(() => {
-    // let branchIdContentId=''
-    // if(contentId){
-    //   branchIdContentId=contentId
-    // }else if(branchId && contentId){
-    //   branchIdContentId = contentId
-    // }else{
-    //   branchIdContentId = 
-    // }
-    // initDoenetML(branchId ? branchId : contentId )
-    initDoenetML(contentId ? contentId : branchId )
-    
+    initDoenetML(contentId ? contentId : branchId)
 }, []);
 
 const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
@@ -49,7 +32,6 @@ const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
 
 let attemptNumber = 1;
 let requestedVariant = { index: attemptNumber }
-let solutionDisplayMode = "button";
   return (
     <Tool>
       <headerPanel title={title}>
@@ -62,7 +44,6 @@ let solutionDisplayMode = "button";
       flags={{
         showCorrectness: true,
         readOnly: true,
-        solutionDisplayMode: solutionDisplayMode,
         showFeedback: true,
         showHints: true,
       }}

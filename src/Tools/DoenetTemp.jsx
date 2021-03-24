@@ -42,16 +42,11 @@ export default function DoenetTemp(props){
 
           </navPanel>
           <mainPanel>
-            {/* <Button value="content Overlay" callback={()=>{
-                openOverlay({type:"content",branchId:"branch213werfghbfdvcsd",title:"content overlay"}) }}></Button> */}
         <Container>
         <Drive types={['content','course']}  urlClickBehavior="select" 
               doenetMLDoubleClickCallback={(info)=>{
-                console.log(">>>info temp" ,info.item );
                 openOverlay({type:"content",branchId:info.item.branchId,contentId:"",title:info.item.label});
-                // openOverlay({type:"content",branchId:'',contentId:"ce25342ebb41c5792b17332855cbda9ba694fc8e2aaefe2a8d2d1b305e305778",title:info.item.label});
-                // openOverlay({type:"content",branchId:info.item.branchId,title:info.item.label});
-
+                // openOverlay({type:"content",branchId:'info.item.branchId',contentId:"593d393a9bc17ff1d3359901d6305ef647651e2a36acc893cbda20b25b374970",title:info.item.label});
                 }}/>
         </Container>
 
