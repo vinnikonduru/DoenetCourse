@@ -15,27 +15,36 @@ import {
 } from "recoil";
 import DoenetViewer from '../../../Tools/DoenetViewer';
 import { fileByContentId } from "./Editor";
-export const viewerOverlayDoenetMLAtom = atom({
-  key:"viewerOverlayDoenetMLAtom",
+export const viewerContentDoenetMLAtom = atom({
+  key:"viewerContentDoenetMLAtom",
   default:{updateNumber:0,doenetML:""}
 })
 
-export default function Overlay({ branchId = '',contentId ='',title }) {
+export default function Content({ branchId = '',contentId ='',title }) {
 
   let initDoenetML = useRecoilCallback(({snapshot,set})=> async (contentId)=>{
     const response = await snapshot.getPromise(fileByContentId(contentId));
     const doenetML = response.data;
-    const viewerObj = await snapshot.getPromise(viewerOverlayDoenetMLAtom);
+    const viewerObj = await snapshot.getPromise(viewerContentDoenetMLAtom);
     const updateNumber = viewerObj.updateNumber+1;
-    set(viewerOverlayDoenetMLAtom,{updateNumber,doenetML})
+    set(viewerContentDoenetMLAtom,{updateNumber,doenetML})
   })
 
   useEffect(() => {
-    initDoenetML(branchId ? branchId : contentId )
+    // let branchIdContentId=''
+    // if(contentId){
+    //   branchIdContentId=contentId
+    // }else if(branchId && contentId){
+    //   branchIdContentId = contentId
+    // }else{
+    //   branchIdContentId = 
+    // }
+    // initDoenetML(branchId ? branchId : contentId )
+    initDoenetML(contentId ? contentId : branchId )
     
 }, []);
 
-const viewerDoenetML = useRecoilValue(viewerOverlayDoenetMLAtom);
+const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
 
 
 let attemptNumber = 1;

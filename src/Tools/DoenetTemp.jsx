@@ -43,20 +43,22 @@ export default function DoenetTemp(props){
           </navPanel>
           <mainPanel>
             {/* <Button value="content Overlay" callback={()=>{
-                openOverlay({type:"overlay",branchId:"branch213werfghbfdvcsd",title:"content overlay"}) }}></Button> */}
+                openOverlay({type:"content",branchId:"branch213werfghbfdvcsd",title:"content overlay"}) }}></Button> */}
         <Container>
         <Drive types={['content','course']}  urlClickBehavior="select" 
               doenetMLDoubleClickCallback={(info)=>{
                 console.log(">>>info temp" ,info.item );
-                openOverlay({type:"overlay",branchId:info.item.branchId,contentId:"8ccc4ce815c5c78421cfcbb3135311bcad2e7dc9e8f6905f0e7d615fea479c62",title:info.item.label});
-                // openOverlay({type:"overlay",branchId:'',contentId:"8ccc4ce815c5c78421cfcbb3135311bcad2e7dc9e8f6905f0e7d615fea479c62",title:info.item.label});
+                openOverlay({type:"content",branchId:info.item.branchId,contentId:"",title:info.item.label});
+                // openOverlay({type:"content",branchId:'',contentId:"ce25342ebb41c5792b17332855cbda9ba694fc8e2aaefe2a8d2d1b305e305778",title:info.item.label});
+                // openOverlay({type:"content",branchId:info.item.branchId,title:info.item.label});
+
                 }}/>
         </Container>
 
           </mainPanel>
           <supportPanel>
           <Button value="support Overlay" callback={()=>{
-                openOverlay({type:"overlay",branchId:"branch213werfghbfdvcsd",title:"support overlay"}) }}></Button>
+                openOverlay({type:"content",branchId:"branch213werfghbfdvcsd",title:"support overlay"}) }}></Button>
           </supportPanel>
           <menuPanel title="content Info">
 
