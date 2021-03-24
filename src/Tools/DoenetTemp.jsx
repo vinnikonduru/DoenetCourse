@@ -46,7 +46,9 @@ export default function DoenetTemp(props){
         <Drive types={['content','course']}  urlClickBehavior="select" 
               doenetMLDoubleClickCallback={(info)=>{
                 openOverlay({type:"content",branchId:info.item.branchId,contentId:"",title:info.item.label});
-                // openOverlay({type:"content",branchId:'info.item.branchId',contentId:"593d393a9bc17ff1d3359901d6305ef647651e2a36acc893cbda20b25b374970",title:info.item.label});
+                // openOverlay({type:"content",branchId:'info.item.branchId',contentId:"77114962473d15cd31268efb9d94492f8df113ac60f5fe233777fd6f63f0a4e5",title:info.item.label});
+                // openOverlay({type:"content",branchId:'',contentId:"77114962473d15cd31268efb9d94492f8df113ac60f5fe233777fd6f63f0a4e5",title:info.item.label});
+
                 }}/>
         </Container>
 
