@@ -45,8 +45,10 @@ export default function DoenetTemp(props){
         <Container>
         <Drive types={['content','course']}  urlClickBehavior="select" 
               doenetMLDoubleClickCallback={(info)=>{
-                openOverlay({type:"content",branchId:info.item.branchId,contentId:"",title:info.item.label});
-                // openOverlay({type:"content",branchId:'info.item.branchId',contentId:"77114962473d15cd31268efb9d94492f8df113ac60f5fe233777fd6f63f0a4e5",title:info.item.label});
+                if("5559e51c42587e820d2c09f903429412760fa64a40159a3f0308640487accee5".length > 21){
+                  openOverlay({type:"content",branchId:'info.item.branchId',contentId:"5559e51c42587e820d2c09f903429412760fa64a40159a3f0308640487accee5",title:info.item.label});
+                }
+                // openOverlay({type:"content",branchId:info.item.branchId,contentId:"",title:info.item.label});
                 // openOverlay({type:"content",branchId:'',contentId:"77114962473d15cd31268efb9d94492f8df113ac60f5fe233777fd6f63f0a4e5",title:info.item.label});
 
                 }}/>
