@@ -175,13 +175,14 @@ export default function DoenetSignIn(props) {
         <div style={{weight: "bold"}}>Device Name: {deviceName}</div>
         <div><p>Check your email for a code to complete sign in.</p></div>
         <p><label>Code (9 digit code): <input type="text"
+          data-cy="signinCodeInput" 
           ref={codeRef}
           value={nineCode}
           onKeyDown={(e) => {
             if (e.key === 'Enter' && validCode) { setSignInStage("check code") }
           }}
           onChange={(e) => { setNineCode(e.target.value) }} /></label></p>
-        <button disabled={!validCode} style={{}} onClick={() => setSignInStage("check code")}>Sign In</button>
+        <button data-cy="signInButton" disabled={!validCode} style={{}} onClick={() => setSignInStage("check code")}>Sign In</button>
       </div>
     )
   }
@@ -208,6 +209,7 @@ export default function DoenetSignIn(props) {
         <img style={{ width: "250px", height: "250px" }} alt="Doenet Logo" src={logo} />
         <div>
           <p><label>Email Address: <input type="text"
+           data-cy="signinEmailInput"
             label="Email Address"
             ref={emailRef}
             value={email}
@@ -224,7 +226,7 @@ export default function DoenetSignIn(props) {
               setMaxAge(0) 
             }}}
           /> Stay Logged In</p>
-          <button disabled={!validEmail} style={{ float: "right" }} onClick={() => setSignInStage("enter code")}>Send Email</button></div>
+          <button data-cy="sendEmailButton" disabled={!validEmail} style={{ float: "right" }} onClick={() => setSignInStage("enter code")}>Send Email</button></div>
       </div>
     );
   }
