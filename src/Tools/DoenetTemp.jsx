@@ -63,7 +63,7 @@ export default function DoenetExampleTool(props) {
         <Drive types={['course']}  urlClickBehavior="select" 
         doenetMLDoubleClickCallback={(info)=>{
             console.log(">>>info",info)
-        //   openOverlay({type:"editor",branchId: info.item.branchId,title: info.item.label});
+          openOverlay({type:"assignment",branchId: info.item.branchId,title: info.item.label,contentId:"bf8ca7354b01ba46ccd991ef60963ad00a8a926ee536beb4a73d8b84e0570b19",assignmentId:info.item.assignmentId});
           }}/>
     </Container>
   }
@@ -112,10 +112,10 @@ export default function DoenetExampleTool(props) {
         </button>
         <button
           onClick={() => {
-            openOverlay({ type: "calendar", title: "Cal", branchId: "fdsa" });
+            openOverlay({ type: "assignment", title: "Assignment", branchId: "fdsa",contentId:"wefv",assignmentId:"ewfveagfa" });
           }}
         >
-          Go to calendar
+          Go to assignment
         </button>
         <p>control important stuff</p>
       </menuPanel>
