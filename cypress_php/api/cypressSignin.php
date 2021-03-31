@@ -10,7 +10,6 @@ include 'db_connection.php';
 $sql="SELECT * FROM user_device WHERE email='devuser@example.com' ORDER BY id DESC LIMIT 1";
 
 
-echo $sql;
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $signInCode = $row["signInCode"];
