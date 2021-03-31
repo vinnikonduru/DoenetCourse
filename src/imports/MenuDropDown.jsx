@@ -233,7 +233,7 @@ const MenuDropDown = ({
               <>
                 <DropdownCustomOption>{o["optionElem"]}</DropdownCustomOption>
                 <DropdownCustomLabelLink>
-                  {!!o.link ? <a href={o.link}>{o["label"]}</a> : o["label"]}
+                  {!!o.link ? <a data-cy={o["id"]} href={o.link}>{o["label"]}</a> : o["label"]}
                 </DropdownCustomLabelLink>
                 {o["subLabel"] && (
                   <DropdownSubLabel>{o["subLabel"]}</DropdownSubLabel>
@@ -246,7 +246,7 @@ const MenuDropDown = ({
                     currentItemDisplay && currentItemDisplay.id === o["id"]
                   }
                 >
-                  {!!o.link ? <a href={o.link}>{o["label"]}</a> : o["label"]}
+                  {!!o.link ? <a data-cy={o["id"]} href={o.link}>{o["label"]}</a> : o["label"]}
                 </DropdownLabelLink>
                 {o["subLabel"] && (
                   <DropdownSubLabel>{o["subLabel"]}</DropdownSubLabel>
