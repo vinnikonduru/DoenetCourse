@@ -18,11 +18,13 @@ $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $signInCode = $row["signInCode"];
 $deviceName = $row["deviceName"];
+$userId = $row["userId"];
 
 
   $response_arr = array(
     "deviceName" => $deviceName,
     "signInCode"=>$signInCode,
+    "userId"=>$userId,
     );
 // http_response_code(200);
 echo json_encode($response_arr);
