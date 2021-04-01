@@ -51,6 +51,17 @@ module.exports = {
         proxy.web(req, res);
       },
     },
+    {
+      src: '/content/.*',
+      dest: (req, res) => {
+        // remove /api prefix (optional)
+        // req.url = req.url.replace(/^\/api/, '');
+        // console.log("api call!");
+        // console.log(req.url);
+        
+        proxy.web(req, res);
+      },
+    },
   ],
   optimize: {
     /* Example: Bundle your final build: */
