@@ -7,7 +7,11 @@ header('Content-Type: application/json');
 
 include 'db_connection.php';
 
-$sql="SELECT * FROM user_device WHERE email='devuser@example.com' ORDER BY id DESC LIMIT 1";
+$jwtArray = include "jwtArray.php";
+$userId = $jwtArray['userId'];
+
+// echo "userId".$userId;
+$sql="SELECT * FROM user_device WHERE email='devuser@example.com' AND userId = 'devuserid' ORDER BY id DESC LIMIT 1";
 
 
 $result = $conn->query($sql);
