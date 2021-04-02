@@ -40,7 +40,7 @@ const contentDoenetMLAtom = atom({
    return(
      <>
      {newParams.contentId ? <Tool>
-       <headerPanel ></headerPanel>
+       <headerPanel title="Content"></headerPanel>
        <mainPanel>
          <DoenetViewer
       key={"doenetviewer" + viewerDoenetML?.updateNumber}
