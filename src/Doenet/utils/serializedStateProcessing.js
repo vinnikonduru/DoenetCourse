@@ -382,8 +382,11 @@ export function createComponentsFromProps(serializedComponents, standardComponen
           }
           newChildren.push(newComponent);
           delete component.props[prop];
-        } else if (!["name", "assignnames", "newnamespace", "tname", "prop", "type", "frommapancestor", "fromsources"].includes(propLower)) {
-          throw Error("Invalid property: " + prop);
+        } else if (![
+          "name", "assignnames", "newnamespace", "tname", "prop",
+          "type", "alias", "indexalias"
+        ].includes(propLower)) {
+          throw Error("Invalid attribute: " + prop);
         }
       }
       component.children.unshift(...newChildren);
@@ -1094,8 +1097,8 @@ export function createComponentNames({ serializedComponents, namespaceStack = []
     let tName = doenetAttributes.tName;
     let propName = doenetAttributes.propName;
     let type = doenetAttributes.type;
-    let fromMapAncestor = doenetAttributes.fromMapAncestor;
-    let fromSources = doenetAttributes.fromSources;
+    let alias = doenetAttributes.alias;
+    let indexAlias = doenetAttributes.indexAlias;
 
     let mustCreateUniqueName =
       componentType === "string"
@@ -1116,7 +1119,7 @@ export function createComponentNames({ serializedComponents, namespaceStack = []
     if (props === undefined) {
       props = serializedComponent.props = {};
     } else {
-      // look for a property that matches name, assignNames, or newNamespace
+      // look for a property that matches an attribute
       // but case insensitive
       for (let key in props) {
         let lowercaseKey = key.toLowerCase();
@@ -1130,8 +1133,6 @@ export function createComponentNames({ serializedComponents, namespaceStack = []
         } else if (lowercaseKey === "assignnames") {
           if (assignNames === undefined) {
             let result = breakStringInPiecesBySpacesOrParens(props[key]);
-            console.log(`result for assignNames`)
-            console.log(result)
             if (result.success) {
               assignNames = result.pieces;
             } else {
@@ -1175,19 +1176,19 @@ export function createComponentNames({ serializedComponents, namespaceStack = []
           } else {
             throw Error("Cannot define type twice for a component");
           }
-        } else if (lowercaseKey === "frommapancestor") {
-          if (fromMapAncestor === undefined) {
-            fromMapAncestor = props[key].toLowerCase();
+        } else if (lowercaseKey === "alias") {
+          if (alias === undefined) {
+            alias = props[key];
             delete props[key];
           } else {
-            throw Error("Cannot define fromMapAncestor twice for a component");
+            throw Error("Cannot define alias twice for a component");
           }
-        } else if (lowercaseKey === "fromsources") {
-          if (fromSources === undefined) {
-            fromSources = props[key].toLowerCase();
+        } else if (lowercaseKey === "indexalias") {
+          if (indexAlias === undefined) {
+            indexAlias = props[key];
             delete props[key];
           } else {
-            throw Error("Cannot define fromSources twice for a component");
+            throw Error("Cannot define indexAlias twice for a component");
           }
         }
       }
@@ -1254,6 +1255,8 @@ export function createComponentNames({ serializedComponents, namespaceStack = []
         throw Error("Duplicate assigned names");
       }
     }
+
+
     if (newNamespace) {
       // newNamespace was specified
       // put in doenetAttributes as boolean
@@ -1315,6 +1318,43 @@ export function createComponentNames({ serializedComponents, namespaceStack = []
       }
     }
 
+
+    if (serializedComponent.doenetAttributes.createUniqueAssignNames &&
+      serializedComponent.originalName
+    ) {
+      let assignNames = serializedComponent.doenetAttributes.assignNames = [];
+      let longNameIdBase = componentName + "|createUniqueName|assignNames|";
+
+      let namespace = '';
+      let oldNamespace;
+      if (!newNamespace) {
+        for (let l = 0; l <= level; l++) {
+          namespace += namespaceStack[l].namespace + '/';
+        }
+        let lastInd = serializedComponent.originalName.lastIndexOf("/");
+        oldNamespace = serializedComponent.originalName.slice(0, lastInd + 1)
+      } else {
+        namespace = componentName + '/';
+        oldNamespace = serializedComponent.originalName + '/';
+      }
+
+
+      for (let [ind, originalName] of serializedComponent.doenetAttributes.originalAssignNames.entries()) {
+        let longNameId = longNameIdBase + ind;
+        let newName = createUniqueName("fromAssignNames", longNameId);
+        assignNames.push(newName);
+
+        let infoForRenaming = {
+          componentName: namespace + newName,
+          originalName: oldNamespace + originalName
+        }
+
+        renameMatchingTNames(infoForRenaming, doenetAttributesByFullTName);
+
+      }
+
+    }
+
     renameMatchingTNames(serializedComponent, doenetAttributesByFullTName);
 
     if (tName) {
@@ -1351,19 +1391,36 @@ export function createComponentNames({ serializedComponents, namespaceStack = []
       doenetAttributes.type = componentClass.defaultType;
     }
 
-    if (fromMapAncestor) {
-      if (!componentClass.acceptFromMapAncestor) {
-        throw Error(`Component type ${componentType} does not accept a fromMapAncestor property`);
+    if (alias) {
+
+      if (!componentClass.acceptAlias) {
+        throw Error("Cannot specify alias for component type " + serializedComponent.componentType);
       }
-      doenetAttributes.fromMapAncestor = fromMapAncestor
+      doenetAttributes.alias = alias;
+
+      if (!(/[a-zA-Z_]/.test(alias.substring(0, 1)))) {
+        throw Error("All aliases must begin with a letter or an underscore");
+      }
+      if (!(/^[a-zA-Z0-9_-]+$/.test(alias))) {
+        throw Error("Aliases can contain only letters, numbers, hyphens, and underscores");
+      }
     }
 
-    if (fromSources) {
-      if (!componentClass.acceptFromSources) {
-        throw Error(`Component type ${componentType} does not accept a fromSources property`);
+    if (indexAlias) {
+
+      if (!componentClass.acceptIndexAlias) {
+        throw Error("Cannot specify index alias for component type " + serializedComponent.componentType);
       }
-      doenetAttributes.fromSources = fromSources
+      doenetAttributes.indexAlias = indexAlias;
+
+      if (!(/[a-zA-Z_]/.test(indexAlias.substring(0, 1)))) {
+        throw Error("All index aliases must begin with a letter or an underscore");
+      }
+      if (!(/^[a-zA-Z0-9_-]+$/.test(indexAlias))) {
+        throw Error("Index aliases can contain only letters, numbers, hyphens, and underscores");
+      }
     }
+
 
     if (serializedComponent.children !== undefined) {
 
@@ -1700,7 +1757,7 @@ export function processAssignNames({
 
     if (originalNamespace !== null) {
       for (let component of serializedComponents) {
-        setTNamesOutsideNamespaceToAbsolute({
+        setTNamesOutsideNamespaceToAbsoluteAndRecordAllTNames({
           namespace: originalNamespace,
           components: [component],
           doenetAttributesByFullTName
@@ -1720,7 +1777,7 @@ export function processAssignNames({
       }
 
       if (originalNamespace !== null) {
-        setTNamesOutsideNamespaceToAbsolute({
+        setTNamesOutsideNamespaceToAbsoluteAndRecordAllTNames({
           namespace: originalNamespace,
           components: [component],
           doenetAttributesByFullTName
@@ -1909,7 +1966,7 @@ export function createComponentNamesFromParentName({
 }
 
 
-function setTNamesOutsideNamespaceToAbsolute({ namespace, components, doenetAttributesByFullTName }) {
+function setTNamesOutsideNamespaceToAbsoluteAndRecordAllTNames({ namespace, components, doenetAttributesByFullTName }) {
 
   let namespaceLength = namespace.length;
   for (let component of components) {
@@ -1925,7 +1982,7 @@ function setTNamesOutsideNamespaceToAbsolute({ namespace, components, doenetAttr
     }
 
     if (component.children) {
-      setTNamesOutsideNamespaceToAbsolute({ namespace, components: component.children, doenetAttributesByFullTName })
+      setTNamesOutsideNamespaceToAbsoluteAndRecordAllTNames({ namespace, components: component.children, doenetAttributesByFullTName })
     }
   }
 }
@@ -1966,7 +2023,11 @@ function markToCreateAllUniqueNames(components) {
       component.doenetAttributes = {};
     }
     component.doenetAttributes.createUniqueName = true;
-    delete component.doenetAttributes.assignNames;
+    if (component.doenetAttributes.assignNames) {
+      component.doenetAttributes.createUniqueAssignNames = true;
+      component.doenetAttributes.originalAssignNames = component.doenetAttributes.assignNames;
+      delete component.doenetAttributes.assignNames;
+    }
     delete component.doenetAttributes.prescribedName;
     if (component.children) {
       markToCreateAllUniqueNames(component.children);

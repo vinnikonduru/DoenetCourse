@@ -784,7 +784,7 @@ export default class Core {
 
   createIsolatedComponentsSub({ serializedComponents, ancestors,
     applyAdapters = true, shadow = false, updatesNeeded, compositesBeingExpanded,
-    createNameContext = "", namespaceForUnamed = "/",
+    createNameContext = "", namespaceForUnamed = "/", componentsReplacementOf,
   }
   ) {
 
@@ -853,6 +853,7 @@ export default class Core {
         componentClass,
         applyAdapters, shadow, updatesNeeded, compositesBeingExpanded,
         namespaceForUnamed,
+        componentsReplacementOf,
       });
 
       let newComponent = createResult.newComponent;
@@ -874,7 +875,7 @@ export default class Core {
     ancestors, componentClass,
     applyAdapters = true, shadow = false,
     updatesNeeded, compositesBeingExpanded,
-    namespaceForUnamed = "/",
+    namespaceForUnamed = "/", componentsReplacementOf
   }) {
 
     // first recursively create children
@@ -899,8 +900,7 @@ export default class Core {
       componentClass.modifySharedParameters({ sharedParameters, serializedComponent });
     }
 
-    if (serializedComponent.doenetAttributes.pushSharedParameters
-    ) {
+    if (serializedComponent.doenetAttributes.pushSharedParameters) {
       for (let parInstruction of serializedComponent.doenetAttributes.pushSharedParameters) {
         let pName = parInstruction.parameterName;
         if (pName in sharedParameters) {
@@ -910,6 +910,19 @@ export default class Core {
           sharedParameters[pName] = [];
         }
         sharedParameters[pName].push(parInstruction.value);
+      }
+    }
+
+    if (serializedComponent.doenetAttributes.addToSharedParameters) {
+      for (let parInstruction of serializedComponent.doenetAttributes.addToSharedParameters) {
+        let pName = parInstruction.parameterName;
+        if (pName in sharedParameters) {
+          sharedParameters[pName] = Object.assign({}, sharedParameters[pName]);
+        }
+        else {
+          sharedParameters[pName] = {};
+        }
+        sharedParameters[pName][parInstruction.key] = parInstruction.value;
       }
     }
 
@@ -1118,6 +1131,10 @@ export default class Core {
 
     this.registerComponent(newComponent);
 
+    if (componentsReplacementOf) {
+      newComponent.replacementOf = componentsReplacementOf
+    }
+
     for (let name in prescribedDependencies) {
       let depArray = prescribedDependencies[name];
       for (let dep of depArray) {
@@ -1179,6 +1196,7 @@ export default class Core {
       });
     }
 
+    this.dependencies.collateCountersAndPropagateToAncestors(newComponent, updatesNeeded);
 
     // remove a level from parameter stack;
     this.parameterStack.pop();
@@ -1308,6 +1326,12 @@ export default class Core {
         component: child,
       };
     }
+
+    // allChildrenOrder contains same children as allChildren,
+    // but retaining an order that we can use for counters.
+    // If defining children are replaced my composite replacements or adapters,
+    // those children come immediately after the corresponding defining child
+    component.allChildrenOrdered = component.activeChildren.map(x => x.componentName)
 
     // if any of activeChildren are compositeComponents
     // replace with new components given by the composite component
@@ -1591,6 +1615,7 @@ export default class Core {
       compositesBeingExpanded,
       createNameContext: component.componentName + "|replacements",
       namespaceForUnamed,
+      componentsReplacementOf: component
     });
 
     this.parameterStack.pop();
@@ -1599,11 +1624,6 @@ export default class Core {
     this.dependencies.updateReplacementDependencies(component, updatesNeeded, compositesBeingExpanded);
 
     component.isExpanded = true;
-
-    // record for top level replacement that they are a replacement of composite
-    for (let comp of component.replacements) {
-      comp.replacementOf = component;
-    }
 
     // resolve replacement state variables
     let stateVariables = [];
@@ -1688,16 +1708,13 @@ export default class Core {
           }
         }
 
-        // // even replacements that are marked as being withheld
-        // // should be in allChildren
-        // if (child.replacementsToWithhold > 0) {
-        //   for (let ind2 = replacements.length; ind2 < child.replacements.length; ind2++) {
-        //     let withheldReplacement = child.replacements[ind2];
-        //     component.allChildren[withheldReplacement.componentName] = {
-        //       component: withheldReplacement,
-        //     }
-        //   }
-        // }
+
+        // find index of child in allChildrenOrdered
+        // and place replacements immediately afterward
+        let childInd = component.allChildrenOrdered.indexOf(child.componentName)
+        component.allChildrenOrdered.splice(childInd + 1, 0,
+          ...replacements.map(x => x.componentName))
+
         if (replacements.length !== 1) {
           // if replaced composite with anything other than one replacement
           // shift activeChildrenIndices of later children
@@ -1814,6 +1831,12 @@ export default class Core {
           activeChildrenIndex: Number(childNum),  // childNum is string since was defined via in
           component: adapter,
         }
+
+        // find index of originalChild in allChildrenOrdered
+        // and place adapter immediately afterward
+        let originalInd = component.allChildrenOrdered.indexOf(originalChild.componentName)
+        component.allChildrenOrdered.splice(originalInd + 1, 0, adapter.componentName)
+
       }
     }
 
@@ -1869,6 +1892,11 @@ export default class Core {
             }
           } else if (dep.dependencyType === "ancestorProp") {
             ancestorProps[dep.property] = dep.ancestorIdentity;
+          } else if (dep.dependencyType === "nonShadowingReplacement") {
+            redefineDependencies = {
+              linkSource: "nonShadowingReplacement",
+              compositeName: name,
+            }
           }
         }
       }
@@ -2402,6 +2430,8 @@ export default class Core {
     let compositeComponent = this._components[redefineDependencies.compositeName];
     let targetComponent = this._components[redefineDependencies.targetName];
 
+    let isNonShadowingReplacement = redefineDependencies.linkSource === "nonShadowingReplacement";
+
     let additionalPropertiesFromStateVariables = {};
 
     if (redefineDependencies.propVariable) {
@@ -2426,7 +2456,7 @@ export default class Core {
           variableName: property,
         }
       }
-      if (
+      if (!isNonShadowingReplacement &&
         (!redefineDependencies.propVariable || propertySpecification.propagateToProps)
         && (property in targetComponent.state)
       ) {
@@ -2641,6 +2671,10 @@ export default class Core {
             = propertySpecification[attribute];
         }
       }
+    }
+
+    if (isNonShadowingReplacement) {
+      return;
     }
 
     if (redefineDependencies.propVariable) {
@@ -5663,7 +5697,7 @@ export default class Core {
             // (presumably an array entry) is recreated
             // TODO: will there be a case where the state variable is not recreatd
             // such as when have a different component?
-            if(updatesNeeded.recreatedComponents[componentName]) {
+            if (updatesNeeded.recreatedComponents[componentName]) {
               continue;
             }
             throw Error(`Reference to invalid state variable ${varName} of ${componentName}`);
@@ -7180,6 +7214,7 @@ export default class Core {
             compositesBeingExpanded,
             createNameContext: component.componentName + "|replacements",
             namespaceForUnamed,
+            componentsReplacementOf: component
           });
 
           newComponents = createResult.components;
@@ -7258,11 +7293,6 @@ export default class Core {
             // splice in new replacements
             composite.replacements.splice(firstIndex, 0, ...newReplacements);
             this.dependencies.updateReplacementDependencies(composite, updatesNeeded, compositesBeingExpanded);
-
-            // record for top level replacement that they are a replacement of composite
-            for (let comp of newReplacements) {
-              comp.replacementOf = composite;
-            }
 
             let newChange = {
               changeType: "addedReplacements",
@@ -7689,6 +7719,7 @@ export default class Core {
           compositesBeingExpanded,
           createNameContext: shadowingComponent.componentName + "|replacements",
           namespaceForUnamed,
+          componentsReplacementOf: shadowingComponent
         });
 
         this.parameterStack.pop();

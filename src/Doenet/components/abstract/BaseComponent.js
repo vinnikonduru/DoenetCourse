@@ -24,6 +24,7 @@ export default class BaseComponent {
 
     this.componentName = componentName;
     this.ancestors = ancestors;
+    this.counters = {};
 
     this.componentInfoObjects = componentInfoObjects;
     this.coreFunctions = coreFunctions;
@@ -212,12 +213,17 @@ export default class BaseComponent {
         parentOverrideChildHide: {
           dependencyType: "parentStateVariable",
           variableName: "overrideChildHide"
-        }
+        },
+        sourceCompositeHidden: {
+          dependencyType: "sourceCompositeStateVariable",
+          variableName: "hidden"
+        },
       }),
       definition: ({ dependencyValues }) => ({
         newValues: {
           hidden:  // check === true so null gives false
             dependencyValues.parentHidden === true
+            || dependencyValues.sourceCompositeHidden === true
             || (dependencyValues.hide === true && !dependencyValues.parentOverrideChildHide)
         }
       })
