@@ -80,6 +80,17 @@ export const useToolControlHelper = () => {
           />,
         ]);
         break;
+        case 'content':
+        setLayers((old) => [
+          ...old,
+          <Content
+            contentId={contentId}
+            branchId={branchId}
+            title={title}
+            key={`ContentLayer${old.length + 1}`}
+          />,
+        ]);
+        break;
       case 'assignment':
         setLayers((old) => [
           ...old,
