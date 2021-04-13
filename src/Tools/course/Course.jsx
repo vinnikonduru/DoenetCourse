@@ -176,7 +176,8 @@ export default function  Course(props) {
           <Container>
           <Drive types={['content','course']}  urlClickBehavior="select" 
          doenetMLDoubleClickCallback={(info)=>{
-           openOverlay({type:"content",branchId: info.item.branchId,contentId:"",title: info.item.label});
+         let isAssignment = info.item.isAssignment === '0' ? "content" : "assignment";
+          openOverlay({type:isAssignment,branchId: info.item.branchId,contentId:"",title: info.item.label});
           }}
           />
           </Container>

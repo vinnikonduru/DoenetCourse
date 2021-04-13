@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import Tool from "../Tool";
+import { nanoid } from 'nanoid';
 
 import {
   atom,
@@ -10,8 +11,11 @@ import {
   selectorFamily,
   useRecoilValueLoadable,
   useRecoilStateLoadable,
-  useRecoilCallback
+  useRecoilCallback,
+  atomFamily
 } from "recoil";
+import axios from "axios";
+
 import DoenetViewer from '../../../Viewer/DoenetViewer';
 import { fileByContentId } from "./Editor";
 import Drive, { 
@@ -32,6 +36,38 @@ export const viewerContentDoenetMLAtom = atom({
 const roleAtom = atom({
   key: "roleAtom",
   default: "Instructor",
+});
+export const assignmentDictionary = atomFamily({
+  key: "assignmentDictionary",
+  default: selectorFamily({
+    key: "assignmentDictionary/Default",
+    get: (driveIdcourseIditemIdparentFolderId) => async (
+      { get },
+      instructions
+    ) => {
+      let folderInfoQueryKey = {
+        driveId: driveIdcourseIditemIdparentFolderId.driveId,
+        folderId: driveIdcourseIditemIdparentFolderId.folderId,
+      };
+      let folderInfo = get(folderDictionarySelector(folderInfoQueryKey));
+
+      const itemObj =
+        folderInfo?.contentsDictionary?.[
+          driveIdcourseIditemIdparentFolderId.itemId
+        ];
+      let itemIdassignmentId = itemObj?.assignmentId
+        ? itemObj.assignmentId
+        : null;
+      if (itemIdassignmentId) {
+        const assignmentInfo = await get(
+          loadAssignmentSelector(itemIdassignmentId)
+        );
+        if (assignmentInfo) {
+          return assignmentInfo?.assignments[0];
+        } else return null;
+      } else return null;
+    },
+  }),
 });
 let assignmentDictionarySelector = selectorFamily({
   //recoilvalue(assignmentDictionarySelector(assignmentId))
@@ -304,7 +340,277 @@ const ContentInfoPanel = (props) => {
       payloadAssignment: assignmentInfo,
     });
   };
-
+  const AssignmentForm = (props) => {
+    let courseId = props.courseId;
+    let itemType = props.itemType;
+    let assignmentId = props.assignmentId;
+    let itemId = props.itemId;
+    let driveId = props.driveId;
+    let folderId = props.folderId;
+    let assignmentInfo = props.assignmentInfo;
+  
+    const role = useRecoilValue(roleAtom);
+  
+    const setAssignmentSettings = useSetRecoilState(
+      assignmentDictionarySelector({
+        itemId: itemId,
+        courseId: courseId,
+        driveId: driveId,
+        folderId: folderId,
+      })
+    );
+    const [folderInfoObj, setFolderInfo] = useRecoilStateLoadable(
+      folderDictionarySelector({ driveId: driveId, folderId: folderId })
+    );
+    let branchId = '';
+      if(folderInfoObj?.state === "hasValue"){
+   
+      let itemInfo = folderInfoObj?.contents?.contentsDictionary[itemId];
+        if (itemInfo?.itemType === "DoenetML"){
+          branchId = itemInfo.branchId;
+        }
+      }
+  
+    const handleChange = (event) => {
+      let name = event.target.name;
+      let value =
+        event.target.type === "checkbox"
+          ? event.target.checked
+          : event.target.value;
+      setAssignmentSettings({ type: "change settings", [name]: value });
+    };
+    const handleOnBlur = (e) => {
+      let name = e.target.name;
+      let value =
+        e.target.type === "checkbox" ? e.target.checked : e.target.value;
+      setAssignmentSettings({ type: "save assignment settings", [name]: value });
+    };
+  
+    const handleSubmit = (e) => {
+      const payload = {
+        ...assignmentInfo,
+        assignmentId: assignmentId,
+        assignment_isPublished: "1",
+        courseId: courseId,
+        branchId:branchId
+      };
+  
+      setAssignmentSettings({
+        type: "assignment was published",
+        itemId: itemId,
+        assignedData: payload,
+      });
+      setFolderInfo({
+        instructionType: "assignment was published",
+        itemId: itemId,
+        payload: payload,
+      });
+    };
+  
+    return role === "Instructor" ? (
+      <>
+      {console.log(">>>> in form",assignmentInfo)}
+        {assignmentId && (
+          <>
+            <div>
+              <label>Assignment Name :</label>
+              <input
+                required
+                type="text"
+                name="title"
+                value={assignmentInfo ? assignmentInfo?.title :''}
+                placeholder="Title goes here"
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Assigned Date:</label>
+              <input
+                required
+                type="text"
+                name="assignedDate"
+                value={assignmentInfo ? assignmentInfo?.assignedDate : ''  }
+                placeholder="0001-01-01 01:01:01 "
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Due date: </label>
+              <input
+                required
+                type="text"
+                name="dueDate"
+                value={ assignmentInfo ? assignmentInfo?.dueDate  : ''}
+                placeholder="0001-01-01 01:01:01"
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+  
+            <div>
+              <label>Time Limit:</label>
+              <input
+                required
+                type="time"
+                name="timeLimit"
+                value={ assignmentInfo ? assignmentInfo?.timeLimit  : ''}
+                placeholder="01:01:01"
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Number Of Attempts:</label>
+              <input
+                required
+                type="number"
+                name="numberOfAttemptsAllowed"
+                value={ assignmentInfo ? assignmentInfo?.numberOfAttemptsAllowed  : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Attempt Aggregation :</label>
+              <input
+                required
+                type="text"
+                name="attemptAggregation"
+                value={ assignmentInfo ? assignmentInfo?.attemptAggregation  : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Total Points Or Percent: </label>
+              <input
+                required
+                type="number"
+                name="totalPointsOrPercent"
+                value={ assignmentInfo ? assignmentInfo?.totalPointsOrPercent  : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Grade Category: </label>
+              <input
+                required
+                type="select"
+                name="gradeCategory"
+                value={ assignmentInfo ? assignmentInfo?.gradeCategory  : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Individualize: </label>
+              <input
+                required
+                type="checkbox"
+                name="individualize"
+                value={assignmentInfo ?  assignmentInfo?.individualize  : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Multiple Attempts: </label>
+              <input
+                required
+                type="checkbox"
+                name="multipleAttempts"
+                value={ assignmentInfo ? assignmentInfo?.multipleAttempts  : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Show solution: </label>
+              <input
+                required
+                type="checkbox"
+                name="showSolution"
+                value={ assignmentInfo ? assignmentInfo?.showSolution  : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Show feedback: </label>
+              <input
+                required
+                type="checkbox"
+                name="showFeedback"
+                value={ assignmentInfo ? assignmentInfo?.showFeedback  : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Show hints: </label>
+              <input
+                required
+                type="checkbox"
+                name="showHints"
+                value={ assignmentInfo ? assignmentInfo?.showHints  : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Show correctness: </label>
+              <input
+                required
+                type="checkbox"
+                name="showCorrectness"
+                value={assignmentInfo ? assignmentInfo?.showCorrectness  : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Proctor make available: </label>
+              <input
+                required
+                type="checkbox"
+                name="proctorMakesAvailable"
+                value={ assignmentInfo ? assignmentInfo?.proctorMakesAvailable : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <ToggleButton
+                value="Publish"
+                switch_value="publish changes"
+                callback={handleSubmit}
+                type="submit"
+              ></ToggleButton>
+            </div>
+            <div></div>
+          </>
+        )}
+      </>
+    ) : (
+      <div>
+        {assignmentId && (
+          <div>
+            <h1>{assignmentInfo?.title}</h1>
+            <p>Due: {assignmentInfo?.dueDate}</p>
+            <p>Time Limit: {assignmentInfo?.timeLimit}</p>
+            <p>
+              Number of Attempts Allowed:{" "}
+              {assignmentInfo?.numberOfAttemptsAllowed}
+            </p>
+            <p>Points: {assignmentInfo?.totalPointsOrPercent}</p>
+          </div>
+        )}
+      </div>
+    );
+  };
   return (
     <div>
       <br />
@@ -318,11 +624,10 @@ const ContentInfoPanel = (props) => {
           />
         )}
 
-      {role === "Instructor" &&
-      (assignmentId === "" || assignmentId === undefined) &&
-      itemType === "DoenetML" ? (
+      {role === "Instructor" ? (
         <ToggleButton value="Make Assignment" callback={handleMakeAssignment} />
-      ) : null}
+      ) 
+      : null}
       <br />
       {assignmentId && assignmentInfo?.isAssignment == "1" && (
         <AssignmentForm
@@ -336,9 +641,9 @@ const ContentInfoPanel = (props) => {
         />
       )}
 
-      {role === "Instructor" && assignmentInfo?.isAssignment == "1" && (
+      {/* {role === "Instructor" && assignmentInfo?.isAssignment == "1" && (
         <ToggleButton value="Make Content" callback={handleMakeContent} />
-      )}
+      )} */}
 
       {role === "Instructor" &&
       assignmentId &&

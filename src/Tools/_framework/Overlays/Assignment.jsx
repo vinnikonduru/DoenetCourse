@@ -63,7 +63,11 @@ export default function Assignment({ courseId, branchId, assignmentId }) {
 
       <supportPanel></supportPanel>
 
-      <menuPanel title={"Assignment Info"}>assignment Info</menuPanel>
+      <menuPanel title={"Assignment Info"}>
+        {/* {role === "Instructor" && assignmentInfo?.isAssignment == "1" && (
+        <ToggleButton value="Make Content" callback={handleMakeContent} />
+      )} */}
+      </menuPanel>
     </Tool>
   );
 }
