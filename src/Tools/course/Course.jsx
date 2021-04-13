@@ -49,7 +49,9 @@ import { driveColors, driveImages } from '../../_reactComponents/Drive/util';
 import Tool from '../_framework/Tool';
 import { useToolControlHelper } from '../_framework/ToolRoot';
 import Toast, { useToast } from '../_framework/Toast';
-import {drivecardSelectedNodesAtom} from '../library/Library'
+import {drivecardSelectedNodesAtom} from '../library/Library';
+import Enrollment from "./Enrollment";
+
 function Container(props){
   return <div
   style={{
@@ -63,7 +65,7 @@ function Container(props){
   </div>
 }
 export default function  Course(props) {
-  console.log(">> course props",props);
+  // console.log(">> course props",props);
 
   const { openOverlay, activateMenuPanel } = useToolControlHelper();
   const [toast, toastType] = useToast();
@@ -76,6 +78,11 @@ export default function  Course(props) {
       routePathDriveId
     ] = urlParamsObj.path.split(":");
   }
+  let courseId = "";
+  if (urlParamsObj?.courseId !== undefined) {
+    courseId = urlParamsObj?.courseId;
+  }
+
   useEffect(() => {
     activateMenuPanel(1);
   }, [activateMenuPanel]);
@@ -84,10 +91,12 @@ export default function  Course(props) {
   const driveCardSelection = ({item}) => {
     let newParams = {};
     newParams["path"] = `${item.driveId}:${item.driveId}:${item.driveId}:Drive`;
+    newParams["courseId"] = `${item.courseId}`;
     history.push("?" + encodeParams(newParams));
   }
   const setDrivecardSelection = useSetRecoilState(drivecardSelectedNodesAtom)
   const clearSelections = useSetRecoilState(clearDriveAndItemSelections);
+  const [openEnrollment, setEnrollmentView] = useState(false);
 
   const profile = useContext(ProfileContext)
   console.log(">>>profile",profile)
@@ -131,7 +140,14 @@ export default function  Course(props) {
   if (routePathDriveId) {
     breadcrumbContainer = <BreadcrumbContainer />;
   }
-  
+
+  const setEnrollment = (e) =>{
+    e.preventDefault()
+    setEnrollmentView(!openEnrollment);
+  }
+
+  const enrollCourseId = { courseId: courseId };
+
   return (
     <Tool>
      <headerPanel title="Course" />
@@ -143,8 +159,14 @@ export default function  Course(props) {
       <Drive driveId={routePathDriveId}  foldersOnly={true} />
       </div>
       </navPanel>
-     <mainPanel>
-     {breadcrumbContainer}
+
+      <mainPanel 
+      responsiveControls={routePathDriveId ? <Button value={openEnrollment ? "Close Enrollment" : "Open Enrollment"} callback={(e)=>setEnrollment(e)}></Button>: ''}
+      >
+        {openEnrollment ? <Enrollment selectedCourse={enrollCourseId} />  
+        :
+        
+        <>{breadcrumbContainer}
         <div 
         onClick={()=>{
           clearSelections()
@@ -176,6 +198,8 @@ export default function  Course(props) {
        driveDoubleClickCallback={({item})=>{driveCardSelection({item})}}
        />
         </div>     
+        </>
+}
          </mainPanel>
     </Tool>
   );

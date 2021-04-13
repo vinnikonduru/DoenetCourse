@@ -110,7 +110,7 @@ let assignmentDictionarySelector = selectorFamily({
         );
         break;
       case "assignment was published":
-        console.log(">>>> published value", value.assignedData.branchId);
+        // console.log(">>>> published value", value.assignedData.branchId);
         let publishAssignment = get(
           assignmentDictionary(driveIdcourseIditemIdparentFolderId)
         );
@@ -177,7 +177,7 @@ let assignmentDictionarySelector = selectorFamily({
   },
 });
 const ContentInfoPanel = (props) => {
-  console.log(">>>content info  props", props);
+  // console.log(">>>content info  props", props);
   let courseId = props.courseId;
   let itemId = props.itemId;
   let itemType = props.itemType;
