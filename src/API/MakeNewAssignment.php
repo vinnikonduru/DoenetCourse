@@ -11,7 +11,7 @@ $jwtArray = include "jwtArray.php";
 $userId = $jwtArray['userId'];
 $_POST = json_decode(file_get_contents("php://input"),true);
 $assignmentId = mysqli_real_escape_string($conn,$_POST["assignmentId"]);
-$itemId = mysqli_real_escape_string($conn,$_POST["itemId"]);
+$contentId = mysqli_real_escape_string($conn,$_POST["contentId"]);
 $courseId = mysqli_real_escape_string($conn,$_POST["courseId"]);
 $branchId = mysqli_real_escape_string($conn,$_POST["branchId"]);
 
@@ -20,7 +20,7 @@ $sql="
 INSERT INTO assignment_draft
 (assignmentId,courseId,creationDate,sourceBranchId,individualize,multipleAttempts,showSolution,showFeedback,showHints,showCorrectness,proctorMakesAvailable)
 VALUES
-('$assignmentId','$courseId',NOW(),'$branchId',0,0,1,1,1,1,0)
+('$assignmentId','$courseId',NOW(),'$branchId','$contentId',0,0,1,1,1,1,0)
 ";
 
 $result = $conn->query($sql); 
