@@ -151,7 +151,7 @@ export default function  Course(props) {
   return (
     <Tool>
      <headerPanel title="Course" />
-     <navPanel>
+     <navPanel isInitOpen>
       <GlobalFont/>
       <div style={{marginBottom:"40px",height:"100vh"}} 
        onClick={useOutsideDriveSelector} 
