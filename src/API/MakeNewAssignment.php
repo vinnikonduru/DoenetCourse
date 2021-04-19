@@ -25,7 +25,7 @@ VALUES
 
 $result = $conn->query($sql); 
   // echo $sql;
-$sqlnew="UPDATE drive_content SET assignmentId='$assignmentId',isAssignment=1 WHERE itemId='$itemId';";
+$sqlnew="UPDATE drive_content SET assignmentId='$assignmentId',isAssignment=1 WHERE branchId='$branchId';";
 //  echo $sqlnew;
 $result = $conn->query($sqlnew); 
 // set response code - 200 OK

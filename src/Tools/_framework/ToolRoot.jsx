@@ -87,6 +87,7 @@ export const useToolControlHelper = () => {
             contentId={contentId}
             branchId={branchId}
             title={title}
+            courseId={courseId}
             key={`ContentLayer${old.length + 1}`}
           />,
         ]);

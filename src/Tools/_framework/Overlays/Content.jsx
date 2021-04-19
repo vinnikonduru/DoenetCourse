@@ -220,6 +220,8 @@ const ContentInfoPanel = (props) => {
   let assignmentId = "";
   let driveId = props.routePathDriveId;
   let folderId = props.routePathFolderId;
+  let branchId = props.branchId;
+
   const [role, setRole] = useRecoilState(roleAtom);
   const assignmentIdSettings = useRecoilValueLoadable(
     assignmentDictionarySelector({
@@ -240,15 +242,16 @@ const ContentInfoPanel = (props) => {
   const [folderInfoObj, setFolderInfo] = useRecoilStateLoadable(
     folderDictionarySelector({ driveId: driveId, folderId: folderId })
   );
-  let branchId = '';
+  
   // console.log(">>>> folderInfoObj",folderInfoObj);
-  if(folderInfoObj?.state === "hasValue"){
- 
-  let itemInfo = folderInfoObj?.contents?.contentsDictionary[itemId];
-    if (itemInfo?.itemType === "DoenetML"){
-      branchId = itemInfo.branchId;
-    }
-  }
+  // if(folderInfoObj?.state === "hasValue"){
+  //   console.log(">>>> folderInfoObj",folderInfoObj);
+
+  // let itemInfo = folderInfoObj?.contents?.contentsDictionary[itemId];
+  //   if (itemInfo?.itemType === "DoenetML"){
+  //     branchId = itemInfo.branchId;
+  //   }
+  // }
   const [makeNewAssignment, setMakeNewAssignment] = useState(false);
 
   let assignmentInfo = "";
@@ -654,7 +657,7 @@ const ContentInfoPanel = (props) => {
   );
 };
 
-export default function Content({ branchId = '',contentId ='',title }) {
+export default function Content({ branchId = '',contentId ='',title,courseId = '' }) {
 
   let initDoenetML = useRecoilCallback(({snapshot,set})=> async (contentId)=>{
     const response = await snapshot.getPromise(fileByContentId(contentId));
@@ -696,9 +699,9 @@ let requestedVariant = { index: attemptNumber }
       <menuPanel title="Content Info">
        {(
           <ContentInfoPanel
-          branchId={branchId}
-            // itemType={""}
-            // courseId={courseId}
+            branchId={branchId}
+            itemType={"DoenetML"}
+            courseId={courseId}
             // routePathDriveId={routePathDriveId}
             // routePathFolderId={routePathFolderId}
             // itemId={""}
