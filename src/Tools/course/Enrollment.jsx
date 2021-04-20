@@ -1,8 +1,15 @@
-import axios from 'axios';
+/**
+ * External dependencies
+ */
 import React, { useState, useEffect, useCallback } from "react";
-import {useDropzone} from 'react-dropzone';
-import parse from 'csv-parse';
 import { nanoid } from 'nanoid';
+import axios from 'axios';
+import parse from 'csv-parse';
+import {useDropzone} from 'react-dropzone';
+
+/**
+ * Internal dependencies
+ */
 import Button from "../../_reactComponents/PanelHeaderComponents/Button";
 
 

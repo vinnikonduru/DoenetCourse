@@ -1,4 +1,10 @@
+/**
+ * External dependencies
+ */
 import React, { useEffect, useState, useRef } from "react";
+/**
+ * Internal dependencies
+ */
 import Tool from "../Tool";
 
 import { 
@@ -8,6 +14,7 @@ import {
 } from "recoil";
 import DoenetViewer from '../../../Viewer/DoenetViewer';
 import { fileByContentId } from "./Editor";
+
 export const assignmentDoenetMLAtom = atom({
   key:"assignmentDoenetMLAtom",
   default:{updateNumber:0,doenetML:"",attemptnumber:0}
@@ -28,7 +35,7 @@ export default function Assignment({ courseId, branchId, assignmentId }) {
 }, []);
   function DoenetViewerPanel(props){
     const assignmentDoenetML = useRecoilValue(assignmentDoenetMLAtom);
-    console.log("assignmentDoenetML",assignmentDoenetML);
+    // console.log("assignmentDoenetML",assignmentDoenetML);
     let attemptNumber = 1;
     let requestedVariant = { index: attemptNumber }
     let solutionDisplayMode = "button";
