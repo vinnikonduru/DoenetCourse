@@ -70,9 +70,20 @@ export default function  Course(props) {
   const { openOverlay, activateMenuPanel } = useToolControlHelper();
   const [toast, toastType] = useToast();
   let routePathDriveId = "";
+  let routePathFolderId = "";
+  let pathItemId = "";
+  let itemType = "";
   let urlParamsObj = Object.fromEntries(
     new URLSearchParams(props.route.location.search)
   );
+    if (urlParamsObj?.path !== undefined) {
+    [
+      routePathDriveId,
+      routePathFolderId,
+      pathItemId,
+      itemType,
+    ] = urlParamsObj.path.split(":");
+  }
   if (urlParamsObj?.path !== undefined) {
     [
       routePathDriveId
@@ -177,7 +188,9 @@ export default function  Course(props) {
           <Drive types={['content','course']}  urlClickBehavior="select" 
          doenetMLDoubleClickCallback={(info)=>{
          let isAssignment = info.item.isAssignment === '0' ? "content" : "assignment";
-          openOverlay({type:isAssignment,branchId: info.item.branchId,contentId:"",courseId:courseId,title: info.item.label});
+          openOverlay({type:isAssignment,branchId: info.item.branchId,contentId:info.item.contentId,courseId:courseId,
+          // driveId:routePathDriveId,itemId:info.item.itemId,folderId:routePathFolderId, 
+          title: info.item.label});
           }}
           />
           </Container>
