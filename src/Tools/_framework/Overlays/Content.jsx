@@ -708,7 +708,7 @@ const ContentInfoPanel = (props) => {
   );
 };
 
-export default function Content({ branchId = '',contentId ='',title,courseId = '' }) {
+export default function Content({ branchId = '',contentId ='',title,courseId = '',driveId='' }) {
 
   let initDoenetML = useRecoilCallback(({snapshot,set})=> async (contentId)=>{
     const response = await snapshot.getPromise(fileByContentId(contentId));
@@ -722,30 +722,41 @@ export default function Content({ branchId = '',contentId ='',title,courseId = '
     initDoenetML(contentId ? contentId : branchId)
 }, []);
 
-const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
+// const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
+
+function DoenetViewerPanel(){
+  const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
 
 
-let attemptNumber = 1;
-let requestedVariant = { index: attemptNumber }
+  let attemptNumber = 1;
+  let requestedVariant = { index: attemptNumber }
+  let assignmentId = "myassignmentid";
+  let solutionDisplayMode = "button";
+  
+  return <DoenetViewer
+      key={"doenetviewer" + viewerDoenetML?.updateNumber}
+      doenetML={viewerDoenetML?.doenetML}
+      flags={{
+        showCorrectness: true,
+        readOnly: false,
+        solutionDisplayMode: solutionDisplayMode,
+        showFeedback: true,
+        showHints: true,
+      }}
+      attemptNumber={attemptNumber}
+      assignmentId={assignmentId}
+      ignoreDatabase={true}
+      requestedVariant={requestedVariant}
+      /> 
+}
   return (
     <Tool>
       <headerPanel title={title}>
       </headerPanel>
 
       <mainPanel>
-      <DoenetViewer
-      key={"doenetviewer" + viewerDoenetML?.updateNumber}
-      doenetML={viewerDoenetML?.doenetML}
-      flags={{
-        showCorrectness: true,
-        readOnly: true,
-        showFeedback: true,
-        showHints: true,
-      }}
-      attemptNumber={attemptNumber}
-      ignoreDatabase={false}
-      requestedVariant={requestedVariant}
-      /> 
+      <div style={{overflowY:"scroll", height:"calc(100vh - 84px)" }}><DoenetViewerPanel /></div>
+    
       </mainPanel>
       <menuPanel title="Content Info">
        {(
@@ -754,7 +765,8 @@ let requestedVariant = { index: attemptNumber }
             contentId={contentId ? contentId : branchId}
             itemType={"DoenetML"}
             courseId={courseId}
-          />
+            driveId={driveId}
+                      />
         )}
 
        </menuPanel>
