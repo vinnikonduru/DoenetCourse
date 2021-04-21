@@ -18,7 +18,7 @@ $branchId = mysqli_real_escape_string($conn,$_POST["branchId"]);
 
 $sql="
 INSERT INTO assignment_draft
-(assignmentId,courseId,creationDate,sourceBranchId,individualize,multipleAttempts,showSolution,showFeedback,showHints,showCorrectness,proctorMakesAvailable)
+(assignmentId,courseId,creationDate,sourceBranchId,contentId,individualize,multipleAttempts,showSolution,showFeedback,showHints,showCorrectness,proctorMakesAvailable)
 VALUES
 ('$assignmentId','$courseId',NOW(),'$branchId','$contentId',0,0,1,1,1,1,0)
 ";
