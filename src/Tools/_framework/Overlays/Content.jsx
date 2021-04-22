@@ -39,7 +39,7 @@ import {
   useAssignmentCallbacks
 } from "../../../_reactComponents/Drive/DriveActions";
 
-export const viewerContentDoenetMLAtom = atom({
+ const viewerContentDoenetMLAtom = atom({
   key:"viewerContentDoenetMLAtom",
   default:{updateNumber:0,doenetML:""}
 })
@@ -47,7 +47,16 @@ const roleAtom = atom({
   key: "roleAtom",
   default: "Instructor",
 });
-export const assignmentDictionary = atomFamily({
+const loadAssignmentSelector = selectorFamily({
+  key: "loadAssignmentSelector",
+  get: (assignmentId) => async ({ get, set }) => {
+    const { data } = await axios.get(
+      `/api/getAllAssignmentSettings.php?assignmentId=${assignmentId}`
+    );
+    return data;
+  },
+});
+ const assignmentDictionary = atomFamily({
   key: "assignmentDictionary",
   default: selectorFamily({
     key: "assignmentDictionary/Default",
@@ -60,7 +69,7 @@ export const assignmentDictionary = atomFamily({
         folderId: driveIdcourseIditemIdparentFolderId.folderId,
       };
       let folderInfo = get(folderDictionarySelector(folderInfoQueryKey));
-
+    console.log(">>>>>>>>>>>>>>>>>>folderInfo",folderInfo)
       const itemObj =
         folderInfo?.contentsDictionary?.[
           driveIdcourseIditemIdparentFolderId.itemId
@@ -80,7 +89,7 @@ export const assignmentDictionary = atomFamily({
   }),
 });
 
-export const AssignmentSelectorActions = Object.freeze({
+ const AssignmentSelectorActions = Object.freeze({
   CHANGE_SETTINGS: "change settings",
   MAKE_ASSIGNMENT:"make new assignment",
   SAVE_SETTINGS: "save assignment settings",
@@ -90,6 +99,12 @@ export const AssignmentSelectorActions = Object.freeze({
   LOAD_ASSIGNMENT: "load available assignment",
 
 });
+// const newCallbackFunction = (driveIdcourseIditemIdparentFolderId) =>{
+//   console.log("@@@@@@@@@@@@@@@@@@@@@@@");
+//   return (
+//     assignmentDictionary(driveIdcourseIditemIdparentFolderId)
+//   )
+// }
 let assignmentDictionarySelector = selectorFamily({
   //recoilvalue(assignmentDictionarySelector(assignmentId))
   key: "assignmentDictionarySelector",
@@ -104,6 +119,7 @@ let assignmentDictionarySelector = selectorFamily({
     switch (type) {
       case AssignmentSelectorActions.CHANGE_SETTINGS:
         set(
+          // newCallbackFunction(driveIdcourseIditemIdparentFolderId),
           assignmentDictionary(driveIdcourseIditemIdparentFolderId),
           (old) => {
             return { ...old, ...value };
@@ -113,6 +129,7 @@ let assignmentDictionarySelector = selectorFamily({
         break;
         case AssignmentSelectorActions.SAVE_SETTINGS:
         const saveInfo = get(
+          // newCallbackFunction(driveIdcourseIditemIdparentFolderId)
           assignmentDictionary(driveIdcourseIditemIdparentFolderId)
         );
         set(
@@ -159,12 +176,10 @@ let assignmentDictionarySelector = selectorFamily({
             timeLimit: '',
             totalPointsOrPercent: '',
             assignment_isPublished: "0",
+            subType:"Administrator"
           };
-  
-          set(
-            assignmentDictionary(driveIdcourseIditemIdparentFolderId),
-            newAssignmentObj
-          );
+          console.log(">>>>>new assignment obj",assignmentDictionary(driveIdcourseIditemIdparentFolderId),newAssignmentObj);
+          set(assignmentDictionary(driveIdcourseIditemIdparentFolderId),newAssignmentObj);
           break;
         case AssignmentSelectorActions.PUBLISH_ASSIGNMENT:
         // console.log(">>>> published value", value.assignedData.branchId);
@@ -233,7 +248,7 @@ let assignmentDictionarySelector = selectorFamily({
     }
   },
 });
-const ContentInfoPanel = (props) => {
+ const ContentInfoPanel = (props) => {
   console.log(">>>content info  props", props);
   let courseId = props.courseId;
   let itemId = props.itemId;
@@ -244,11 +259,12 @@ const ContentInfoPanel = (props) => {
   let branchId = props.branchId;
   let contentId = props.contentId;
 
-  const { publishAssignment, onPublishAssignmentError } = useAssignmentCallbacks();
-  const { publishContent, onPublishContentError } = useAssignmentCallbacks();
-  const { updateAssignmentTitle, onUpdateAssignmentTitleError } = useAssignmentCallbacks();
-  const { convertAssignmentToContent, onConvertAssignmentToContentError } = useAssignmentCallbacks();
-  
+  // const { publishAssignment, onPublishAssignmentError } = useAssignmentCallbacks();
+  // const { publishContent, onPublishContentError } = useAssignmentCallbacks();
+  // const { updateAssignmentTitle, onUpdateAssignmentTitleError } = useAssignmentCallbacks();
+  // const { convertAssignmentToContent, onConvertAssignmentToContentError } = useAssignmentCallbacks();
+  let assignmentInfo = "";
+
   const [role, setRole] = useRecoilState(roleAtom);
   const assignmentIdSettings = useRecoilValueLoadable(
     assignmentDictionarySelector({
@@ -265,6 +281,7 @@ const ContentInfoPanel = (props) => {
       courseId: courseId,
       driveId: driveId,
       folderId: folderId,
+      contentId:contentId
     })
   );
   const [folderInfoObj, setFolderInfo] = useRecoilStateLoadable(
@@ -282,7 +299,6 @@ const ContentInfoPanel = (props) => {
   // }
   const [makeNewAssignment, setMakeNewAssignment] = useState(false);
 
-  let assignmentInfo = "";
 
   if (assignmentIdSettings?.state === "hasValue") {
     assignmentInfo = assignmentIdSettings?.contents;
@@ -293,7 +309,7 @@ const ContentInfoPanel = (props) => {
     }
   }
 
-  const handleMakeAssignment = () => {
+   const handleMakeAssignment = () => {
     setMakeNewAssignment(true);
   };
   if (
@@ -319,28 +335,28 @@ const ContentInfoPanel = (props) => {
     });
   }
 
-  const handlePublishContentCallback = (event) =>{
+  // const handlePublishContentCallback = (event) =>{
 
-    const result = publishContent({
-      driveIdFolderId: {driveId:itemInfo.driveId, folderId:itemInfo.parentFolderId},
-      itemId: itemId,
-      payload: payload
-    });
-    result.then((resp)=>{
-      if(resp.data.success){
-        axios.post(`/api/handlePublishContent.php`, payload).then((response) => {
-          console.log(response.data);
-        });
-        addToast(`Content Published`, ToastType.SUCCESS);
-      }else{
-        onPublishContentError({errorMessage: resp.data.message});
-      }
-    }).catch((e)=>{
-      onRenameItemError({errorMessage: e.message});
-    })
-  }
+  //   const result = publishContent({
+  //     driveIdFolderId: {driveId:itemInfo.driveId, folderId:itemInfo.parentFolderId},
+  //     itemId: itemId,
+  //     payload: payload
+  //   });
+  //   result.then((resp)=>{
+  //     if(resp.data.success){
+  //       axios.post(`/api/handlePublishContent.php`, payload).then((response) => {
+  //         console.log(response.data);
+  //       });
+  //       addToast(`Content Published`, ToastType.SUCCESS);
+  //     }else{
+  //       onPublishContentError({errorMessage: resp.data.message});
+  //     }
+  //   }).catch((e)=>{
+  //     onRenameItemError({errorMessage: e.message});
+  //   })
+  // }
 
-  const handlePublishContent = () => {
+   const handlePublishContent = () => {
     let payload = {
       itemId: itemId,
     };
@@ -394,7 +410,7 @@ const ContentInfoPanel = (props) => {
     //   payloadAssignment: assignmentInfo,
     // });
   };
-  const AssignmentForm = (props) => {
+   const AssignmentForm = (props) => {
     let courseId = props.courseId;
     let itemType = props.itemType;
     let assignmentId = props.assignmentId;
@@ -463,7 +479,6 @@ const ContentInfoPanel = (props) => {
   
     return role === "Instructor" ? (
       <>
-      {console.log(">>>> in form",assignmentInfo)}
         {assignmentId && (
           <>
             <div>
@@ -708,7 +723,7 @@ const ContentInfoPanel = (props) => {
   );
 };
 
-export default function Content({ branchId = '',contentId ='',title,courseId = '',driveId='' }) {
+export default function Content({ branchId = '',contentId ='',title,courseId = '',driveId='' ,folderId='',itemId=''}) {
 
   let initDoenetML = useRecoilCallback(({snapshot,set})=> async (contentId)=>{
     const response = await snapshot.getPromise(fileByContentId(contentId));
@@ -758,7 +773,7 @@ function DoenetViewerPanel(){
       <div style={{overflowY:"scroll", height:"calc(100vh - 84px)" }}><DoenetViewerPanel /></div>
     
       </mainPanel>
-      <menuPanel title="Content Info">
+      <menuPanel title="Content Info" isInitOpen>
        {(
           <ContentInfoPanel
             branchId={branchId}
@@ -766,6 +781,8 @@ function DoenetViewerPanel(){
             itemType={"DoenetML"}
             courseId={courseId}
             driveId={driveId}
+            folderId={folderId}
+            itemId={itemId}
                       />
         )}
 

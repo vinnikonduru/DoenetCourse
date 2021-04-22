@@ -48,7 +48,9 @@ export const useToolControlHelper = () => {
     assignmentId,
     attemptNumber,
     userId,
-    driveId
+    driveId,
+    folderId,
+    itemId
     }) => {
     switch (type.toLowerCase()) {
       case 'gradebookassignmentview':
@@ -90,6 +92,8 @@ export const useToolControlHelper = () => {
             title={title}
             courseId={courseId}
             driveId={driveId}
+            folderId={folderId}
+            itemId={itemId}
             key={`ContentLayer${old.length + 1}`}
           />,
         ]);

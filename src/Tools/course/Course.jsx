@@ -8,13 +8,14 @@ import {
 } from "react-router-dom";
 import {
   atom,
-  useSetRecoilState,
-  useRecoilValue,
-  selector,
+  atomFamily,
   selectorFamily,
+  RecoilRoot,
+  useSetRecoilState,
   useRecoilValueLoadable,
   useRecoilStateLoadable,
-  useRecoilCallback
+  useRecoilState,
+  useRecoilValue,
 } from "recoil";
 import axios from "axios";
 import 'codemirror/lib/codemirror.css';
@@ -23,35 +24,25 @@ import 'codemirror/theme/material.css';
 /**
  * Internal dependencies
  */
-import Drive, { 
-  folderDictionarySelector, 
-  globalSelectedNodesAtom, 
-  folderDictionary, 
+import Drive, {  
   clearDriveAndItemSelections,
-  fetchDrivesSelector,
   encodeParams,
-  fetchDriveUsers,
-  fetchDrivesQuery,
 } from "../../_reactComponents/Drive/Drive";
-import { 
-  useAddItem,
-  useDeleteItem,
-  useRenameItem
-} from "../../_reactComponents/Drive/DriveActions";
 import { BreadcrumbContainer } from "../../_reactComponents/Breadcrumb";
 import Button from "../../_reactComponents/PanelHeaderComponents/Button";
 import DriveCards from "../../_reactComponents/Drive/DriveCards";
 import "../../_reactComponents/Drive/drivecard.css";
-import DoenetDriveCardMenu from "../../_reactComponents/Drive/DoenetDriveCardMenu";
 import '../../_utils/util.css';
 import GlobalFont from "../../_utils/GlobalFont";
-import { driveColors, driveImages } from '../../_reactComponents/Drive/util';
 import Tool from '../_framework/Tool';
 import { useToolControlHelper } from '../_framework/ToolRoot';
 import Toast, { useToast } from '../_framework/Toast';
 import {drivecardSelectedNodesAtom} from '../library/Library';
 import Enrollment from "./Enrollment";
-
+export const roleAtom = atom({
+  key: "roleAtom",
+  default: "Instructor",
+});
 function Container(props){
   return <div
   style={{
@@ -99,7 +90,7 @@ export default function  Course(props) {
   }, [activateMenuPanel]);
   const history = useHistory();
 
-  const driveCardSelection = ({item}) => {
+  const DriveCardCallBack = ({item}) => {
     let newParams = {};
     newParams["path"] = `${item.driveId}:${item.driveId}:${item.driveId}:Drive`;
     newParams["courseId"] = `${item.courseId}`;
@@ -108,6 +99,7 @@ export default function  Course(props) {
   const setDrivecardSelection = useSetRecoilState(drivecardSelectedNodesAtom)
   const clearSelections = useSetRecoilState(clearDriveAndItemSelections);
   const [openEnrollment, setEnrollmentView] = useState(false);
+  const role = useRecoilValue(roleAtom);
 
   const profile = useContext(ProfileContext)
   console.log(">>>profile",profile)
@@ -158,7 +150,18 @@ export default function  Course(props) {
   }
 
   const enrollCourseId = { courseId: courseId };
-
+  let hideUnpublished = true;
+  if (role === "Instructor") {
+    hideUnpublished = false;
+  }
+  let urlClickBehavior = '';
+  if(role === 'Instructor'){
+    urlClickBehavior = 'select';
+  }
+  let responsiveControls = '';
+  if(role === 'Instructor' && routePathDriveId){
+    responsiveControls =<Button value={openEnrollment ? "Close Enrollment" : "Open Enrollment"} callback={(e)=>setEnrollment(e)}></Button> 
+   }
   return (
     <Tool>
      <headerPanel title="Course" />
@@ -172,7 +175,8 @@ export default function  Course(props) {
       </navPanel>
 
       <mainPanel 
-      responsiveControls={routePathDriveId ? <Button value={openEnrollment ? "Close Enrollment" : "Open Enrollment"} callback={(e)=>setEnrollment(e)}></Button>: ''}
+      // responsiveControls={routePathDriveId ? 
+      // <Button value={openEnrollment ? "Close Enrollment" : "Open Enrollment"} callback={(e)=>setEnrollment(e)}></Button>: ''}
       >
         {openEnrollment ? <Enrollment selectedCourse={enrollCourseId} />  
         :
@@ -185,10 +189,14 @@ export default function  Course(props) {
         className={routePathDriveId ? 'mainPanelStyle' : ''}
         >
           <Container>
-          <Drive types={['content','course']}  urlClickBehavior="select" 
+          <Drive 
+          driveId={routePathDriveId}
+          hideUnpublished={hideUnpublished}
+          // types={['content','course']}  
+          urlClickBehavior="select" 
          doenetMLDoubleClickCallback={(info)=>{
          let isAssignment = info.item.isAssignment === '0' ? "content" : "assignment";
-          openOverlay({type:isAssignment,branchId: info.item.branchId,contentId:info.item.contentId,courseId:courseId,driveId:routePathDriveId,title: info.item.label});
+          openOverlay({type:isAssignment,branchId: info.item.branchId,contentId:info.item.contentId,courseId:courseId,driveId:routePathDriveId,folderId:routePathFolderId,itemId:info.item.itemId,title: info.item.label});
           }}
           />
           </Container>
@@ -203,12 +211,21 @@ export default function  Course(props) {
         tabIndex={0}
         className={routePathDriveId ? '' : 'mainPanelStyle' }
         >
-       <DriveCards
-       types={['course']}
-       subTypes={['Administrator']}
-       routePathDriveId={routePathDriveId}
-       driveDoubleClickCallback={({item})=>{driveCardSelection({item})}}
-       />
+            <h2>Admin</h2>
+              <DriveCards
+              routePathDriveId={routePathDriveId}
+              isOneDriveSelect={true} 
+              types={['course']}
+              subTypes={['Administrator']}
+              driveDoubleClickCallback={({item})=>{DriveCardCallBack({item})}}/>
+              <h2>Student</h2>
+              <DriveCards 
+              routePathDriveId={routePathDriveId}
+              isOneDriveSelect={true} 
+              types={['course']}     
+              subTypes={['Student']}
+              driveDoubleClickCallback={({item})=>{DriveCardCallBack({item})}}/>
+       
         </div>     
         </>
 }
