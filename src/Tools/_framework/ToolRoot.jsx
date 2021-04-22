@@ -25,6 +25,7 @@ export const useToolControlHelper = () => {
   const activateMenuPanel = useMenuPanelController();
   const activateSupportPanel = useSupportDividerController();
   const [
+    Content,
     Assignment,
     Editor,
     Image,
@@ -32,6 +33,7 @@ export const useToolControlHelper = () => {
     GradebookAssignmentView,
     GradebookAttemptView,
   ] = useRef([
+    lazy(() => import('./Overlays/Content')),
     lazy(() => import('./Overlays/Assignment')),
     lazy(() => import('./Overlays/Editor')),
     lazy(() => import('./Overlays/Image')),
