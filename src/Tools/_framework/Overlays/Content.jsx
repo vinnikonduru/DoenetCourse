@@ -38,7 +38,9 @@ import ToggleButton from '../../../_reactComponents/PanelHeaderComponents/Toggle
 import { 
   useAssignmentCallbacks
 } from "../../../_reactComponents/Drive/DriveActions";
-
+import {
+  useAssignment,useAssignmentCallback
+} from "../../course/CourseActions";
  const viewerContentDoenetMLAtom = atom({
   key:"viewerContentDoenetMLAtom",
   default:{updateNumber:0,doenetML:""}
@@ -56,7 +58,7 @@ const loadAssignmentSelector = selectorFamily({
     return data;
   },
 });
- const assignmentDictionary = atomFamily({
+ export const assignmentDictionary = atomFamily({
   key: "assignmentDictionary",
   default: selectorFamily({
     key: "assignmentDictionary/Default",
@@ -78,11 +80,11 @@ const loadAssignmentSelector = selectorFamily({
         ? itemObj.assignmentId
         : null;
       if (itemIdassignmentId) {
-        const assignmentInfo = await get(
+        const updateAssignmentInfo = await get(
           loadAssignmentSelector(itemIdassignmentId)
         );
-        if (assignmentInfo) {
-          return assignmentInfo?.assignments[0];
+        if (updateAssignmentInfo) {
+          return updateAssignmentInfo?.assignments[0];
         } else return null;
       } else return null;
     },
@@ -248,7 +250,12 @@ let assignmentDictionarySelector = selectorFamily({
     }
   },
 });
+
  const ContentInfoPanel = (props) => {
+   
+   
+  const { addAssignment ,changeSettings, onAddAssignmentError } = useAssignment();
+
   console.log(">>>content info  props", props);
   let courseId = props.courseId;
   let itemId = props.itemId;
@@ -263,19 +270,31 @@ let assignmentDictionarySelector = selectorFamily({
   // const { publishContent, onPublishContentError } = useAssignmentCallbacks();
   // const { updateAssignmentTitle, onUpdateAssignmentTitleError } = useAssignmentCallbacks();
   // const { convertAssignmentToContent, onConvertAssignmentToContentError } = useAssignmentCallbacks();
-  let assignmentInfo = "";
 
   const [role, setRole] = useRecoilState(roleAtom);
+  const [updateAssignmentInfo,setAssignmentForm] = useState({});
+  const {assignmentCallbacks} = useAssignmentCallback();
   const assignmentIdSettings = useRecoilValueLoadable(
-    assignmentDictionarySelector({
-      itemId: itemId,
-      courseId: courseId,
-      driveId: driveId,
-      folderId: folderId,
-      contentId:contentId
-    })
+
+    assignmentDictionary(
+      {
+          itemId: itemId,
+          courseId: courseId,
+          driveId: driveId,
+          folderId: folderId,
+          contentId:contentId
+      }
+    )
+    // assignmentDictionarySelector({
+    //   itemId: itemId,
+    //   courseId: courseId,
+    //   driveId: driveId,
+    //   folderId: folderId,
+    //   contentId:contentId
+    // })
   );
-  const setAssignmentSettings = useSetRecoilState(
+  console.log(">>>>>>>>assignmentIdSettings",assignmentIdSettings);
+  const setAssignmentSettings = useSetRecoilState(  //TODO Remove
     assignmentDictionarySelector({
       itemId: itemId,
       courseId: courseId,
@@ -300,61 +319,41 @@ let assignmentDictionarySelector = selectorFamily({
   const [makeNewAssignment, setMakeNewAssignment] = useState(false);
 
 
-  if (assignmentIdSettings?.state === "hasValue") {
-    assignmentInfo = assignmentIdSettings?.contents;
-    console.log(">>>assignmentInfo",assignmentInfo);
-    if (assignmentInfo?.assignmentId) {
-      assignmentId = assignmentInfo?.assignmentId;
-      setAssignmentSettings({ type: "update new assignment", assignmentInfo });
-    }
-  }
-
-   const handleMakeAssignment = () => {
-    setMakeNewAssignment(true);
-  };
-  if (
-    makeNewAssignment &&
-    (assignmentId === "" || assignmentId === undefined)
-  ) {
-    assignmentId = nanoid(); // This is to generate a new one
-
-    setAssignmentSettings({
-      type: "make new assignment",
-      assignmentId: assignmentId,
-    });
-    let payload = {
-      assignmentId,
-      itemId,
-      courseId,
-      branchId,
-      contentId
-    };
-    setMakeNewAssignment(false);
-    axios.post(`/api/makeNewAssignment.php`, payload).then((response) => {
-      console.log(response.data);
-    });
-  }
-
-  // const handlePublishContentCallback = (event) =>{
-
-  //   const result = publishContent({
-  //     driveIdFolderId: {driveId:itemInfo.driveId, folderId:itemInfo.parentFolderId},
-  //     itemId: itemId,
-  //     payload: payload
-  //   });
-  //   result.then((resp)=>{
-  //     if(resp.data.success){
-  //       axios.post(`/api/handlePublishContent.php`, payload).then((response) => {
-  //         console.log(response.data);
-  //       });
-  //       addToast(`Content Published`, ToastType.SUCCESS);
-  //     }else{
-  //       onPublishContentError({errorMessage: resp.data.message});
-  //     }
-  //   }).catch((e)=>{
-  //     onRenameItemError({errorMessage: e.message});
-  //   })
+  // if (assignmentIdSettings?.state === "hasValue") {   
+  //   updateAssignmentInfo = assignmentIdSettings?.contents;
+  //   console.log(">>>updateAssignmentInfo",updateAssignmentInfo);
+  //   if (updateAssignmentInfo?.assignmentId) {
+  //     assignmentId = updateAssignmentInfo?.assignmentId;
+  //     setAssignmentSettings({ type: "update new assignment", updateAssignmentInfo });
+  //   }
   // }
+
+  //  const handleMakeAssignment = () => {
+  //   setMakeNewAssignment(true);
+  // };
+  // if (
+  //   makeNewAssignment &&
+  //   (assignmentId === "" || assignmentId === undefined)
+  // ) {
+  //   assignmentId = nanoid(); // This is to generate a new one
+
+  //   setAssignmentSettings({
+  //     type: "make new assignment",
+  //     assignmentId: assignmentId,
+  //   });
+  //   let payload = {
+  //     assignmentId,
+  //     itemId,
+  //     courseId,
+  //     branchId,
+  //     contentId
+  //   };
+  //   setMakeNewAssignment(false);
+  //   axios.post(`/api/makeNewAssignment.php`, payload).then((response) => {
+  //     console.log(response.data);
+  //   });
+  // }
+
 
    const handlePublishContent = () => {
     let payload = {
@@ -385,7 +384,7 @@ let assignmentDictionarySelector = selectorFamily({
     axios.post(`/api/handleMakeContent.php`, payload).then((response) => {
       console.log(response.data);
     });
-    setAssignmentSettings({ type: "assignment to content", assignmentInfo });
+    setAssignmentSettings({ type: "assignment to content", updateAssignmentInfo });   // TODO
     // setFolderInfo({
     //   instructionType: "assignment to content",
     //   itemId: itemId,
@@ -400,14 +399,14 @@ let assignmentDictionarySelector = selectorFamily({
     axios.post(`/api/handleBackAssignment.php`, payload).then((response) => {
       console.log(response.data);
     });
-    setAssignmentSettings({
+    setAssignmentSettings({                                                          // TODO
       type: "load available assignment",
-      assignmentInfo,
+      updateAssignmentInfo,
     });
     // setFolderInfo({
     //   instructionType: "assignment title update",
     //   itemId: itemId,
-    //   payloadAssignment: assignmentInfo,
+    //   payloadAssignment: updateAssignmentInfo,
     // });
   };
    const AssignmentForm = (props) => {
@@ -417,7 +416,7 @@ let assignmentDictionarySelector = selectorFamily({
     let itemId = props.itemId;
     let driveId = props.driveId;
     let folderId = props.folderId;
-    let assignmentInfo = props.assignmentInfo;
+    let updateAssignmentInfo = props.updateAssignmentInfo;
   
     const role = useRecoilValue(roleAtom);
   
@@ -441,31 +440,37 @@ let assignmentDictionarySelector = selectorFamily({
         }
       }
   
+   
     const handleChange = (event) => {
       let name = event.target.name;
       let value =
         event.target.type === "checkbox"
           ? event.target.checked
           : event.target.value;
-      setAssignmentSettings({ type: "change settings", [name]: value });
+      changeSettings({
+        [name]: value,
+        driveIdcourseIditemIdparentFolderId: {driveId: driveId, folderId: folderId,itemId:itemId,courseId:courseId,branch:branchId,contentId:contentId},
+      });
+      // setAssignmentSettings({ type: "change settings", [name]: value });   // TODO
     };
     const handleOnBlur = (e) => {
       let name = e.target.name;
       let value =
         e.target.type === "checkbox" ? e.target.checked : e.target.value;
-      setAssignmentSettings({ type: "save assignment settings", [name]: value });
+        
+      // setAssignmentSettings({ type: "save assignment settings", [name]: value });    // TODO
     };
   
     const handleSubmit = (e) => {
       const payload = {
-        ...assignmentInfo,
+        ...updateAssignmentInfo,
         assignmentId: assignmentId,
         assignment_isPublished: "1",
         courseId: courseId,
         branchId:branchId
       };
   
-      setAssignmentSettings({
+      setAssignmentSettings({    // TODO
         type: "assignment was published",
         itemId: itemId,
         assignedData: payload,
@@ -479,7 +484,7 @@ let assignmentDictionarySelector = selectorFamily({
   
     return role === "Instructor" ? (
       <>
-        {assignmentId && (
+        { (
           <>
             <div>
               <label>Assignment Name :</label>
@@ -487,7 +492,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="text"
                 name="title"
-                value={assignmentInfo ? assignmentInfo?.title :''}
+                value={updateAssignmentInfo ? updateAssignmentInfo?.title :''}
                 placeholder="Title goes here"
                 onBlur={handleOnBlur}
                 onChange={handleChange}
@@ -499,7 +504,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="text"
                 name="assignedDate"
-                value={assignmentInfo ? assignmentInfo?.assignedDate : ''  }
+                value={updateAssignmentInfo ? updateAssignmentInfo?.assignedDate : ''  }
                 placeholder="0001-01-01 01:01:01 "
                 onBlur={handleOnBlur}
                 onChange={handleChange}
@@ -511,7 +516,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="text"
                 name="dueDate"
-                value={ assignmentInfo ? assignmentInfo?.dueDate  : ''}
+                value={ updateAssignmentInfo ? updateAssignmentInfo?.dueDate  : ''}
                 placeholder="0001-01-01 01:01:01"
                 onBlur={handleOnBlur}
                 onChange={handleChange}
@@ -524,7 +529,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="time"
                 name="timeLimit"
-                value={ assignmentInfo ? assignmentInfo?.timeLimit  : ''}
+                value={ updateAssignmentInfo ? updateAssignmentInfo?.timeLimit  : ''}
                 placeholder="01:01:01"
                 onBlur={handleOnBlur}
                 onChange={handleChange}
@@ -536,7 +541,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="number"
                 name="numberOfAttemptsAllowed"
-                value={ assignmentInfo ? assignmentInfo?.numberOfAttemptsAllowed  : ''}
+                value={ updateAssignmentInfo ? updateAssignmentInfo?.numberOfAttemptsAllowed  : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -547,7 +552,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="text"
                 name="attemptAggregation"
-                value={ assignmentInfo ? assignmentInfo?.attemptAggregation  : ''}
+                value={ updateAssignmentInfo ? updateAssignmentInfo?.attemptAggregation  : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -558,7 +563,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="number"
                 name="totalPointsOrPercent"
-                value={ assignmentInfo ? assignmentInfo?.totalPointsOrPercent  : ''}
+                value={ updateAssignmentInfo ? updateAssignmentInfo?.totalPointsOrPercent  : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -569,7 +574,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="select"
                 name="gradeCategory"
-                value={ assignmentInfo ? assignmentInfo?.gradeCategory  : ''}
+                value={ updateAssignmentInfo ? updateAssignmentInfo?.gradeCategory  : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -580,7 +585,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="individualize"
-                value={assignmentInfo ?  assignmentInfo?.individualize  : ''}
+                value={updateAssignmentInfo ?  updateAssignmentInfo?.individualize  : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -591,7 +596,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="multipleAttempts"
-                value={ assignmentInfo ? assignmentInfo?.multipleAttempts  : ''}
+                value={ updateAssignmentInfo ? updateAssignmentInfo?.multipleAttempts  : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -602,7 +607,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="showSolution"
-                value={ assignmentInfo ? assignmentInfo?.showSolution  : ''}
+                value={ updateAssignmentInfo ? updateAssignmentInfo?.showSolution  : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -613,7 +618,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="showFeedback"
-                value={ assignmentInfo ? assignmentInfo?.showFeedback  : ''}
+                value={ updateAssignmentInfo ? updateAssignmentInfo?.showFeedback  : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -624,7 +629,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="showHints"
-                value={ assignmentInfo ? assignmentInfo?.showHints  : ''}
+                value={ updateAssignmentInfo ? updateAssignmentInfo?.showHints  : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -635,7 +640,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="showCorrectness"
-                value={assignmentInfo ? assignmentInfo?.showCorrectness  : ''}
+                value={updateAssignmentInfo ? updateAssignmentInfo?.showCorrectness  : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -646,7 +651,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="proctorMakesAvailable"
-                value={ assignmentInfo ? assignmentInfo?.proctorMakesAvailable : ''}
+                value={ updateAssignmentInfo ? updateAssignmentInfo?.proctorMakesAvailable : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -667,14 +672,14 @@ let assignmentDictionarySelector = selectorFamily({
       <div>
         {assignmentId && (
           <div>
-            <h1>{assignmentInfo?.title}</h1>
-            <p>Due: {assignmentInfo?.dueDate}</p>
-            <p>Time Limit: {assignmentInfo?.timeLimit}</p>
+            <h1>{updateAssignmentInfo?.title}</h1>
+            <p>Due: {updateAssignmentInfo?.dueDate}</p>
+            <p>Time Limit: {updateAssignmentInfo?.timeLimit}</p>
             <p>
               Number of Attempts Allowed:{" "}
-              {assignmentInfo?.numberOfAttemptsAllowed}
+              {updateAssignmentInfo?.numberOfAttemptsAllowed}
             </p>
-            <p>Points: {assignmentInfo?.totalPointsOrPercent}</p>
+            <p>Points: {updateAssignmentInfo?.totalPointsOrPercent}</p>
           </div>
         )}
       </div>
@@ -685,7 +690,7 @@ let assignmentDictionarySelector = selectorFamily({
       <br />
 
       {role === "Instructor" &&
-        assignmentInfo?.assignment_isPublished !== "1" && (
+        updateAssignmentInfo?.assignment_isPublished !== "1" && (
           <ToggleButton
             value="Publish Content"
             switch_value="Published"
@@ -694,30 +699,52 @@ let assignmentDictionarySelector = selectorFamily({
         )}
 
       {role === "Instructor" ? (
-        <ToggleButton value="Make Assignment" callback={handleMakeAssignment} />
+        <ToggleButton value="Make Assignment" callback={()=>{
+          assignmentId = nanoid();
+          const result = addAssignment({
+            driveIdcourseIditemIdparentFolderId: {driveId: driveId, folderId: folderId,itemId:itemId,courseId:courseId,branch:branchId,contentId:contentId},
+             assignmentId: assignmentId            
+          });
+          // if(result){
+          //   setAssignmentForm(result);
+          // }
+          result.then(resp => {
+            if (resp){
+              // addToast(`Add new assignment 'Untitled assignment'`, ToastType.SUCCESS);
+              setAssignmentForm(resp)
+            }
+            // else{
+            //   onAddAssignmentError({errorMessage: resp.data.message});
+            // }
+          })
+          // .catch( e => {
+          //   onAddAssignmentError({errorMessage: e.message});
+          // })
+        }
+        } />
       ) 
       : null}
       <br />
-      {assignmentId && assignmentInfo?.isAssignment == "1" && (
+      {updateAssignmentInfo?.isAssignment == "1" && (
         <AssignmentForm
           itemType={itemType}
           courseId={courseId}
           driveId={driveId}
           folderId={folderId}
           assignmentId={assignmentId}
-          assignmentInfo={assignmentInfo}
+          updateAssignmentInfo={updateAssignmentInfo}
           itemId={itemId}
         />
       )}
 
-      {/* {role === "Instructor" && assignmentInfo?.isAssignment == "1" && (
+      {/* {role === "Instructor" && updateAssignmentInfo?.isAssignment == "1" && (
         <ToggleButton value="Make Content" callback={handleMakeContent} />
       )} */}
 
       {role === "Instructor" &&
       assignmentId &&
-      assignmentInfo?.isAssignment == "0" ? (
-        <ToggleButton value="Make Assignment" callback={loadBackAssignment} />
+      updateAssignmentInfo?.isAssignment == "0" ? (
+        <ToggleButton value="back Assignment" callback={loadBackAssignment} />
       ) : null}
     </div>
   );
