@@ -174,7 +174,7 @@ export default function  Course(props) {
       </div>
       </navPanel>
 
-      <mainPanel 
+      <mainPanel responsiveControls={responsiveControls}
       // responsiveControls={routePathDriveId ? 
       // <Button value={openEnrollment ? "Close Enrollment" : "Open Enrollment"} callback={(e)=>setEnrollment(e)}></Button>: ''}
       >
