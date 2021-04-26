@@ -16,7 +16,7 @@ import Toast, { useToast } from '../../Tools/_framework/Toast';
 export const useAssignment = () => {
   const [addToast, ToastType] = useToast();
 
-  const addAssignment = useRecoilCallback(
+  const addContentAssignment = useRecoilCallback(
     ({ snapshot, set }) => async ({
       driveIdcourseIditemIdparentFolderId,
       assignmentId,
@@ -119,7 +119,7 @@ export const useAssignment = () => {
     },
   );
 
-  const publishAssignment = useRecoilCallback(
+  const publishContentAssignment = useRecoilCallback(
     ({ snapshot, set }) => async (
       props
     ) => {
@@ -201,10 +201,10 @@ export const useAssignment = () => {
     addToast(`${errorMessage}`, ToastType.ERROR);
   };
   return {
-    addAssignment,
+    addContentAssignment,
     changeSettings,
     saveSettings,
-    publishAssignment,
+    publishContentAssignment,
     updateexistingAssignment,
     assignmentToContent,
     loadAvailableAssignment,
