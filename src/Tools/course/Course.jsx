@@ -48,7 +48,8 @@ function Container(props){
   style={{
       maxWidth: "850px",
       // border: "1px red solid",
-      margin: "20px",
+      padding: "20px",
+      display:"grid"
   }
   }
   >
@@ -235,14 +236,14 @@ export default function  Course(props) {
         tabIndex={0}
         className={routePathDriveId ? '' : 'mainPanelStyle' }
         >
-            <h2>Admin</h2>
+            {!routePathDriveId &&<h2>Admin</h2>}
               <DriveCards
               routePathDriveId={routePathDriveId}
               isOneDriveSelect={true} 
               types={['course']}
               subTypes={['Administrator']}
               driveDoubleClickCallback={({item})=>{DriveCardCallBack({item})}}/>
-              <h2>Student</h2>
+              {!routePathDriveId &&<h2>Student</h2>}
               <DriveCards 
               routePathDriveId={routePathDriveId}
               isOneDriveSelect={true} 
