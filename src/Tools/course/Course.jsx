@@ -35,7 +35,7 @@ import "../../_reactComponents/Drive/drivecard.css";
 import '../../_utils/util.css';
 import GlobalFont from "../../_utils/GlobalFont";
 import Tool from '../_framework/Tool';
-import { useToolControlHelper } from '../_framework/ToolRoot';
+import { useToolControlHelper ,ProfileContext} from '../_framework/ToolRoot';
 import Toast, { useToast } from '../_framework/Toast';
 import {drivecardSelectedNodesAtom} from '../library/Library';
 import Enrollment from "./Enrollment";
@@ -161,6 +161,30 @@ export default function  Course(props) {
   let responsiveControls = '';
   if(role === 'Instructor' && routePathDriveId){
     responsiveControls =<Button value={openEnrollment ? "Close Enrollment" : "Open Enrollment"} callback={(e)=>setEnrollment(e)}></Button> 
+   }
+
+   const profile = useContext(ProfileContext)
+
+   if (profile.signedIn === "0"){
+     return (<>
+      <GlobalFont/>
+     <Tool>
+ 
+       <headerPanel title="Course">
+       </headerPanel>
+ 
+       <mainPanel>
+         <div style={{margin:"10px"}}>
+           <h1>You are not signed in</h1>
+           <h2>Course currently requirers sign in for use</h2> 
+           <h2><a href='/signin'>Sign in with this link</a></h2>
+           </div>
+       </mainPanel>
+     
+      
+     </Tool>
+     </>
+     )
    }
   return (
     <Tool>
