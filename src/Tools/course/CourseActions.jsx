@@ -76,7 +76,7 @@ export const useAssignment = () => {
     ({ snapshot, set }) => async (
       props
     ) => {
-      console.log(">>>>>>props in actions", props);
+      // console.log(">>>>>> actions change", props);
       let {driveIdcourseIditemIdparentFolderId,...value } = props
       set(
         assignmentDictionary(driveIdcourseIditemIdparentFolderId),
@@ -90,10 +90,12 @@ export const useAssignment = () => {
   );
 
   const saveSettings = useRecoilCallback(
-    ({ snapshot, set }) => async ({
-      driveIdcourseIditemIdparentFolderId,
-      value,
-    }) => {
+    ({ snapshot, set }) => async (
+      props
+      ) => {
+      // console.log(">>>>>> actions save", props);
+      let {driveIdcourseIditemIdparentFolderId,...value } = props
+
       set(
         assignmentDictionary(driveIdcourseIditemIdparentFolderId),
         (old) => {
@@ -118,21 +120,21 @@ export const useAssignment = () => {
   );
 
   const publishAssignment = useRecoilCallback(
-    ({ snapshot, set }) => async ({
-      driveIdcourseIditemIdparentFolderId,
-      value,
-    }) => {
-     
-      set(
-        assignmentDictionary(driveIdcourseIditemIdparentFolderId),
-        publishAssignment
-      );
+    ({ snapshot, set }) => async (
+      props
+    ) => {
+      let {driveIdcourseIditemIdparentFolderId,...value } = props
+
+      // set(                                                 //TODO
+      //   assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+      //   publishAssignment
+      // );
       const payloadPublish = {
-        ...publishAssignment,
-        assignmentId: publishAssignment.assignmentId,
+        ...value,
+        assignmentId: props.assignmentId,
         assignment_isPublished: "1",
-        branchId:value.assignedData.branchId,
-        courseId: driveIdcourseIditemIdparentFolderId.courseId,
+        branchId:props.branchId,
+        courseId: props.courseId,
       };
       axios
         .post("/api/publishAssignment.php", payloadPublish)
@@ -210,14 +212,5 @@ export const useAssignment = () => {
   };
 };
 
-export const useAssignmentCallback = () =>{
-  const assignmentCallbacks = useRecoilCallback(({ snapshot, get }) => async (driveIdcourseIditemIdparentFolderId) => {
-    const aInfo = await snapshot.getPromise(assignmentDictionary(driveIdcourseIditemIdparentFolderId));
-     
-    return aInfo;
-
-  });
-  return {assignmentCallbacks};
-}
 
  
