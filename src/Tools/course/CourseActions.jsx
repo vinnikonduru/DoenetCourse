@@ -144,7 +144,7 @@ export const useAssignment = () => {
   const loadAvailableAssignment = useRecoilCallback(
     ({ snapshot, set }) => async (props) => {
       let { driveIdcourseIditemIdparentFolderId, ...value } = props;
-      let handlebackAssignment = get(assignmentDictionary);
+      let handlebackAssignment = await snapshot.getPromise(assignmentDictionary);
       const payloadAssignment = { ...handlebackAssignment, isAssignment: 1 };
       set(assignmentDictionary, payloadAssignment);
     },

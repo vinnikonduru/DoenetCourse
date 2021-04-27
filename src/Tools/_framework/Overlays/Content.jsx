@@ -386,11 +386,12 @@ export const ContentInfoPanel = (props) => {
     axios.post(`/api/handleBackAssignment.php`, payload).then((response) => {
       console.log(response.data);
     });
-    setAssignmentSettings({
-      // TODO
-      type: 'load available assignment',
-      aInfo,
-    });
+    loadAvailableAssignment()
+    // setAssignmentSettings({
+    //   // TODO
+    //   type: 'load available assignment',
+    //   aInfo,
+    // });
     // setFolderInfo({                                            //TODO
     //   instructionType: "assignment title update",
     //   itemId: itemId,
@@ -804,7 +805,7 @@ export const ContentInfoPanel = (props) => {
       )}
 
       {role === 'Instructor' && assignmentId && aInfo?.isAssignment == '0' ? (
-        <ToggleButton value="back Assignment" callback={loadBackAssignment} />
+        <ToggleButton value="load Assignment" callback={loadBackAssignment} />
       ) : null}
     </div>
   );
