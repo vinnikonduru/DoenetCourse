@@ -101,12 +101,7 @@ const loadAssignmentSelector = selectorFamily({
   LOAD_ASSIGNMENT: "load available assignment",
 
 });
-// const newCallbackFunction = (driveIdcourseIditemIdparentFolderId) =>{
-//   console.log("@@@@@@@@@@@@@@@@@@@@@@@");
-//   return (
-//     assignmentDictionary(driveIdcourseIditemIdparentFolderId)
-//   )
-// }
+
 let assignmentDictionarySelector = selectorFamily({
   //recoilvalue(assignmentDictionarySelector(assignmentId))
   key: "assignmentDictionarySelector",
@@ -121,7 +116,6 @@ let assignmentDictionarySelector = selectorFamily({
     switch (type) {
       case AssignmentSelectorActions.CHANGE_SETTINGS:
         set(
-          // newCallbackFunction(driveIdcourseIditemIdparentFolderId),
           assignmentDictionary(driveIdcourseIditemIdparentFolderId),
           (old) => {
             return { ...old, ...value };
@@ -275,11 +269,6 @@ let assignmentDictionarySelector = selectorFamily({
   let branchId = props.branchId;
   let contentId = props.contentId;
 
-  // const { publishAssignment, onPublishAssignmentError } = useAssignmentCallbacks();
-  // const { publishContent, onPublishContentError } = useAssignmentCallbacks();
-  // const { updateAssignmentTitle, onUpdateAssignmentTitleError } = useAssignmentCallbacks();
-  // const { convertAssignmentToContent, onConvertAssignmentToContentError } = useAssignmentCallbacks();
-
   const [role, setRole] = useRecoilState(roleAtom);
   const [updateAssignmentInfo,setAssignmentForm] = useRecoilState(assignmentDictionary({itemId: itemId,
     courseId: courseId,
@@ -370,30 +359,7 @@ let assignmentDictionarySelector = selectorFamily({
 
   const [makecontent, setMakeContent] = useState(false);
 
-  const handleMakeContent = (e) => {
-    setMakeContent(true);
-  };
 
-  if (makecontent) {
-    let payload = {
-      itemId: itemId,
-    };
-    setMakeContent(false);
-    axios.post(`/api/handleMakeContent.php`, payload).then((response) => {
-      console.log(response.data);
-    });
-    setAssignmentSettings({ type: "assignment to content", updateAssignmentInfo });   // TODO
-    
-    convertAssignmentToContent({
-      driveIdFolderId:{
-        driveId: driveId,
-        folderId: folderId,
-      },
-      itemId: itemId,
-      assignedDataSavenew: payload,
-    })
-
-  }
 
   const loadBackAssignment = () => {
     let payload = {
@@ -711,6 +677,15 @@ let assignmentDictionarySelector = selectorFamily({
                     courseId: courseId,
                     branchId:branchId
                   };
+                  publishAssignment({
+                    driveIdFolderId:{
+                      driveId: driveId,
+                      folderId: folderId,
+                    },
+                    itemId: itemId,
+                    payload:payload
+
+                  })
                   const result = publishContentAssignment(payload);
                   // if(result){
                   //   setAssignmentForm(result);
@@ -807,9 +782,7 @@ let assignmentDictionarySelector = selectorFamily({
         />
       )}
 
-      {/* {role === "Instructor" && updateAssignmentInfo?.isAssignment == "1" && (
-        <ToggleButton value="Make Content" callback={handleMakeContent} />
-      )} */}
+     
 
       {role === "Instructor" &&
       assignmentId &&

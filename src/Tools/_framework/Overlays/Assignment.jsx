@@ -2,18 +2,35 @@
  * External dependencies
  */
 import React, { useEffect, useState, useRef } from "react";
+import {
+  atom,
+  useSetRecoilState,
+  useRecoilValue,
+  selector,
+  useRecoilState,
+  selectorFamily,
+  useRecoilValueLoadable,
+  useRecoilStateLoadable,
+  useRecoilCallback,
+  atomFamily
+} from "recoil";
+import axios from "axios";
+
+
 /**
  * Internal dependencies
  */
 import Tool from "../Tool";
-
-import { 
-  useRecoilValue, 
-  atom, 
-  useRecoilCallback
-} from "recoil";
 import DoenetViewer from '../../../Viewer/DoenetViewer';
 import { fileByContentId } from "./Editor";
+import { 
+  useAssignmentCallbacks
+} from "../../../_reactComponents/Drive/DriveActions";
+import {
+  useAssignment
+} from "../../course/CourseActions";
+import { assignmentDictionary } from '../../_framework/Overlays/Content';
+import ToggleButton from '../../../_reactComponents/PanelHeaderComponents/ToggleButton'
 
 export const assignmentDoenetMLAtom = atom({
   key:"assignmentDoenetMLAtom",
@@ -21,7 +38,7 @@ export const assignmentDoenetMLAtom = atom({
 })
 
 
-export default function Assignment({ courseId, branchId, assignmentId }) {
+export default function Assignment({ branchId = '',contentId ='',title,courseId = '',driveId='' ,folderId='',itemId='',assignmentId='' }) {
   let initDoenetML = useRecoilCallback(({snapshot,set})=> async (contentId)=>{
     const response = await snapshot.getPromise(fileByContentId(contentId));
     const doenetML = response.data;
@@ -30,9 +47,30 @@ export default function Assignment({ courseId, branchId, assignmentId }) {
     set(assignmentDoenetMLAtom,{updateNumber,doenetML})
   })
 
+  const {assignmentToContent, onAddAssignmentError } = useAssignment();
+  const { publishAssignment, 
+    onPublishAssignmentError,
+    publishContent,
+    onPublishContentError,
+    updateAssignmentTitle,
+    onUpdateAssignmentTitleError,
+    convertAssignmentToContent,
+    onConvertAssignmentToContentError } = useAssignmentCallbacks();
+
+  const [updateAssignmentInfo,setAssignmentForm] = useRecoilState(assignmentDictionary({itemId: itemId,
+    courseId: courseId,
+    driveId: driveId,
+    folderId: folderId,
+    contentId:contentId,
+    branchId:branchId
+  }));
+
+console.log(">>>>>>>>>updateAssignmentInfo",updateAssignmentInfo);
   useEffect(() => {
     initDoenetML(assignmentId ? assignmentId : branchId)
 }, []);
+
+
   function DoenetViewerPanel(props){
     const assignmentDoenetML = useRecoilValue(assignmentDoenetMLAtom);
     // console.log("assignmentDoenetML",assignmentDoenetML);
@@ -57,6 +95,32 @@ export default function Assignment({ courseId, branchId, assignmentId }) {
         requestedVariant={requestedVariant}
         /> 
   }
+
+
+  const handleMakeContent = (e) => {
+    let payload = {
+      itemId: itemId,
+    };
+    axios.post(`/api/handleMakeContent.php`, payload).then((response) => {
+      console.log(response.data);
+    });
+    assignmentToContent();
+    // setAssignmentForm((old)=>{
+    //   return  {...old, [isAssignment]: 0}  
+    // })
+    convertAssignmentToContent({
+      driveIdFolderId:{
+        driveId: driveId,
+        folderId: folderId,
+      },
+      itemId: itemId,
+      assignedDataSavenew: payload,
+    })
+  };
+
+
+
+  
   return (
     <Tool>
       <headerPanel></headerPanel>
@@ -70,10 +134,11 @@ export default function Assignment({ courseId, branchId, assignmentId }) {
 
       <supportPanel></supportPanel>
 
-      <menuPanel title={"Assignment Info"}>
-        {/* {role === "Instructor" && assignmentInfo?.isAssignment == "1" && (
+      <menuPanel title={"Assignment Info"} isInitOpen>
+        
+        { (
         <ToggleButton value="Make Content" callback={handleMakeContent} />
-      )} */}
+      )}
       </menuPanel>
     </Tool>
   );
