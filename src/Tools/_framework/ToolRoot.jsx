@@ -105,8 +105,12 @@ export const useToolControlHelper = () => {
           ...old,
           <Assignment
             branchId={branchId}
+            driveId={driveId}
+            folderId={folderId}
             assignmentId={assignmentId}
             courseId={courseId}
+            itemId={itemId}
+            contentId={contentId}
             key={`AssignmentLayer${old.length + 1}`}
           />,
         ]);

@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import React, { useEffect, useState, useRef } from "react";
-import Tool from "../Tool";
+import React, { useEffect, useState, useRef } from 'react';
+import Tool from '../Tool';
 import { nanoid } from 'nanoid';
 
 import {
@@ -15,63 +15,63 @@ import {
   useRecoilValueLoadable,
   useRecoilStateLoadable,
   useRecoilCallback,
-  atomFamily
-} from "recoil";
-import axios from "axios";
+  atomFamily,
+} from 'recoil';
+import axios from 'axios';
 
 /**
  * Internal dependencies
  */
 import DoenetViewer from '../../../Viewer/DoenetViewer';
-import { fileByContentId } from "./Editor";
-import Drive, { 
-  folderDictionarySelector, 
-  globalSelectedNodesAtom, 
-  folderDictionary, 
+import { fileByContentId } from './Editor';
+import Drive, {
+  folderDictionarySelector,
+  globalSelectedNodesAtom,
+  folderDictionary,
   clearDriveAndItemSelections,
   fetchDrivesSelector,
   encodeParams,
   fetchDriveUsers,
   fetchDrivesQuery,
-} from "../../../_reactComponents/Drive/Drive";
-import ToggleButton from '../../../_reactComponents/PanelHeaderComponents/ToggleButton'
-import { 
-  useAssignmentCallbacks
-} from "../../../_reactComponents/Drive/DriveActions";
-import {
-  useAssignment
-} from "../../course/CourseActions";
- const viewerContentDoenetMLAtom = atom({
-  key:"viewerContentDoenetMLAtom",
-  default:{updateNumber:0,doenetML:""}
-})
+} from '../../../_reactComponents/Drive/Drive';
+import ToggleButton from '../../../_reactComponents/PanelHeaderComponents/ToggleButton';
+import { useAssignmentCallbacks } from '../../../_reactComponents/Drive/DriveActions';
+import { useAssignment } from '../../course/CourseActions';
+const viewerContentDoenetMLAtom = atom({
+  key: 'viewerContentDoenetMLAtom',
+  default: { updateNumber: 0, doenetML: '' },
+});
 const roleAtom = atom({
-  key: "roleAtom",
-  default: "Instructor",
+  key: 'roleAtom',
+  default: 'Instructor',
 });
 const loadAssignmentSelector = selectorFamily({
-  key: "loadAssignmentSelector",
+  key: 'loadAssignmentSelector',
   get: (assignmentId) => async ({ get, set }) => {
     const { data } = await axios.get(
-      `/api/getAllAssignmentSettings.php?assignmentId=${assignmentId}`
+      `/api/getAllAssignmentSettings.php?assignmentId=${assignmentId}`,
     );
     return data;
   },
 });
- export const assignmentDictionary = atomFamily({
-  key: "assignmentDictionary",
-  default: selectorFamily({
-    key: "assignmentDictionary/Default",
+export const assignmentDictionary = atom({
+  key: 'assignmentDictionary',
+  default: selector({
+    key: 'assignmentDictionary/Default',
     get: (driveIdcourseIditemIdparentFolderId) => async (
       { get },
-      instructions
+      instructions,
     ) => {
+      console.log(
+        '>>>>>>>>>>>>>>asignmentDictioanryinfo',
+        driveIdcourseIditemIdparentFolderId,
+      );
       let folderInfoQueryKey = {
         driveId: driveIdcourseIditemIdparentFolderId.driveId,
         folderId: driveIdcourseIditemIdparentFolderId.folderId,
       };
       let folderInfo = get(folderDictionarySelector(folderInfoQueryKey));
-    console.log(">>>>>>>>>>>>>>>>>>folderInfo",folderInfo)
+      //  console.log(">>>>>>>>>>>>>>>>>>folderInfo",folderInfo)
       const itemObj =
         folderInfo?.contentsDictionary?.[
           driveIdcourseIditemIdparentFolderId.itemId
@@ -80,37 +80,34 @@ const loadAssignmentSelector = selectorFamily({
         ? itemObj.assignmentId
         : null;
       if (itemIdassignmentId) {
-        const updateAssignmentInfo = await get(
-          loadAssignmentSelector(itemIdassignmentId)
-        );
-        if (updateAssignmentInfo) {
-          return updateAssignmentInfo?.assignments[0];
+        const aInfo = await get(loadAssignmentSelector(itemIdassignmentId));
+        if (aInfo) {
+          return aInfo?.assignments[0];
         } else return null;
       } else return null;
     },
   }),
 });
 
- const AssignmentSelectorActions = Object.freeze({
-  CHANGE_SETTINGS: "change settings",
-  MAKE_ASSIGNMENT:"make new assignment",
-  SAVE_SETTINGS: "save assignment settings",
-  PUBLISH_ASSIGNMENT: "assignment was published",
-  UPDATE_ASSIGNMENT: "update new assignment",
-  ASSIGNMENT_TO_CONTENT: "assignment to content",
-  LOAD_ASSIGNMENT: "load available assignment",
-
+const AssignmentSelectorActions = Object.freeze({
+  CHANGE_SETTINGS: 'change settings',
+  MAKE_ASSIGNMENT: 'make new assignment',
+  SAVE_SETTINGS: 'save assignment settings',
+  PUBLISH_ASSIGNMENT: 'assignment was published',
+  UPDATE_ASSIGNMENT: 'update new assignment',
+  ASSIGNMENT_TO_CONTENT: 'assignment to content',
+  LOAD_ASSIGNMENT: 'load available assignment',
 });
 
 let assignmentDictionarySelector = selectorFamily({
   //recoilvalue(assignmentDictionarySelector(assignmentId))
-  key: "assignmentDictionarySelector",
+  key: 'assignmentDictionarySelector',
   get: (driveIdcourseIditemIdparentFolderId) => ({ get }) => {
     return get(assignmentDictionary(driveIdcourseIditemIdparentFolderId));
   },
   set: (driveIdcourseIditemIdparentFolderId) => (
     { set, get },
-    instructions
+    instructions,
   ) => {
     let { type, ...value } = instructions;
     switch (type) {
@@ -119,101 +116,107 @@ let assignmentDictionarySelector = selectorFamily({
           assignmentDictionary(driveIdcourseIditemIdparentFolderId),
           (old) => {
             return { ...old, ...value };
-          }
+          },
         );
 
         break;
-        case AssignmentSelectorActions.SAVE_SETTINGS:
+      case AssignmentSelectorActions.SAVE_SETTINGS:
         const saveInfo = get(
           // newCallbackFunction(driveIdcourseIditemIdparentFolderId)
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId)
+          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
         );
         set(
           assignmentDictionary(driveIdcourseIditemIdparentFolderId),
           (old) => {
             return { ...old, ...value };
-          }
+          },
         );
         let saveAssignmentNew = { ...saveInfo, ...value };
         set(
           assignmentDictionary(driveIdcourseIditemIdparentFolderId),
-          saveAssignmentNew
+          saveAssignmentNew,
         );
         const payload = {
           ...saveInfo,
           assignmentId: saveAssignmentNew.assignmentId,
-          assignment_isPublished: "0",
+          assignment_isPublished: '0',
         };
 
-        axios.post("/api/saveAssignmentToDraft.php", payload).then((resp) => {
+        axios.post('/api/saveAssignmentToDraft.php', payload).then((resp) => {
           console.log(resp.data);
         });
         break;
-        case AssignmentSelectorActions.MAKE_ASSIGNMENT:
-        
-          let newAssignmentObj = {
-            ...value,
-            title: "Untitled Assignment",
-            assignedDate: '',
-            attemptAggregation: '',
-            dueDate: '',
-            gradeCategory: '',
-            individualize: "0",
-            isAssignment: "1",
-            isPublished: "0",
-            itemId: driveIdcourseIditemIdparentFolderId.itemId,
-            multipleAttempts: '',
-            numberOfAttemptsAllowed: '',
-            proctorMakesAvailable: "0",
-            showCorrectness: "1",
-            showFeedback: "1",
-            showHints: "1",
-            showSolution: "1",
-            timeLimit: '',
-            totalPointsOrPercent: '',
-            assignment_isPublished: "0",
-            subType:"Administrator"
-          };
-          console.log(">>>>>new assignment obj",assignmentDictionary(driveIdcourseIditemIdparentFolderId),newAssignmentObj);
-          set(assignmentDictionary(driveIdcourseIditemIdparentFolderId),newAssignmentObj);
-          break;
-        case AssignmentSelectorActions.PUBLISH_ASSIGNMENT:
+      case AssignmentSelectorActions.MAKE_ASSIGNMENT:
+        let newAssignmentObj = {
+          ...value,
+          title: 'Untitled Assignment',
+          assignedDate: '',
+          attemptAggregation: '',
+          dueDate: '',
+          gradeCategory: '',
+          individualize: '0',
+          isAssignment: '1',
+          isPublished: '0',
+          itemId: driveIdcourseIditemIdparentFolderId.itemId,
+          multipleAttempts: '',
+          numberOfAttemptsAllowed: '',
+          proctorMakesAvailable: '0',
+          showCorrectness: '1',
+          showFeedback: '1',
+          showHints: '1',
+          showSolution: '1',
+          timeLimit: '',
+          totalPointsOrPercent: '',
+          assignment_isPublished: '0',
+          subType: 'Administrator',
+        };
+        console.log(
+          '>>>>>new assignment obj',
+          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          newAssignmentObj,
+        );
+        set(
+          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          newAssignmentObj,
+        );
+        break;
+      case AssignmentSelectorActions.PUBLISH_ASSIGNMENT:
         // console.log(">>>> published value", value.assignedData.branchId);
         let publishAssignment = get(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId)
+          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
         );
 
         set(
           assignmentDictionary(driveIdcourseIditemIdparentFolderId),
-          publishAssignment
+          publishAssignment,
         );
         const payloadPublish = {
           ...publishAssignment,
           assignmentId: publishAssignment.assignmentId,
-          assignment_isPublished: "1",
-          branchId:value.assignedData.branchId,
+          assignment_isPublished: '1',
+          branchId: value.assignedData.branchId,
           courseId: driveIdcourseIditemIdparentFolderId.courseId,
         };
         axios
-          .post("/api/publishAssignment.php", payloadPublish)
+          .post('/api/publishAssignment.php', payloadPublish)
           .then((resp) => {
             console.log(resp.data);
           });
         break;
-        case AssignmentSelectorActions.UPDATE_ASSIGNMENT:
+      case AssignmentSelectorActions.UPDATE_ASSIGNMENT:
         let editAssignment = get(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId)
+          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
         );
 
         set(
           assignmentDictionary(driveIdcourseIditemIdparentFolderId),
-          editAssignment
+          editAssignment,
         );
 
         break;
-        case AssignmentSelectorActions.ASSIGNMENT_TO_CONTENT:
+      case AssignmentSelectorActions.ASSIGNMENT_TO_CONTENT:
         let handlebackContent = get(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId)
+          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
         );
 
         const payloadContent = {
@@ -222,13 +225,13 @@ let assignmentDictionarySelector = selectorFamily({
         };
         set(
           assignmentDictionary(driveIdcourseIditemIdparentFolderId),
-          payloadContent
+          payloadContent,
         );
 
         break;
-        case AssignmentSelectorActions.LOAD_ASSIGNMENT:
+      case AssignmentSelectorActions.LOAD_ASSIGNMENT:
         let handlebackAssignment = get(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId)
+          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
         );
 
         const payloadAssignment = {
@@ -237,7 +240,7 @@ let assignmentDictionarySelector = selectorFamily({
         };
         set(
           assignmentDictionary(driveIdcourseIditemIdparentFolderId),
-          payloadAssignment
+          payloadAssignment,
         );
 
         break;
@@ -245,52 +248,71 @@ let assignmentDictionarySelector = selectorFamily({
   },
 });
 
- const ContentInfoPanel = (props) => {
-   
-   
-  const { addContentAssignment ,changeSettings, saveSettings,publishContentAssignment, onAddAssignmentError } = useAssignment();
-  const { publishAssignment, 
+export const ContentInfoPanel = (props) => {
+  const {
+    addContentAssignment,
+    changeSettings,
+    saveSettings,
+    publishContentAssignment,
+    onAddAssignmentError,
+  } = useAssignment();
+  const {
+    publishAssignment,
     onPublishAssignmentError,
     publishContent,
     onPublishContentError,
     updateAssignmentTitle,
     onUpdateAssignmentTitleError,
     convertAssignmentToContent,
-    onConvertAssignmentToContentError } = useAssignmentCallbacks();
+    onConvertAssignmentToContentError,
+  } = useAssignmentCallbacks();
 
-
-  console.log(">>>content info  props", props);
+  console.log('>>>content info  props', props);
   let courseId = props.courseId;
   let itemId = props.itemId;
   let itemType = props.itemType;
-  let assignmentId = "";
+  let assignmentId = '';
   let driveId = props.driveId;
   let folderId = props.folderId;
   let branchId = props.branchId;
   let contentId = props.contentId;
 
   const [role, setRole] = useRecoilState(roleAtom);
-  const [updateAssignmentInfo,setAssignmentForm] = useRecoilState(assignmentDictionary({itemId: itemId,
-    courseId: courseId,
-    driveId: driveId,
-    folderId: folderId,
-    contentId:contentId,
-    branchId:branchId
-  }));
+  // const [aInfo,setAssignmentForm] = useRecoilState(assignmentDictionary({itemId: itemId,
+  //   courseId: courseId,
+  //   driveId: driveId,
+  //   folderId: folderId,
+  //   contentId:contentId,
+  //   branchId:branchId
+  // }));
+  // const [aInfo,setAssignmentForm] = useRecoilState(assignmentDictionary);
 
-  const setAssignmentSettings = useSetRecoilState(  //TODO Remove
+  const assignmentIdSettings = useRecoilValueLoadable(assignmentDictionary);
+
+  let aInfo = '';
+
+  if (assignmentIdSettings?.state === 'hasValue') {
+    aInfo = assignmentIdSettings?.contents;
+    if (aInfo?.assignmentId) {
+      assignmentId = aInfo?.assignmentId;
+      // setAssignmentSettings({ type: "update new assignment", aInfo }); TODO remove
+    }
+  }
+  console.log('>>>>>>>>>>>>>here2222@@@@@@@@@@', aInfo);
+  const setAssignmentSettings = useSetRecoilState(
+    //TODO Remove
     assignmentDictionarySelector({
       itemId: itemId,
       courseId: courseId,
       driveId: driveId,
       folderId: folderId,
-      contentId:contentId
-    })
+      contentId: contentId,
+    }),
   );
   const [folderInfoObj, setFolderInfo] = useRecoilStateLoadable(
-    folderDictionarySelector({ driveId: driveId, folderId: folderId })
+    folderDictionarySelector({ driveId: driveId, folderId: folderId }),
   );
-  
+
   // console.log(">>>> folderInfoObj",folderInfoObj);
   // if(folderInfoObj?.state === "hasValue"){
   //   console.log(">>>> folderInfoObj",folderInfoObj);
@@ -302,13 +324,12 @@ let assignmentDictionarySelector = selectorFamily({
   // }
   const [makeNewAssignment, setMakeNewAssignment] = useState(false);
 
-
-  // if (assignmentIdSettings?.state === "hasValue") {   
-  //   updateAssignmentInfo = assignmentIdSettings?.contents;
-  //   console.log(">>>updateAssignmentInfo",updateAssignmentInfo);
-  //   if (updateAssignmentInfo?.assignmentId) {
-  //     assignmentId = updateAssignmentInfo?.assignmentId;
-  //     setAssignmentSettings({ type: "update new assignment", updateAssignmentInfo });
+  // if (aInfo?.state === "hasValue") {
+  //   aInfo = aInfo?.contents;
+  //   console.log(">>>aInfo",aInfo);
+  //   if (aInfo?.assignmentId) {
+  //     assignmentId = aInfo?.assignmentId;
+  //     setAssignmentSettings({ type: "update new assignment", aInfo });
   //   }
   // }
 
@@ -338,19 +359,18 @@ let assignmentDictionarySelector = selectorFamily({
   //   });
   // }
 
-
-   const handlePublishContent = () => {
+  const handlePublishContent = () => {
     let payload = {
       itemId: itemId,
     };
     publishContent({
-      driveIdFolderId:{
+      driveIdFolderId: {
         driveId: driveId,
         folderId: folderId,
       },
       itemId: itemId,
       payload: payload,
-    })
+    });
 
     axios.post(`/api/handlePublishContent.php`, payload).then((response) => {
       console.log(response.data);
@@ -359,8 +379,6 @@ let assignmentDictionarySelector = selectorFamily({
 
   const [makecontent, setMakeContent] = useState(false);
 
-
-
   const loadBackAssignment = () => {
     let payload = {
       itemId: itemId,
@@ -368,107 +386,111 @@ let assignmentDictionarySelector = selectorFamily({
     axios.post(`/api/handleBackAssignment.php`, payload).then((response) => {
       console.log(response.data);
     });
-    setAssignmentSettings({                                                          // TODO
-      type: "load available assignment",
-      updateAssignmentInfo,
+    setAssignmentSettings({
+      // TODO
+      type: 'load available assignment',
+      aInfo,
     });
     // setFolderInfo({                                            //TODO
     //   instructionType: "assignment title update",
     //   itemId: itemId,
-    //   payloadAssignment: updateAssignmentInfo,
+    //   payloadAssignment: aInfo,
     // });
   };
-   const AssignmentForm = (props) => {
+  const AssignmentForm = (props) => {
     let courseId = props.courseId;
     let itemType = props.itemType;
-    let assignmentId = props.updateAssignmentInfo.assignmentId;
+    let assignmentId = props.aInfo.assignmentId;
     let itemId = props.itemId;
     let driveId = props.driveId;
     let folderId = props.folderId;
     // let branchId = props.branchId;
-    let updateAssignmentInfo = props.updateAssignmentInfo;
-  
+    let aInfo = props.aInfo;
+
     const role = useRecoilValue(roleAtom);
-  
+
     const setAssignmentSettings = useSetRecoilState(
       assignmentDictionarySelector({
         itemId: itemId,
         courseId: courseId,
         driveId: driveId,
         folderId: folderId,
-      })
+      }),
     );
     const [folderInfoObj, setFolderInfo] = useRecoilStateLoadable(
-      folderDictionarySelector({ driveId: driveId, folderId: folderId })
+      folderDictionarySelector({ driveId: driveId, folderId: folderId }),
     );
     let branchId = '';
-      if(folderInfoObj?.state === "hasValue"){
-   
+    if (folderInfoObj?.state === 'hasValue') {
       let itemInfo = folderInfoObj?.contents?.contentsDictionary[itemId];
-        if (itemInfo?.itemType === "DoenetML"){
-          branchId = itemInfo.branchId;
-        }
+      if (itemInfo?.itemType === 'DoenetML') {
+        branchId = itemInfo.branchId;
       }
-  
-   
+    }
+
     const handleChange = (event) => {
       event.preventDefault();
       let name = event.target.name;
       let value =
-        event.target.type === "checkbox"
+        event.target.type === 'checkbox'
           ? event.target.checked
           : event.target.value;
-          setAssignmentForm((old)=>{
-            console.log(">!!!!!!!!!!here@@@@@@@@@@@!!!!!",{ ...old, [name]:value});
-            return  {   ...old,  [name]:value }  
-          } )
+      // setAssignmentForm((old)=>{ TODO
+      //   // console.log(">!!!!!!!!!!here@@@@@@@@@@@!!!!!",{ ...old, [name]:value});
+      //   return  {   ...old,  [name]:value }
+      // } )
       const result = changeSettings({
         [name]: value,
         driveIdcourseIditemIdparentFolderId: {
-          driveId: driveId, 
+          driveId: driveId,
           folderId: folderId,
-          itemId:itemId,
-          courseId:courseId,
-          branchId:branchId,
-          contentId:contentId},
+          itemId: itemId,
+          courseId: courseId,
+          branchId: branchId,
+          contentId: contentId,
+        },
       });
-      result.then((resp)=>{
-        if (resp.data.success){
-          // addToast(`Renamed item to '${newLabel}'`, ToastType.SUCCESS);
-        }else{
-          // onRenameItemError({errorMessage: resp.data.message});
-        }
-      }).catch((e)=>{
-        // onRenameItemError({errorMessage: e.message});
-      })
-      
+      result
+        .then((resp) => {
+          if (resp.data.success) {
+            // addToast(`Renamed item to '${newLabel}'`, ToastType.SUCCESS);
+          } else {
+            // onRenameItemError({errorMessage: resp.data.message});
+          }
+        })
+        .catch((e) => {
+          // onRenameItemError({errorMessage: e.message});
+        });
+
       // setAssignmentSettings({ type: "change settings", [name]: value });   // TODO
     };
     const handleOnBlur = (e) => {
+      console.log('>>>>>>>>>>>blur', e);
       let name = e.target.name;
       let value =
-        e.target.type === "checkbox" ? e.target.checked : e.target.value;
+        e.target.type === 'checkbox' ? e.target.checked : e.target.value;
 
-        setAssignmentForm((old)=>{
-          return  {   ...old,  [name]:value }  
-        })
+      // setAssignmentForm((old)=>{  TODO
+      //   return  {   ...old,  [name]:value }
+      // })
 
-        const result = saveSettings({
-          [name]: value,
-          driveIdcourseIditemIdparentFolderId: {
-            driveId: driveId, 
-            folderId: folderId,
-            itemId:itemId,
-            courseId:courseId,
-            branchId:branchId,
-            contentId:contentId},
-        });
+      const result = saveSettings({
+        [name]: value,
+        driveIdcourseIditemIdparentFolderId: {
+          driveId: driveId,
+          folderId: folderId,
+          itemId: itemId,
+          courseId: courseId,
+          branchId: branchId,
+          contentId: contentId,
+        },
+      });
       // setAssignmentSettings({ type: "save assignment settings", [name]: value });    // TODO
     };
-  
+
     // const handleSubmit = (e) => {
     //   const payload = {
-    //     ...updateAssignmentInfo,
+    //     ...aInfo,
     //     assignmentId: assignmentId,
     //     assignment_isPublished: "1",
     //     courseId: courseId,
@@ -490,10 +512,10 @@ let assignmentDictionarySelector = selectorFamily({
     //   //   payload: payload,
     //   // });
     // };
-  
-    return role === "Instructor" ? (
+
+    return role === 'Instructor' ? (
       <>
-        { (
+        {
           <>
             <div>
               <label>Assignment Name :</label>
@@ -501,9 +523,9 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="text"
                 name="title"
-                value={updateAssignmentInfo ? updateAssignmentInfo?.title :''}
+                value={aInfo ? aInfo?.title : ''}
                 placeholder="Title goes here"
-                onBlur={handleOnBlur}
+                onBlur={(e) => handleOnBlur(e)}
                 onChange={handleChange}
               />
             </div>
@@ -513,9 +535,9 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="text"
                 name="assignedDate"
-                value={updateAssignmentInfo ? updateAssignmentInfo?.assignedDate : ''  }
+                value={aInfo ? aInfo?.assignedDate : ''}
                 placeholder="0001-01-01 01:01:01 "
-                onBlur={handleOnBlur}
+                onBlur={() => handleOnBlur()}
                 onChange={handleChange}
               />
             </div>
@@ -525,20 +547,20 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="text"
                 name="dueDate"
-                value={ updateAssignmentInfo ? updateAssignmentInfo?.dueDate  : ''}
+                value={aInfo ? aInfo?.dueDate : ''}
                 placeholder="0001-01-01 01:01:01"
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
             </div>
-  
+
             <div>
               <label>Time Limit:</label>
               <input
                 required
                 type="time"
                 name="timeLimit"
-                value={ updateAssignmentInfo ? updateAssignmentInfo?.timeLimit  : ''}
+                value={aInfo ? aInfo?.timeLimit : ''}
                 placeholder="01:01:01"
                 onBlur={handleOnBlur}
                 onChange={handleChange}
@@ -550,7 +572,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="number"
                 name="numberOfAttemptsAllowed"
-                value={ updateAssignmentInfo ? updateAssignmentInfo?.numberOfAttemptsAllowed  : ''}
+                value={aInfo ? aInfo?.numberOfAttemptsAllowed : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -561,7 +583,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="text"
                 name="attemptAggregation"
-                value={ updateAssignmentInfo ? updateAssignmentInfo?.attemptAggregation  : ''}
+                value={aInfo ? aInfo?.attemptAggregation : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -572,7 +594,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="number"
                 name="totalPointsOrPercent"
-                value={ updateAssignmentInfo ? updateAssignmentInfo?.totalPointsOrPercent  : ''}
+                value={aInfo ? aInfo?.totalPointsOrPercent : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -583,7 +605,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="select"
                 name="gradeCategory"
-                value={ updateAssignmentInfo ? updateAssignmentInfo?.gradeCategory  : ''}
+                value={aInfo ? aInfo?.gradeCategory : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -594,7 +616,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="individualize"
-                value={updateAssignmentInfo ?  updateAssignmentInfo?.individualize  : ''}
+                value={aInfo ? aInfo?.individualize : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -605,7 +627,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="multipleAttempts"
-                value={ updateAssignmentInfo ? updateAssignmentInfo?.multipleAttempts  : ''}
+                value={aInfo ? aInfo?.multipleAttempts : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -616,7 +638,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="showSolution"
-                value={ updateAssignmentInfo ? updateAssignmentInfo?.showSolution  : ''}
+                value={aInfo ? aInfo?.showSolution : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -627,7 +649,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="showFeedback"
-                value={ updateAssignmentInfo ? updateAssignmentInfo?.showFeedback  : ''}
+                value={aInfo ? aInfo?.showFeedback : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -638,7 +660,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="showHints"
-                value={ updateAssignmentInfo ? updateAssignmentInfo?.showHints  : ''}
+                value={aInfo ? aInfo?.showHints : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -649,7 +671,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="showCorrectness"
-                value={updateAssignmentInfo ? updateAssignmentInfo?.showCorrectness  : ''}
+                value={aInfo ? aInfo?.showCorrectness : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -660,7 +682,7 @@ let assignmentDictionarySelector = selectorFamily({
                 required
                 type="checkbox"
                 name="proctorMakesAvailable"
-                value={ updateAssignmentInfo ? updateAssignmentInfo?.proctorMakesAvailable : ''}
+                value={aInfo ? aInfo?.proctorMakesAvailable : ''}
                 onBlur={handleOnBlur}
                 onChange={handleChange}
               />
@@ -669,60 +691,55 @@ let assignmentDictionarySelector = selectorFamily({
               <ToggleButton
                 value="Publish assignment"
                 switch_value="publish changes"
-                callback={()=>{
+                callback={() => {
                   const payload = {
-                    ...updateAssignmentInfo,
+                    ...aInfo,
                     assignmentId: assignmentId,
-                    assignment_isPublished: "1",
+                    assignment_isPublished: '1',
                     courseId: courseId,
-                    branchId:branchId
+                    branchId: branchId,
                   };
                   publishAssignment({
-                    driveIdFolderId:{
+                    driveIdFolderId: {
                       driveId: driveId,
                       folderId: folderId,
                     },
                     itemId: itemId,
-                    payload:payload
-
-                  })
+                    payload: payload,
+                  });
                   const result = publishContentAssignment(payload);
                   // if(result){
                   //   setAssignmentForm(result);
                   // }
-                  result.then(resp => {
-                    if (resp){
+                  result.then((resp) => {
+                    if (resp) {
                       // addToast(`Add new assignment 'Untitled assignment'`, ToastType.SUCCESS);
-                      setAssignmentForm(resp)
+                      // setAssignmentForm(resp) TODO
                     }
                     // else{
                     //   onAddAssignmentError({errorMessage: resp.data.message});
                     // }
-                  })
+                  });
                   // .catch( e => {
                   //   onAddAssignmentError({errorMessage: e.message});
                   // })
-                }
-                }
+                }}
                 type="submit"
               ></ToggleButton>
             </div>
             <div></div>
           </>
-        )}
+        }
       </>
     ) : (
       <div>
         {assignmentId && (
           <div>
-            <h1>{updateAssignmentInfo?.title}</h1>
-            <p>Due: {updateAssignmentInfo?.dueDate}</p>
-            <p>Time Limit: {updateAssignmentInfo?.timeLimit}</p>
-            <p>
-              Number of Attempts Allowed:{" "}
-              {updateAssignmentInfo?.numberOfAttemptsAllowed}
-            </p>
-            <p>Points: {updateAssignmentInfo?.totalPointsOrPercent}</p>
+            <h1>{aInfo?.title}</h1>
+            <p>Due: {aInfo?.dueDate}</p>
+            <p>Time Limit: {aInfo?.timeLimit}</p>
+            <p>Number of Attempts Allowed: {aInfo?.numberOfAttemptsAllowed}</p>
+            <p>Points: {aInfo?.totalPointsOrPercent}</p>
           </div>
         )}
       </div>
@@ -732,44 +749,48 @@ let assignmentDictionarySelector = selectorFamily({
     <div>
       <br />
 
-      {role === "Instructor" &&
-        updateAssignmentInfo?.assignment_isPublished !== "1" && (
-          <ToggleButton
-            value="Publish Content"
-            switch_value="Published"
-            callback={handlePublishContent}
-          />
-        )}
+      {role === 'Instructor' && aInfo?.assignment_isPublished !== '1' && (
+        <ToggleButton
+          value="Publish Content"
+          switch_value="Published"
+          callback={handlePublishContent}
+        />
+      )}
 
-      {role === "Instructor" ? (
-        <ToggleButton value="Make Assignment" callback={()=>{
-          assignmentId = nanoid();
-          const result = addContentAssignment({
-            driveIdcourseIditemIdparentFolderId: {driveId: driveId, folderId: folderId,itemId:itemId,courseId:courseId,branchId:branchId,contentId:contentId},
-             assignmentId: assignmentId            
-          });
-          // if(result){
-          //   setAssignmentForm(result);
-          // }
-          result.then(resp => {
-            if (resp){
-              // addToast(`Add new assignment 'Untitled assignment'`, ToastType.SUCCESS);
-              setAssignmentForm(resp)
-            }
-            // else{
-            //   onAddAssignmentError({errorMessage: resp.data.message});
-            // }
-          })
-          // .catch( e => {
-          //   onAddAssignmentError({errorMessage: e.message});
-          // })
-        }
-        } />
-      ) 
-      : null}
+      {role === 'Instructor' ? (
+        <ToggleButton
+          value="Make Assignment"
+          callback={() => {
+            assignmentId = nanoid();
+            const result = addContentAssignment({
+              driveIdcourseIditemIdparentFolderId: {
+                driveId: driveId,
+                folderId: folderId,
+                itemId: itemId,
+                courseId: courseId,
+                branchId: branchId,
+                contentId: contentId,
+              },
+              assignmentId: assignmentId,
+            });
+
+            result.then((resp) => {
+              if (resp) {
+                // addToast(`Add new assignment 'Untitled assignment'`, ToastType.SUCCESS);
+                // setAssignmentForm(resp) TODO
+              }
+              // else{
+              //   onAddAssignmentError({errorMessage: resp.data.message});
+              // }
+            });
+            // .catch( e => {
+            //   onAddAssignmentError({errorMessage: e.message});
+            // })
+          }}
+        />
+      ) : null}
       <br />
-      {/* {console.log(">>>>>>>>>>>>>updateAssignmentInfoupdateAssignmentInfoupdateAssignmentInfo",updateAssignmentInfo)} */}
-      {updateAssignmentInfo?.isAssignment == "1" && (
+      {aInfo.isAssignment == '1' && (
         <AssignmentForm
           itemType={itemType}
           courseId={courseId}
@@ -777,88 +798,91 @@ let assignmentDictionarySelector = selectorFamily({
           folderId={folderId}
           branchId={branchId}
           assignmentId={assignmentId}
-          updateAssignmentInfo={updateAssignmentInfo}
+          aInfo={aInfo}
           itemId={itemId}
         />
       )}
 
-     
-
-      {role === "Instructor" &&
-      assignmentId &&
-      updateAssignmentInfo?.isAssignment == "0" ? (
+      {role === 'Instructor' && assignmentId && aInfo?.isAssignment == '0' ? (
         <ToggleButton value="back Assignment" callback={loadBackAssignment} />
       ) : null}
     </div>
   );
 };
 
-export default function Content({ branchId = '',contentId ='',title,courseId = '',driveId='' ,folderId='',itemId=''}) {
-
-  let initDoenetML = useRecoilCallback(({snapshot,set})=> async (contentId)=>{
-    const response = await snapshot.getPromise(fileByContentId(contentId));
-    const doenetML = response.data;
-    const viewerObj = await snapshot.getPromise(viewerContentDoenetMLAtom);
-    const updateNumber = viewerObj.updateNumber+1;
-    set(viewerContentDoenetMLAtom,{updateNumber,doenetML})
-  })
+export default function Content({
+  branchId = '',
+  contentId = '',
+  title,
+  courseId = '',
+  driveId = '',
+  folderId = '',
+  itemId = '',
+}) {
+  let initDoenetML = useRecoilCallback(
+    ({ snapshot, set }) => async (contentId) => {
+      const response = await snapshot.getPromise(fileByContentId(contentId));
+      const doenetML = response.data;
+      const viewerObj = await snapshot.getPromise(viewerContentDoenetMLAtom);
+      const updateNumber = viewerObj.updateNumber + 1;
+      set(viewerContentDoenetMLAtom, { updateNumber, doenetML });
+    },
+  );
 
   useEffect(() => {
-    initDoenetML(contentId ? contentId : branchId)
-}, []);
+    initDoenetML(contentId ? contentId : branchId);
+  }, []);
 
-// const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
+  // const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
 
-function DoenetViewerPanel(){
-  const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
+  function DoenetViewerPanel() {
+    const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
 
+    let attemptNumber = 1;
+    let requestedVariant = { index: attemptNumber };
+    let assignmentId = 'myassignmentid';
+    let solutionDisplayMode = 'button';
 
-  let attemptNumber = 1;
-  let requestedVariant = { index: attemptNumber }
-  let assignmentId = "myassignmentid";
-  let solutionDisplayMode = "button";
-  
-  return <DoenetViewer
-      key={"doenetviewer" + viewerDoenetML?.updateNumber}
-      doenetML={viewerDoenetML?.doenetML}
-      flags={{
-        showCorrectness: true,
-        readOnly: false,
-        solutionDisplayMode: solutionDisplayMode,
-        showFeedback: true,
-        showHints: true,
-      }}
-      attemptNumber={attemptNumber}
-      assignmentId={assignmentId}
-      ignoreDatabase={true}
-      requestedVariant={requestedVariant}
-      /> 
-}
+    return (
+      <DoenetViewer
+        key={'doenetviewer' + viewerDoenetML?.updateNumber}
+        doenetML={viewerDoenetML?.doenetML}
+        flags={{
+          showCorrectness: true,
+          readOnly: false,
+          solutionDisplayMode: solutionDisplayMode,
+          showFeedback: true,
+          showHints: true,
+        }}
+        attemptNumber={attemptNumber}
+        assignmentId={assignmentId}
+        ignoreDatabase={true}
+        requestedVariant={requestedVariant}
+      />
+    );
+  }
   return (
     <Tool>
-      <headerPanel title={title}>
-      </headerPanel>
+      <headerPanel title={title}></headerPanel>
 
       <mainPanel>
-      <div style={{overflowY:"scroll", height:"calc(100vh - 84px)" }}><DoenetViewerPanel /></div>
-    
+        <div style={{ overflowY: 'scroll', height: 'calc(100vh - 84px)' }}>
+          <DoenetViewerPanel />
+        </div>
       </mainPanel>
       <menuPanel title="Content Info" isInitOpen>
-       {(
+        {
           <ContentInfoPanel
             branchId={branchId}
             contentId={contentId ? contentId : branchId}
-            itemType={"DoenetML"}
+            itemType={'DoenetML'}
             courseId={courseId}
             driveId={driveId}
             folderId={folderId}
             itemId={itemId}
-                      />
-        )}
-
-       </menuPanel>
-
+          />
+        }
+      </menuPanel>
     </Tool>
   );
 }
-
