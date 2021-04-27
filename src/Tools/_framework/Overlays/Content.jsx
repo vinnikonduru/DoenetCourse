@@ -386,7 +386,6 @@ export const ContentInfoPanel = (props) => {
     axios.post(`/api/handleBackAssignment.php`, payload).then((response) => {
       console.log(response.data);
     });
-    loadAvailableAssignment()
     // setAssignmentSettings({
     //   // TODO
     //   type: 'load available assignment',

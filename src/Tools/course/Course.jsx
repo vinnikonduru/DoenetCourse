@@ -163,30 +163,33 @@ export default function  Course(props) {
   if(role === 'Instructor' && routePathDriveId){
     responsiveControls =<Button value={openEnrollment ? "Close Enrollment" : "Open Enrollment"} callback={(e)=>setEnrollment(e)}></Button> 
    }
-
-   const profile = useContext(ProfileContext)
-
-   if (profile.signedIn === "0"){
-     return (<>
-      <GlobalFont/>
-     <Tool>
- 
-       <headerPanel title="Course">
-       </headerPanel>
- 
-       <mainPanel>
-         <div style={{margin:"10px"}}>
-           <h1>You are not signed in</h1>
-           <h2>Course currently requirers sign in for use</h2> 
-           <h2><a href='/signin'>Sign in with this link</a></h2>
-           </div>
-       </mainPanel>
-     
+   
+  const profile = useContext(ProfileContext)
+  console.log(">>>profile",profile)
+  
+    if (profile.signedIn === "0"){
+      return (<>
+       <GlobalFont/>
+      <Tool>
+  
+        <headerPanel title="Course">
+        </headerPanel>
+  
+        <mainPanel>
+          <div style={{border:"1px solid grey",borderRadius:"20px",margin:"auto",marginTop:"10%",padding:"10px",width:"50%"}}>
+            <div style={{textAlign:"center",alignItems:"center",marginBottom:"20px"}}>
+            <h2>You are not signed in</h2>
+            <h2>Course currently requires sign in for use</h2> 
+            <button style={{background:"#1a5a99",borderRadius:"5px"}}><a href='/signin' style={{color:"white",textDecoration:"none"}}>Sign in with this link</a></button>
+            </div>
+            </div>
+        </mainPanel>
       
-     </Tool>
-     </>
-     )
-   }
+       
+      </Tool>
+      </>
+      )
+    }
   return (
     <Tool>
      <headerPanel title="Course" />

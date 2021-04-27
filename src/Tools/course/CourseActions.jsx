@@ -136,15 +136,16 @@ export const useAssignment = () => {
 
   const assignmentToContent = useRecoilCallback(
     ({ snapshot, set }) => async (props) => {
+      let { driveIdcourseIditemIdparentFolderId, ...value } = props;
+
       const handlebackContent = await snapshot.getPromise(assignmentDictionary);
       const payloadContent = { ...handlebackContent, isAssignment: 0 };
       set(assignmentDictionary, payloadContent);
     },
   );
-  const loadAvailableAssignment = useRecoilCallback(
-    ({ snapshot, set }) => async (props) => {
+  const loadAvailableAssignment = useRecoilCallback(({ snapshot, set }) => async (props) => {
       let { driveIdcourseIditemIdparentFolderId, ...value } = props;
-      let handlebackAssignment = await snapshot.getPromise(assignmentDictionary);
+      const handlebackAssignment = await snapshot.getPromise(assignmentDictionary);
       const payloadAssignment = { ...handlebackAssignment, isAssignment: 1 };
       set(assignmentDictionary, payloadAssignment);
     },
