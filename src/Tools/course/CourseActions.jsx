@@ -10,7 +10,7 @@ import { useRecoilCallback } from 'recoil';
  * Internal dependencies
  */
 
-import { assignmentDictionary } from '../_framework/Overlays/Content';
+import { assignmentDictionary } from '../course/Course';
 import Toast, { useToast } from '../../Tools/_framework/Toast';
 
 export const useAssignment = () => {
@@ -52,17 +52,13 @@ export const useAssignment = () => {
         branchId: driveIdcourseIditemIdparentFolderId.branchId,
         contentId: driveIdcourseIditemIdparentFolderId.contentId,
       };
+      set(assignmentDictionary, newAssignmentObj);
 
       axios.post(`/api/makeNewAssignment.php`, payload).then((response) => {
-        set(assignmentDictionary, newAssignmentObj);
+        // set(assignmentDictionary, newAssignmentObj);
         console.log(response.data);
       });
 
-      console.log(
-        '>>>>>new assignment obj',
-        assignmentDictionary,
-        newAssignmentObj,
-      );
       // set(
       //   assignmentDictionary(driveIdcourseIditemIdparentFolderId),
       //   newAssignmentObj,
@@ -74,7 +70,6 @@ export const useAssignment = () => {
 
   const changeSettings = useRecoilCallback(
     ({ snapshot, set }) => async (props) => {
-      console.log('>>>>>> actions change', props);
       let { driveIdcourseIditemIdparentFolderId, ...value } = props;
       set(assignmentDictionary, (old) => {
         return { ...old, ...value };
@@ -84,7 +79,6 @@ export const useAssignment = () => {
 
   const saveSettings = useRecoilCallback(
     ({ snapshot, set }) => async (props) => {
-      console.log('>>>>>> actions save', props);
       let { driveIdcourseIditemIdparentFolderId, ...value } = props;
 
       const saveInfo = await snapshot.getPromise(assignmentDictionary);
@@ -134,10 +128,8 @@ export const useAssignment = () => {
     },
   );
 
-  const assignmentToContent = useRecoilCallback(
-    ({ snapshot, set }) => async (props) => {
+  const assignmentToContent = useRecoilCallback(({ snapshot, set }) => async (props) => {
       let { driveIdcourseIditemIdparentFolderId, ...value } = props;
-
       const handlebackContent = await snapshot.getPromise(assignmentDictionary);
       const payloadContent = { ...handlebackContent, isAssignment: 0 };
       set(assignmentDictionary, payloadContent);
