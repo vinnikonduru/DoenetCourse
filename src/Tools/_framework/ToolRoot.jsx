@@ -92,10 +92,6 @@ export const useToolControlHelper = () => {
             contentId={contentId}
             branchId={branchId}
             title={title}
-            courseId={courseId}
-            driveId={driveId}
-            folderId={folderId}
-            itemId={itemId}
             key={`ContentLayer${old.length + 1}`}
           />,
         ]);
@@ -105,11 +101,8 @@ export const useToolControlHelper = () => {
           ...old,
           <Assignment
             branchId={branchId}
-            driveId={driveId}
-            folderId={folderId}
+            title={title}
             assignmentId={assignmentId}
-            courseId={courseId}
-            itemId={itemId}
             contentId={contentId}
             key={`AssignmentLayer${old.length + 1}`}
           />,
