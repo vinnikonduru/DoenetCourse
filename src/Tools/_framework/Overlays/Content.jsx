@@ -54,10 +54,10 @@ const loadAssignmentSelector = selectorFamily({
     return data;
   },
 });
-export const assignmentDictionary = atom({
-  key: 'assignmentDictionary',
+export const assignmentDictionaryNew = atom({
+  key: 'assignmentDictionaryNew',
   default: selector({
-    key: 'assignmentDictionary/Default',
+    key: 'assignmentDictionaryNew/Default',
     get: (driveIdcourseIditemIdparentFolderId) => async (
       { get },
       instructions,
@@ -99,11 +99,11 @@ const AssignmentSelectorActions = Object.freeze({
   LOAD_ASSIGNMENT: 'load available assignment',
 });
 
-let assignmentDictionarySelector = selectorFamily({
-  //recoilvalue(assignmentDictionarySelector(assignmentId))
-  key: 'assignmentDictionarySelector',
+let assignmentDictionaryNewSelector = selectorFamily({
+  //recoilvalue(assignmentDictionaryNewSelector(assignmentId))
+  key: 'assignmentDictionaryNewSelector',
   get: (driveIdcourseIditemIdparentFolderId) => ({ get }) => {
-    return get(assignmentDictionary(driveIdcourseIditemIdparentFolderId));
+    return get(assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId));
   },
   set: (driveIdcourseIditemIdparentFolderId) => (
     { set, get },
@@ -113,7 +113,7 @@ let assignmentDictionarySelector = selectorFamily({
     switch (type) {
       case AssignmentSelectorActions.CHANGE_SETTINGS:
         set(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
           (old) => {
             return { ...old, ...value };
           },
@@ -123,17 +123,17 @@ let assignmentDictionarySelector = selectorFamily({
       case AssignmentSelectorActions.SAVE_SETTINGS:
         const saveInfo = get(
           // newCallbackFunction(driveIdcourseIditemIdparentFolderId)
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
         );
         set(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
           (old) => {
             return { ...old, ...value };
           },
         );
         let saveAssignmentNew = { ...saveInfo, ...value };
         set(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
           saveAssignmentNew,
         );
         const payload = {
@@ -172,22 +172,22 @@ let assignmentDictionarySelector = selectorFamily({
         };
         console.log(
           '>>>>>new assignment obj',
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
           newAssignmentObj,
         );
         set(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
           newAssignmentObj,
         );
         break;
       case AssignmentSelectorActions.PUBLISH_ASSIGNMENT:
         // console.log(">>>> published value", value.assignedData.branchId);
         let publishAssignment = get(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
         );
 
         set(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
           publishAssignment,
         );
         const payloadPublish = {
@@ -205,18 +205,18 @@ let assignmentDictionarySelector = selectorFamily({
         break;
       case AssignmentSelectorActions.UPDATE_ASSIGNMENT:
         let editAssignment = get(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
         );
 
         set(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
           editAssignment,
         );
 
         break;
       case AssignmentSelectorActions.ASSIGNMENT_TO_CONTENT:
         let handlebackContent = get(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
         );
 
         const payloadContent = {
@@ -224,14 +224,14 @@ let assignmentDictionarySelector = selectorFamily({
           isAssignment: 0,
         };
         set(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
           payloadContent,
         );
 
         break;
       case AssignmentSelectorActions.LOAD_ASSIGNMENT:
         let handlebackAssignment = get(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
         );
 
         const payloadAssignment = {
@@ -239,7 +239,7 @@ let assignmentDictionarySelector = selectorFamily({
           isAssignment: 1,
         };
         set(
-          assignmentDictionary(driveIdcourseIditemIdparentFolderId),
+          assignmentDictionaryNew(driveIdcourseIditemIdparentFolderId),
           payloadAssignment,
         );
 
@@ -278,16 +278,16 @@ export const ContentInfoPanel = (props) => {
   let contentId = props.contentId;
 
   const [role, setRole] = useRecoilState(roleAtom);
-  // const [aInfo,setAssignmentForm] = useRecoilState(assignmentDictionary({itemId: itemId,
+  // const [aInfo,setAssignmentForm] = useRecoilState(assignmentDictionaryNew({itemId: itemId,
   //   courseId: courseId,
   //   driveId: driveId,
   //   folderId: folderId,
   //   contentId:contentId,
   //   branchId:branchId
   // }));
-  // const [aInfo,setAssignmentForm] = useRecoilState(assignmentDictionary);
+  // const [aInfo,setAssignmentForm] = useRecoilState(assignmentDictionaryNew);
 
-  const assignmentIdSettings = useRecoilValueLoadable(assignmentDictionary);
+  const assignmentIdSettings = useRecoilValueLoadable(assignmentDictionaryNew);
 
   let aInfo = '';
 
@@ -301,7 +301,7 @@ export const ContentInfoPanel = (props) => {
   console.log('>>>>>>>>>>>>>here2222@@@@@@@@@@', aInfo);
   const setAssignmentSettings = useSetRecoilState(
     //TODO Remove
-    assignmentDictionarySelector({
+    assignmentDictionaryNewSelector({
       itemId: itemId,
       courseId: courseId,
       driveId: driveId,
@@ -397,7 +397,7 @@ export const ContentInfoPanel = (props) => {
     //   payloadAssignment: aInfo,
     // });
   };
-  const AssignmentForm = (props) => {
+ const AssignmentForm = (props) => {
     let courseId = props.courseId;
     let itemType = props.itemType;
     let assignmentId = props.aInfo.assignmentId;
@@ -410,7 +410,7 @@ export const ContentInfoPanel = (props) => {
     const role = useRecoilValue(roleAtom);
 
     const setAssignmentSettings = useSetRecoilState(
-      assignmentDictionarySelector({
+      assignmentDictionaryNewSelector({
         itemId: itemId,
         courseId: courseId,
         driveId: driveId,
@@ -810,30 +810,14 @@ export const ContentInfoPanel = (props) => {
   );
 };
 
+
+
 export default function Content({
   branchId = '',
   contentId = '',
-  title,
-  courseId = '',
-  driveId = '',
-  folderId = '',
-  itemId = '',
+  title
 }) {
-  let initDoenetML = useRecoilCallback(
-    ({ snapshot, set }) => async (contentId) => {
-      const response = await snapshot.getPromise(fileByContentId(contentId));
-      const doenetML = response.data;
-      const viewerObj = await snapshot.getPromise(viewerContentDoenetMLAtom);
-      const updateNumber = viewerObj.updateNumber + 1;
-      set(viewerContentDoenetMLAtom, { updateNumber, doenetML });
-    },
-  );
 
-  useEffect(() => {
-    initDoenetML(contentId ? contentId : branchId);
-  }, []);
-
-  // const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
 
   function DoenetViewerPanel() {
     const viewerDoenetML = useRecoilValue(viewerContentDoenetMLAtom);
@@ -847,6 +831,7 @@ export default function Content({
       <DoenetViewer
         key={'doenetviewer' + viewerDoenetML?.updateNumber}
         doenetML={viewerDoenetML?.doenetML}
+        contentId={contentId ? contentId : branchId}
         flags={{
           showCorrectness: true,
           readOnly: false,
@@ -870,19 +855,6 @@ export default function Content({
           <DoenetViewerPanel />
         </div>
       </mainPanel>
-      <menuPanel title="Content Info" isInitOpen>
-        {
-          <ContentInfoPanel
-            branchId={branchId}
-            contentId={contentId ? contentId : branchId}
-            itemType={'DoenetML'}
-            courseId={courseId}
-            driveId={driveId}
-            folderId={folderId}
-            itemId={itemId}
-          />
-        }
-      </menuPanel>
     </Tool>
   );
 }
