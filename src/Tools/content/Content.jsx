@@ -1,4 +1,11 @@
-import React from 'react';
+/**
+ * External dependencies
+ */
+import React, { useState,useEffect }  from 'react';
+
+/**
+ * Internal dependencies
+ */
 import Tool from '../_framework/Tool';
 import DoenetViewer from '../../Viewer/DoenetViewer.jsx';
 
