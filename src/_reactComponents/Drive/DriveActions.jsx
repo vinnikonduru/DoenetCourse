@@ -970,7 +970,7 @@ const onmakeAssignmentError = ({errorMessage=null}) => {
         let newObj = JSON.parse(JSON.stringify(old));
         let newItemObj = newObj.contentsDictionary[itemId];          
         newItemObj.isAssignment = "1";
-        newItemObj.assignment_title = payloadAssignment?.assignment_title;      //TODO
+        newItemObj.assignment_title = payloadAssignment?.assignment_title;     
         newItemObj.assignmentId = payloadAssignment?.assignmentId;
         return newObj;
       })
