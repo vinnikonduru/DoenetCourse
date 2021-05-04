@@ -55,15 +55,8 @@ export const useAssignment = () => {
       set(assignmentDictionary(driveIdcourseIditemIdparentFolderId), newAssignmentObj);
 
       axios.post(`/api/makeNewAssignment.php`, payload).then((response) => {
-        // set(assignmentDictionary, newAssignmentObj);
         console.log(response.data);
       });
-
-      // set(
-      //   assignmentDictionary(driveIdcourseIditemIdparentFolderId),
-      //   newAssignmentObj,
-      // );
-
       return newAssignmentObj;
     },
   );

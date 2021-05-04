@@ -79,7 +79,6 @@ export const assignmentDictionary = atomFamily({
       let itemIdassignmentId = itemObj?.assignmentId
         ? itemObj.assignmentId
         : null;
-        console.log(">>>>>>>>>>>itemIdassignmentId",itemIdassignmentId);
       if (itemIdassignmentId) {
         const aInfo = await get(loadAssignmentSelector(itemIdassignmentId));
         if (aInfo) {
@@ -397,7 +396,6 @@ const DoenetMLInfoPanel = (props) =>{
 
   if (assignmentInfoSettings?.state === 'hasValue') {
     aInfo = assignmentInfoSettings?.contents;
-    console.log(">>>>>>here @@@@@@@@@@@@@@@@",aInfo);
     if (aInfo?.assignmentId) {
       assignmentId = aInfo?.assignmentId;
     }
@@ -459,7 +457,6 @@ const DoenetMLInfoPanel = (props) =>{
       assignmentId:aInfo?.assignmentId,
       [name]: value,
     };
-    console.log(">>>>>>>>>>. update title payload",payload);
     if(name === 'assignment_title'){
       updateAssignmentTitle({
         driveIdFolderId: {
@@ -539,7 +536,7 @@ const DoenetMLInfoPanel = (props) =>{
         itemId: itemInfo.itemId,
         courseId: courseId,
       }
-      
+
     });
 
     updateAssignmentTitle({
@@ -551,8 +548,12 @@ const DoenetMLInfoPanel = (props) =>{
       payloadAssignment: payload,
     });
   };
-  // // Publish content
-  if(itemInfo?.isPublished === '0'){
+  const [showAForm, setShowAForm] = useState(false);
+  const role = useRecoilValue(roleAtom);
+  const [addToast, ToastType] = useToast();
+ 
+  
+  if(itemInfo?.isPublished === '0'){                                       // // Publish content
     publishContentButton = <>
      <Button
         value="Publish Content"
@@ -562,20 +563,13 @@ const DoenetMLInfoPanel = (props) =>{
     </>
   }
 
-
-  // Make assignment
-  const [showAForm, setShowAForm] = useState(false);
-  const role = useRecoilValue(roleAtom);
-  const [addToast, ToastType] = useToast();
-
-   if(itemInfo?.isAssignment === '0' && itemInfo.assignmentId === null){
+if(itemInfo?.isAssignment === '0' && itemInfo.assignmentId === null){   // // Make assignment
     makeAssignmentButton = <>
     <Button
           value="Make Assignment"
           callback={() => {
             let assignmentId = nanoid();
             setShowAForm(true);
-
             const result = addContentAssignment({
               driveIdcourseIditemIdparentFolderId: {
                 driveId: itemInfo.driveId,
@@ -618,190 +612,30 @@ const DoenetMLInfoPanel = (props) =>{
         />
     </>
   }
-
-  // View Assignment Form
-  else if(itemInfo.isAssignment === '1' && assignmentId
-  // 
-  ){  
-    assignmentForm = <> 
-    {/* (role === 'Instructor' && isAssignment === '1') ||
-    assignment_isPublished === '1' ? ( */}
-    <>
+// // View Assignment Form 
+ if(itemInfo.isAssignment === '1' && (itemInfo.assignmentId || aInfo?.assignmentId)) {
+    assignmentForm = <>
       {
         <>
-          <div>
-            <label>Assignment Name :</label>
-            <input
-              required
-              type="text"
-              name="assignment_title"
-              value={aInfo ? aInfo?.assignment_title : ''}
-              placeholder="Title goes here"
-              onBlur={(e) => handleOnBlur(e)}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Assigned Date:</label>
-            <input
-              required
-              type="text"
-              name="assignedDate"
-              value={aInfo ? aInfo?.assignedDate : ''}
-              placeholder="0001-01-01 01:01:01 "
-              onBlur={() => handleOnBlur()}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Due date: </label>
-            <input
-              required
-              type="text"
-              name="dueDate"
-              value={aInfo ? aInfo?.dueDate : ''}
-              placeholder="0001-01-01 01:01:01"
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div>
-            <label>Time Limit:</label>
-            <input
-              required
-              type="time"
-              name="timeLimit"
-              value={aInfo ? aInfo?.timeLimit : ''}
-              placeholder="01:01:01"
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Number Of Attempts:</label>
-            <input
-              required
-              type="number"
-              name="numberOfAttemptsAllowed"
-              value={aInfo ? aInfo?.numberOfAttemptsAllowed : ''}
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Attempt Aggregation :</label>
-            <input
-              required
-              type="text"
-              name="attemptAggregation"
-              value={aInfo ? aInfo?.attemptAggregation : ''}
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Total Points Or Percent: </label>
-            <input
-              required
-              type="number"
-              name="totalPointsOrPercent"
-              value={aInfo ? aInfo?.totalPointsOrPercent : ''}
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Grade Category: </label>
-            <input
-              required
-              type="select"
-              name="gradeCategory"
-              value={aInfo ? aInfo?.gradeCategory : ''}
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Individualize: </label>
-            <input
-              required
-              type="checkbox"
-              name="individualize"
-              value={aInfo ? aInfo?.individualize : ''}
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Multiple Attempts: </label>
-            <input
-              required
-              type="checkbox"
-              name="multipleAttempts"
-              value={aInfo ? aInfo?.multipleAttempts : ''}
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Show solution: </label>
-            <input
-              required
-              type="checkbox"
-              name="showSolution"
-              value={aInfo ? aInfo?.showSolution : ''}
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Show feedback: </label>
-            <input
-              required
-              type="checkbox"
-              name="showFeedback"
-              value={aInfo ? aInfo?.showFeedback : ''}
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Show hints: </label>
-            <input
-              required
-              type="checkbox"
-              name="showHints"
-              value={aInfo ? aInfo?.showHints : ''}
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Show correctness: </label>
-            <input
-              required
-              type="checkbox"
-              name="showCorrectness"
-              value={aInfo ? aInfo?.showCorrectness : ''}
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Proctor make available: </label>
-            <input
-              required
-              type="checkbox"
-              name="proctorMakesAvailable"
-              value={aInfo ? aInfo?.proctorMakesAvailable : ''}
-              onBlur={handleOnBlur}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-          <Button
-              value="Publish assignment new"
+          <div><label>Assignment Name :</label><input required type="text" name="assignment_title" value={aInfo ? aInfo?.assignment_title : ''} placeholder="Title goes here" onBlur={(e) => handleOnBlur(e)} onChange={handleChange} /></div>
+          <div><label>Assigned Date:</label><input required type="text" name="assignedDate" value={aInfo ? aInfo?.assignedDate : ''} placeholder="0001-01-01 01:01:01 " onBlur={() => handleOnBlur()} onChange={handleChange}/></div>
+          <div><label>Due date: </label><input required type="text" name="dueDate" value={aInfo ? aInfo?.dueDate : ''} placeholder="0001-01-01 01:01:01" onBlur={handleOnBlur} onChange={handleChange} /></div>
+          <div><label>Time Limit:</label><input required type="time" name="timeLimit" value={aInfo ? aInfo?.timeLimit : ''} placeholder="01:01:01" onBlur={handleOnBlur} onChange={handleChange}/></div>
+          <div><label>Number Of Attempts:</label><input required type="number" name="numberOfAttemptsAllowed" value={aInfo ? aInfo?.numberOfAttemptsAllowed : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
+          <div><label>Attempt Aggregation :</label><input required type="text" name="attemptAggregation" value={aInfo ? aInfo?.attemptAggregation : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
+          <div><label>Total Points Or Percent: </label><input required type="number" name="totalPointsOrPercent" value={aInfo ? aInfo?.totalPointsOrPercent : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
+          <div><label>Grade Category: </label><input required type="select" name="gradeCategory" value={aInfo ? aInfo?.gradeCategory : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
+          <div><label>Individualize: </label><input required type="checkbox" name="individualize" value={aInfo ? aInfo?.individualize : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
+          <div><label>Multiple Attempts: </label><input required type="checkbox" name="multipleAttempts" value={aInfo ? aInfo?.multipleAttempts : ''} onBlur={handleOnBlur} onChange={handleChange}/> </div>
+          <div><label>Show solution: </label><input required type="checkbox" name="showSolution" value={aInfo ? aInfo?.showSolution : ''} onBlur={handleOnBlur} onChange={handleChange}/> </div>
+          <div><label>Show feedback: </label><input required type="checkbox" name="showFeedback" value={aInfo ? aInfo?.showFeedback : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
+          <div><label>Show hints: </label><input required type="checkbox" name="showHints" value={aInfo ? aInfo?.showHints : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
+          <div><label>Show correctness: </label><input required type="checkbox" name="showCorrectness" value={aInfo ? aInfo?.showCorrectness : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
+          <div><label>Proctor make available: </label><input required type="checkbox" name="proctorMakesAvailable" value={aInfo ? aInfo?.proctorMakesAvailable : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
+          <br />
+       <div>
+           <Button
+              value="Publish assignment"
               switch_value="publish changes"
               callback={() => {
                 const result = publishContentAssignment({
@@ -846,46 +680,25 @@ const DoenetMLInfoPanel = (props) =>{
               }}
               type="submit"
             ></Button>
-            <br />
           </div>
-          <div></div>
-          <div></div>
         </>
       }
     </>
 
-  {/* ) : ( */}
-    {/* <div>
-      {
-        itemInfo.assignment_isPublished ===
-          '1'(
-            <div>
-              <h1>{aInfo?.assignment_title}</h1>
-              <p>Due: {aInfo?.dueDate}</p>
-              <p>Time Limit: {aInfo?.timeLimit}</p>
-              <p>
-                Number of Attempts Allowed: {aInfo?.numberOfAttemptsAllowed}
-              </p>
-              <p>Points: {aInfo?.totalPointsOrPercent}</p>
-            </div>,
-          )}
-    </div> */}
-  {/* ); */}
-    <br /><br />
-    {/* Make Assignment as content */}
-    <Button value="Make Content" callback={handleMakeContent} />
-    </>
+ 
   }
+ // // Make Assignment Title update(Load back available assignment) //TODO add assignmentId from ainfo
+ if(itemInfo.isAssignment === '0'  && aInfo?.assignmentId){  
+  loadAssignmentButton = <>
+  <Button value="load Assignment" callback={loadBackAssignment} />
+  </>
+}
+//  Make Assignment to content 
+  if(itemInfo.isAssignment === '1'){
+assignmentToContentButton =
+  <Button value="Make Content" callback={handleMakeContent} />
+ }
 
-
-   // Make Assignment Title update(Load back available assignment)
-   else if(itemInfo.isAssignment === '0' 
-  //  && itemInfo.assignmentId === assignmentId
-   ){  //TODO add assignmentId from ainfo
-    loadAssignmentButton = <>
-    <Button value="load Assignment" callback={loadBackAssignment} />
-    </>
-  }
 
 
   return <>
@@ -894,7 +707,7 @@ const DoenetMLInfoPanel = (props) =>{
   {publishContentButton}<br /> 
 
   {loadAssignmentButton}<br />
-  {/* {assignmentToContentButton}<br /> */}
+  {assignmentToContentButton}<br />
   {assignmentForm}
   {unPublishContentButton}
   </>
@@ -918,6 +731,7 @@ const ItemInfo = (props) => {
     console.error(contentInfoLoad.contents)
     return null;}
     let contentInfo = contentInfoLoad?.contents?.itemInfo;
+    console.log(">>> contentInfo",contentInfo);
 
     if(contentInfoLoad.contents?.number > 1){
        return <>
@@ -941,3 +755,24 @@ const ItemInfo = (props) => {
     
  
 };
+
+
+
+
+//Student view info panel
+
+// <div>
+//       {
+//         itemInfo.assignment_isPublished ===
+//           '1'(
+//             <div>
+//               <h1>{aInfo?.assignment_title}</h1>
+//               <p>Due: {aInfo?.dueDate}</p>
+//               <p>Time Limit: {aInfo?.timeLimit}</p>
+//               <p>
+//                 Number of Attempts Allowed: {aInfo?.numberOfAttemptsAllowed}
+//               </p>
+//               <p>Points: {aInfo?.totalPointsOrPercent}</p>
+//             </div>,
+//           )}
+//     </div>
