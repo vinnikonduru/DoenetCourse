@@ -2,11 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import {
-  atom,
-  useRecoilValue,
-  useRecoilValueLoadable,
-} from 'recoil';
+import { atom, useRecoilValue, useRecoilValueLoadable } from 'recoil';
 
 /**
  * Internal dependencies
@@ -14,6 +10,7 @@ import {
 import Tool from '../Tool';
 import DoenetViewer from '../../../Viewer/DoenetViewer';
 import { assignmentDictionary } from '../../course/Course';
+
 export const assignmentDoenetMLAtom = atom({
   key: 'assignmentDoenetMLAtom',
   default: { updateNumber: 0, doenetML: '', attemptnumber: 0 },
@@ -22,12 +19,10 @@ export const assignmentDoenetMLAtom = atom({
 export default function Assignment({
   branchId = '',
   assignmentId = '',
-  contentId='',
+  contentId = '',
+  title,
 }) {
-
-
-
-  const assignmentInfo = useRecoilValueLoadable(assignmentDictionary);
+  const assignmentInfo = useRecoilValueLoadable(assignmentDictionary());
   let aInfo = '';
 
   if (assignmentInfo?.state === 'hasValue') {
@@ -56,16 +51,15 @@ export default function Assignment({
         attemptNumber={attemptNumber}
         contentId={contentId ? contentId : branchId}
         assignmentId={assignmentId ? assignmentId : contentId}
-        ignoreDatabase={false}
+        ignoreDatabase={true}
         requestedVariant={requestedVariant}
       />
     );
   }
 
-
   return (
     <Tool>
-      <headerPanel></headerPanel>
+      <headerPanel title={title} />
 
       <mainPanel>
         <div style={{ overflowY: 'scroll', height: 'calc(100vh - 84px)' }}>
@@ -74,7 +68,6 @@ export default function Assignment({
       </mainPanel>
 
       <supportPanel></supportPanel>
-
     </Tool>
   );
 }
