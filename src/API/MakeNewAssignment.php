@@ -20,10 +20,8 @@ $itemId = mysqli_real_escape_string($conn,$_POST["itemId"]);
 $success = TRUE;
 $message = "";
 
-if ($driveId == ""){
-  $success = FALSE;
-  $message = 'Internal Error: missing driveId';
-}elseif ($courseId == ""){
+
+if ($courseId == ""){
   $success = FALSE;
   $message = 'Internal Error: missing courseId';
 }elseif ($assignmentId == ""){
@@ -35,9 +33,6 @@ if ($driveId == ""){
 }elseif ($contentId == ""){
   $success = FALSE;
   $message = "Internal Error: missing contentId";
-}elseif ($userId == ""){
-  $success = FALSE;
-  $message = "You need to be signed in to create a assignment";
 }
 if ($success){
 
