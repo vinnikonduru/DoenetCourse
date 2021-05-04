@@ -921,7 +921,7 @@ export const useAssignmentCallbacks = () => {
       let newObj = JSON.parse(JSON.stringify(old));
       let newItemObj = newObj.contentsDictionary[itemId];          
       newItemObj.isAssignment = "1";
-      // newItemObj.assignment_title = payload?.title;      // TODO
+      newItemObj.assignment_title = payload?.assignment_title;      
       newItemObj.assignmentId = payload?.assignmentId;
       return newObj;
     })
@@ -938,7 +938,7 @@ const onmakeAssignmentError = ({errorMessage=null}) => {
         let newItemObj = newObj.contentsDictionary[itemId];          
         newItemObj.assignment_isPublished = "1";
         newItemObj.isAssignment = "1";
-        newItemObj.assignment_title = payload?.title;
+        newItemObj.assignment_title = payload?.assignment_title;
         newItemObj.assignmentId = payload?.assignmentId;
         return newObj;
       })
@@ -970,7 +970,7 @@ const onmakeAssignmentError = ({errorMessage=null}) => {
         let newObj = JSON.parse(JSON.stringify(old));
         let newItemObj = newObj.contentsDictionary[itemId];          
         newItemObj.isAssignment = "1";
-        // newItemObj.assignment_title = payloadAssignment?.title;      //TODO
+        newItemObj.assignment_title = payloadAssignment?.assignment_title;      //TODO
         newItemObj.assignmentId = payloadAssignment?.assignmentId;
         return newObj;
       })
