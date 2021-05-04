@@ -14,7 +14,32 @@ $assignmentId = mysqli_real_escape_string($conn,$_POST["assignmentId"]);
 $contentId = mysqli_real_escape_string($conn,$_POST["contentId"]);
 $courseId = mysqli_real_escape_string($conn,$_POST["courseId"]);
 $branchId = mysqli_real_escape_string($conn,$_POST["branchId"]);
+$itemId = mysqli_real_escape_string($conn,$_POST["itemId"]);
 
+
+$success = TRUE;
+$message = "";
+
+if ($driveId == ""){
+  $success = FALSE;
+  $message = 'Internal Error: missing driveId';
+}elseif ($courseId == ""){
+  $success = FALSE;
+  $message = 'Internal Error: missing courseId';
+}elseif ($assignmentId == ""){
+  $success = FALSE;
+  $message = "Internal Error: missing assignmentId";
+}elseif ($branchId == ""){
+  $success = FALSE;
+  $message = "Internal Error: missing branchId";
+}elseif ($contentId == ""){
+  $success = FALSE;
+  $message = "Internal Error: missing contentId";
+}elseif ($userId == ""){
+  $success = FALSE;
+  $message = "You need to be signed in to create a assignment";
+}
+if ($success){
 
 $sql="
 INSERT INTO assignment_draft
@@ -24,6 +49,7 @@ VALUES
 ";
 
 $result = $conn->query($sql); 
+}
   // echo $sql;
 $sqlnew="UPDATE drive_content SET assignmentId='$assignmentId',isAssignment=1 WHERE branchId='$branchId';";
 //  echo $sqlnew;
