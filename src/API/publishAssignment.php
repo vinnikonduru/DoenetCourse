@@ -15,7 +15,7 @@ $_POST = json_decode(file_get_contents("php://input"),true);
 $branchId = mysqli_real_escape_string($conn,$_POST["branchId"]);
 
 $assignmentId = mysqli_real_escape_string($conn,$_POST["assignmentId"]);
-$title = mysqli_real_escape_string($conn,$_POST["title"]);
+$title = mysqli_real_escape_string($conn,$_POST["assignment_title"]);
 if($title == ''){$title = 'Untitled Assignment';}
 $dueDate = mysqli_real_escape_string($conn,$_POST["dueDate"]);
 if ($dueDate == ''){ $dueDate = '1-1-1 01:01:01';}

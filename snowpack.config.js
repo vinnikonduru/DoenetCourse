@@ -66,7 +66,7 @@ module.exports = {
     knownEntrypoints: ['crypto-js/sha1'],
   },
   devOptions: {
-    openUrl: '/library',
+    openUrl: '/course',
   },
   buildOptions: {
     watch: true,

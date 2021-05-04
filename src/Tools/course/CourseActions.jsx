@@ -23,7 +23,7 @@ export const useAssignment = () => {
       // assignment creation
       let newAssignmentObj = {
         assignmentId: assignmentId,
-        title: 'Untitled Assignment',
+        assignment_title: 'Untitled Assignment',
         assignedDate: '',
         attemptAggregation: '',
         dueDate: '',

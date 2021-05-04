@@ -1,33 +1,38 @@
+/**
+ * External dependencies
+ */
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter as Router, Switch, Route } from 'react-router-dom';
-// import { DropTargetsProvider } from "../imports/DropTarget";
-// import { BreadcrumbProvider } from "../imports/Breadcrumb";
 import { RecoilRoot } from 'recoil';
 
-import DoenetCourse from './DoenetCourse';
+/**
+ * Internal dependencies
+ */
+import Course from './Course';
+import { DropTargetsProvider } from '../../_reactComponents/DropTarget';
+import { BreadcrumbProvider } from '../../_reactComponents/Breadcrumb';
 import ToolRoot from '../_framework/ToolRoot';
 
 ReactDOM.render(
-  // <DropTargetsProvider>
-  // <BreadcrumbProvider>
-  <RecoilRoot>
-    <Router>
-      <Switch>
-        <Route
-          path="/"
-          render={(routeprops) => (
-            <ToolRoot
-              route={{ ...routeprops }}
-              tool={<DoenetCourse key={'BaseTool'} />}
+  <DropTargetsProvider>
+    <BreadcrumbProvider>
+      <RecoilRoot>
+        <Router>
+          <Switch>
+            <Route
+              path="/"
+              render={(routeprops) => (
+                <ToolRoot
+                  tool={<Course key={'BaseTool'} route={{ ...routeprops }} />}
+                />
+              )}
             />
-          )}
-        />
-      </Switch>
-    </Router>
-  </RecoilRoot>,
-  // </BreadcrumbProvider>
-  // </DropTargetsProvider>,
+          </Switch>
+        </Router>
+      </RecoilRoot>
+    </BreadcrumbProvider>
+  </DropTargetsProvider>,
   document.getElementById('root'),
 );
 
