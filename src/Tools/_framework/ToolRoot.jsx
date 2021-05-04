@@ -50,10 +50,7 @@ export const useToolControlHelper = () => {
     assignmentId,
     attemptNumber,
     userId,
-    driveId,
-    folderId,
-    itemId
-    }) => {
+  }) => {
     switch (type.toLowerCase()) {
       case 'gradebookassignmentview':
         setLayers((old) => [
@@ -86,16 +83,16 @@ export const useToolControlHelper = () => {
         ]);
         break;
         case 'content':
-        setLayers((old) => [
-          ...old,
-          <Content
-            contentId={contentId}
-            branchId={branchId}
-            title={title}
-            key={`ContentLayer${old.length + 1}`}
-          />,
-        ]);
-        break;
+          setLayers((old) => [
+            ...old,
+            <Content
+              contentId={contentId}
+              branchId={branchId}
+              title={title}
+              key={`ContentLayer${old.length + 1}`}
+            />,
+          ]);
+          break;
       case 'assignment':
         setLayers((old) => [
           ...old,
@@ -103,6 +100,7 @@ export const useToolControlHelper = () => {
             branchId={branchId}
             title={title}
             assignmentId={assignmentId}
+            courseId={courseId}
             contentId={contentId}
             key={`AssignmentLayer${old.length + 1}`}
           />,
