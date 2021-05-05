@@ -44,7 +44,7 @@ import { useAssignment } from '../course/CourseActions';
 import { useAssignmentCallbacks } from '../../_reactComponents/Drive/DriveActions';
 import { selectedInformation } from '../library/Library';
 // import {assignmentDictionary} from "../_framework/Overlays/Content"
-import CollapseSection from '../../_reactComponents/PanelHeaderComponents/CollapseSection'
+import CollapseSection from '../../_reactComponents/PanelHeaderComponents/CollapseSection';
 
 export const roleAtom = atom({
   key: 'roleAtom',
@@ -94,7 +94,7 @@ let assignmentDictionarySelector = selectorFamily({
   get: (driveIdcourseIditemIdparentFolderId) => ({ get }) => {
     return get(assignmentDictionary(driveIdcourseIditemIdparentFolderId));
   },
-})
+});
 
 function Container(props) {
   return (
@@ -124,8 +124,6 @@ function AutoSelect(props) {
 }
 
 export default function Course(props) {
-
-
   const { openOverlay, activateMenuPanel } = useToolControlHelper();
   const [toast, toastType] = useToast();
   let routePathDriveId = '';
@@ -170,7 +168,7 @@ export default function Course(props) {
   const [openEnrollment, setEnrollmentView] = useState(false);
   const role = useRecoilValue(roleAtom);
 
-  function cleardrivecardSelection(){
+  function cleardrivecardSelection() {
     setDrivecardSelection([]);
     // let newParams = {};
     // newParams["path"] = `:::`;
@@ -254,7 +252,6 @@ export default function Course(props) {
     );
   }
 
-
   return (
     <Tool>
       <headerPanel title="Course" />
@@ -268,9 +265,7 @@ export default function Course(props) {
         </div>
       </navPanel>
 
-      <mainPanel
-        responsiveControls={responsiveControls}
-      >
+      <mainPanel responsiveControls={responsiveControls}>
         <AutoSelect />
         {openEnrollment ? (
           <Enrollment selectedCourse={enrollCourseId} />
@@ -294,11 +289,10 @@ export default function Course(props) {
                     let isAssignment =
                       info.item.isAssignment === '0' ? 'content' : 'assignment';
                     openOverlay({
-                      type:isAssignment,
+                      type: isAssignment,
                       branchId: info.item.branchId,
-                      contentId:info.item.contentId,
-                      assignmentId:info.item.assignmentId,
-                     
+                      contentId: info.item.contentId,
+                      assignmentId: info.item.assignmentId,
                     });
                   }}
                 />
@@ -336,8 +330,8 @@ export default function Course(props) {
       </mainPanel>
       {routePathDriveId && (
         <menuPanel isInitOpen title="Selected">
-          <ItemInfo route={props.route}/>
-          <br /><br />
+          <ItemInfo route={props.route} />
+          <br />
           {/* <MaterialsInfo
            itemType={itemType} courseId={courseId} pathItemId={pathItemId} routePathDriveId={routePathDriveId} routePathFolderId={routePathFolderId} /> */}
         </menuPanel>
@@ -347,11 +341,7 @@ export default function Course(props) {
   );
 }
 
-
-
-
-const DoenetMLInfoPanel = (props) =>{
-
+const DoenetMLInfoPanel = (props) => {
   let urlParamsObj = Object.fromEntries(
     new URLSearchParams(props.props.route.location.search),
   );
@@ -384,12 +374,14 @@ const DoenetMLInfoPanel = (props) =>{
   } = useAssignmentCallbacks();
 
   const itemInfo = props.contentInfo;
-  const assignmentInfoSettings = useRecoilValueLoadable(assignmentDictionarySelector(
-    {driveId:itemInfo.driveId,
-      folderId:itemInfo.parentFolderId,
-      itemId:itemInfo.itemId,
-      courseId:courseId}
-    ));
+  const assignmentInfoSettings = useRecoilValueLoadable(
+    assignmentDictionarySelector({
+      driveId: itemInfo.driveId,
+      folderId: itemInfo.parentFolderId,
+      itemId: itemInfo.itemId,
+      courseId: courseId,
+    }),
+  );
 
   let aInfo = '';
   let assignmentId = '';
@@ -407,7 +399,20 @@ const DoenetMLInfoPanel = (props) =>{
   let assignmentToContentButton = null;
   let loadAssignmentButton = null;
   let unPublishContentButton = null;
-   
+  let viewDoenetMLButton = (itemInfo.isAssignment === '0' &&
+    <Button
+      value="View DoenetML"
+      callback={() => {
+        openOverlay({
+          type: 'content',
+          branchId: itemInfo?.branchId,
+          contentId: itemInfo?.contentId,
+        });
+      }}
+    />
+  );
+  const { openOverlay } = useToolControlHelper();
+
   const handleChange = (event) => {
     event.preventDefault();
     let name = event.target.name;
@@ -415,7 +420,7 @@ const DoenetMLInfoPanel = (props) =>{
       event.target.type === 'checkbox'
         ? event.target.checked
         : event.target.value;
-  
+
     const result = changeSettings({
       [name]: value,
       driveIdcourseIditemIdparentFolderId: {
@@ -423,7 +428,6 @@ const DoenetMLInfoPanel = (props) =>{
         folderId: itemInfo.parentFolderId,
         itemId: itemInfo.itemId,
         courseId: courseId,
-       
       },
     });
     result
@@ -448,16 +452,16 @@ const DoenetMLInfoPanel = (props) =>{
         driveId: itemInfo.driveId,
         folderId: itemInfo.parentFolderId,
         itemId: itemInfo.itemId,
-        courseId: courseId
+        courseId: courseId,
       },
     });
-     let payload = {
+    let payload = {
       itemId: itemInfo.itemId,
       isAssignment: '1',
-      assignmentId:aInfo?.assignmentId,
+      assignmentId: aInfo?.assignmentId,
       [name]: value,
     };
-    if(name === 'assignment_title'){
+    if (name === 'assignment_title') {
       updateAssignmentTitle({
         driveIdFolderId: {
           driveId: itemInfo.driveId,
@@ -467,8 +471,6 @@ const DoenetMLInfoPanel = (props) =>{
         payloadAssignment: payload,
       });
     }
-   
-
   };
   const handlePublishContent = () => {
     let payload = {
@@ -496,13 +498,12 @@ const DoenetMLInfoPanel = (props) =>{
       console.log(response.data);
     });
     assignmentToContent({
-
-      driveIdcourseIditemIdparentFolderId:{
+      driveIdcourseIditemIdparentFolderId: {
         driveId: itemInfo.driveId,
         folderId: itemInfo.parentFolderId,
         itemId: itemInfo.itemId,
         courseId: courseId,
-      }
+      },
     });
     // setAssignmentForm((old)=>{   //TODO remove
     //   return  {...old, [isAssignment]: 0}
@@ -517,12 +518,12 @@ const DoenetMLInfoPanel = (props) =>{
     });
   };
 
-    const loadBackAssignment = () => {
+  const loadBackAssignment = () => {
     let payload = {
       itemId: itemInfo.itemId,
       isAssignment: '1',
-      assignmentId:aInfo?.assignmentId,
-      title:aInfo?.assignment_title
+      assignmentId: aInfo?.assignmentId,
+      title: aInfo?.assignment_title,
     };
     axios.post(`/api/handleBackAssignment.php`, payload).then((response) => {
       console.log(response.data);
@@ -530,13 +531,12 @@ const DoenetMLInfoPanel = (props) =>{
 
     loadAvailableAssignment({
       ...aInfo,
-      driveIdcourseIditemIdparentFolderId:{
+      driveIdcourseIditemIdparentFolderId: {
         driveId: itemInfo.driveId,
         folderId: itemInfo.parentFolderId,
         itemId: itemInfo.itemId,
         courseId: courseId,
-      }
-
+      },
     });
 
     updateAssignmentTitle({
@@ -551,21 +551,25 @@ const DoenetMLInfoPanel = (props) =>{
   const [showAForm, setShowAForm] = useState(false);
   const role = useRecoilValue(roleAtom);
   const [addToast, ToastType] = useToast();
- 
-  
-  if(itemInfo?.isPublished === '0'){                                       // // Publish content
-    publishContentButton = <>
-     <Button
-        value="Publish Content"
-        switch_value="Published"
-        callback={handlePublishContent}
-      />
-    </>
+
+  if (itemInfo?.isPublished === '0') {
+    // // Publish content
+    publishContentButton = (
+      <>
+        <Button
+          value="Publish Content"
+          switch_value="Published"
+          callback={handlePublishContent}
+        />
+      </>
+    );
   }
 
-if(itemInfo?.isAssignment === '0' && itemInfo.assignmentId === null){   // // Make assignment
-    makeAssignmentButton = <>
-    <Button
+  if (itemInfo?.isAssignment === '0' && itemInfo.assignmentId === null) {
+    // // Make assignment
+    makeAssignmentButton = (
+      <>
+        <Button
           value="Make Assignment"
           callback={() => {
             let assignmentId = nanoid();
@@ -577,187 +581,370 @@ if(itemInfo?.isAssignment === '0' && itemInfo.assignmentId === null){   // // Ma
                 itemId: itemInfo.itemId,
                 courseId: courseId,
               },
-              branchId:itemInfo.branchId,
-              contentId:itemInfo.contentId ? itemInfo.contentId : itemInfo.branchId,
+              branchId: itemInfo.branchId,
+              contentId: itemInfo.contentId
+                ? itemInfo.contentId
+                : itemInfo.branchId,
               assignmentId: assignmentId,
             });
             let payload = {
               ...aInfo,
               itemId: itemInfo.itemId,
-              assignment_title:"Untitled Assignment",
-              assignmentId:assignmentId,
-              isAssignment:'1',
+              assignment_title: 'Untitled Assignment',
+              assignmentId: assignmentId,
+              isAssignment: '1',
               branchId: itemInfo.branchId,
             };
-          
+
             makeAssignment({
               driveIdFolderId: {
                 driveId: itemInfo.driveId,
-               folderId: itemInfo.parentFolderId,
+                folderId: itemInfo.parentFolderId,
               },
               itemId: itemInfo.itemId,
               payload: payload,
             });
-            result.then((resp) => {
-              if (resp) {
-                addToast(`Add new assignment 'Untitled assignment'`, ToastType.SUCCESS);
-              }
-              else{
-                onAssignmentError({errorMessage: resp.data.message});
-              }
-            }).catch( e => {
-              onAssignmentError({errorMessage: e.message});
-            })
+            result
+              .then((resp) => {
+                if (resp) {
+                  addToast(
+                    `Add new assignment 'Untitled assignment'`,
+                    ToastType.SUCCESS,
+                  );
+                } else {
+                  onAssignmentError({ errorMessage: resp.data.message });
+                }
+              })
+              .catch((e) => {
+                onAssignmentError({ errorMessage: e.message });
+              });
           }}
         />
-    </>
+      </>
+    );
   }
-// // View Assignment Form 
- if(itemInfo.isAssignment === '1' && (itemInfo.assignmentId || aInfo?.assignmentId)) {
-    assignmentForm = <>
-      {
-        <>
-          <div><label>Assignment Name :</label><input required type="text" name="assignment_title" value={aInfo ? aInfo?.assignment_title : ''} placeholder="Title goes here" onBlur={(e) => handleOnBlur(e)} onChange={handleChange} /></div>
-          <div><label>Assigned Date:</label><input required type="text" name="assignedDate" value={aInfo ? aInfo?.assignedDate : ''} placeholder="0001-01-01 01:01:01 " onBlur={() => handleOnBlur()} onChange={handleChange}/></div>
-          <div><label>Due date: </label><input required type="text" name="dueDate" value={aInfo ? aInfo?.dueDate : ''} placeholder="0001-01-01 01:01:01" onBlur={handleOnBlur} onChange={handleChange} /></div>
-          <div><label>Time Limit:</label><input required type="time" name="timeLimit" value={aInfo ? aInfo?.timeLimit : ''} placeholder="01:01:01" onBlur={handleOnBlur} onChange={handleChange}/></div>
-          <div><label>Number Of Attempts:</label><input required type="number" name="numberOfAttemptsAllowed" value={aInfo ? aInfo?.numberOfAttemptsAllowed : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
-          <div><label>Attempt Aggregation :</label><input required type="text" name="attemptAggregation" value={aInfo ? aInfo?.attemptAggregation : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
-          <div><label>Total Points Or Percent: </label><input required type="number" name="totalPointsOrPercent" value={aInfo ? aInfo?.totalPointsOrPercent : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
-          <div><label>Grade Category: </label><input required type="select" name="gradeCategory" value={aInfo ? aInfo?.gradeCategory : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
-          <div><label>Individualize: </label><input required type="checkbox" name="individualize" value={aInfo ? aInfo?.individualize : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
-          <div><label>Multiple Attempts: </label><input required type="checkbox" name="multipleAttempts" value={aInfo ? aInfo?.multipleAttempts : ''} onBlur={handleOnBlur} onChange={handleChange}/> </div>
-          <div><label>Show solution: </label><input required type="checkbox" name="showSolution" value={aInfo ? aInfo?.showSolution : ''} onBlur={handleOnBlur} onChange={handleChange}/> </div>
-          <div><label>Show feedback: </label><input required type="checkbox" name="showFeedback" value={aInfo ? aInfo?.showFeedback : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
-          <div><label>Show hints: </label><input required type="checkbox" name="showHints" value={aInfo ? aInfo?.showHints : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
-          <div><label>Show correctness: </label><input required type="checkbox" name="showCorrectness" value={aInfo ? aInfo?.showCorrectness : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
-          <div><label>Proctor make available: </label><input required type="checkbox" name="proctorMakesAvailable" value={aInfo ? aInfo?.proctorMakesAvailable : ''} onBlur={handleOnBlur} onChange={handleChange}/></div>
-          <br />
-       <div>
-           <Button
-              value="Publish assignment"
-              switch_value="publish changes"
-              callback={() => {
-                const result = publishContentAssignment({
-                  driveIdcourseIditemIdparentFolderId: {
-                    driveId: itemInfo.driveId,
-                    folderId: itemInfo.parentFolderId,
-                    itemId: itemInfo.itemId,
+  // // View Assignment Form
+  if (
+    itemInfo.isAssignment === '1' &&
+    (itemInfo.assignmentId || aInfo?.assignmentId)
+  ) {
+    assignmentForm = (
+      <>
+        {
+          <>
+            <div>
+              <label>Assignment Name :</label>
+              <input
+                required
+                type="text"
+                name="assignment_title"
+                value={aInfo ? aInfo?.assignment_title : ''}
+                placeholder="Title goes here"
+                onBlur={(e) => handleOnBlur(e)}
+                onChange={handleChange}
+              />
+            </div>
+            {/* <div>
+              <label>Assigned Date:</label>
+              <input
+                required
+                type="text"
+                name="assignedDate"
+                value={aInfo ? aInfo?.assignedDate : ''}
+                placeholder="0001-01-01 01:01:01 "
+                onBlur={() => handleOnBlur()}
+                onChange={handleChange}
+              />
+            </div> */}
+            <div>
+              <label>Due date: </label>
+              <input
+                required
+                type="text"
+                name="dueDate"
+                value={aInfo ? aInfo?.dueDate : ''}
+                placeholder="0001-01-01 01:01:01"
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Time Limit:</label>
+              <input
+                required
+                type="time"
+                name="timeLimit"
+                value={aInfo ? aInfo?.timeLimit : ''}
+                placeholder="01:01:01"
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Number Of Attempts:</label>
+              <input
+                required
+                type="number"
+                name="numberOfAttemptsAllowed"
+                value={aInfo ? aInfo?.numberOfAttemptsAllowed : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Attempt Aggregation :</label>
+              <input
+                required
+                type="text"
+                name="attemptAggregation"
+                value={aInfo ? aInfo?.attemptAggregation : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Total Points Or Percent: </label>
+              <input
+                required
+                type="number"
+                name="totalPointsOrPercent"
+                value={aInfo ? aInfo?.totalPointsOrPercent : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Grade Category: </label>
+              <input
+                required
+                type="select"
+                name="gradeCategory"
+                value={aInfo ? aInfo?.gradeCategory : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Individualize: </label>
+              <input
+                required
+                type="checkbox"
+                name="individualize"
+                value={aInfo ? aInfo?.individualize : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Multiple Attempts: </label>
+              <input
+                required
+                type="checkbox"
+                name="multipleAttempts"
+                value={aInfo ? aInfo?.multipleAttempts : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />{' '}
+            </div>
+            <div>
+              <label>Show solution: </label>
+              <input
+                required
+                type="checkbox"
+                name="showSolution"
+                value={aInfo ? aInfo?.showSolution : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />{' '}
+            </div>
+            <div>
+              <label>Show feedback: </label>
+              <input
+                required
+                type="checkbox"
+                name="showFeedback"
+                value={aInfo ? aInfo?.showFeedback : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Show hints: </label>
+              <input
+                required
+                type="checkbox"
+                name="showHints"
+                value={aInfo ? aInfo?.showHints : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Show correctness: </label>
+              <input
+                required
+                type="checkbox"
+                name="showCorrectness"
+                value={aInfo ? aInfo?.showCorrectness : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <label>Proctor make available: </label>
+              <input
+                required
+                type="checkbox"
+                name="proctorMakesAvailable"
+                value={aInfo ? aInfo?.proctorMakesAvailable : ''}
+                onBlur={handleOnBlur}
+                onChange={handleChange}
+              />
+            </div>
+            <br />
+            <div>
+              <Button
+                value="Publish assignment"
+                switch_value="publish changes"
+                callback={() => {
+                  const result = publishContentAssignment({
+                    driveIdcourseIditemIdparentFolderId: {
+                      driveId: itemInfo.driveId,
+                      folderId: itemInfo.parentFolderId,
+                      itemId: itemInfo.itemId,
+                      courseId: courseId,
+                    },
+                    branchId: itemInfo.branchId,
+                    contentId: itemInfo.contentId
+                      ? itemInfo.contentId
+                      : itemInfo.branchId,
+                    assignmentId: assignmentId,
+                  });
+                  const payload = {
+                    ...aInfo,
+                    assignmentId: assignmentId,
+                    assignment_isPublished: '1',
                     courseId: courseId,
-                  },
-                   branchId:itemInfo.branchId,
-                   contentId:itemInfo.contentId ? itemInfo.contentId : itemInfo.branchId,
-                  assignmentId: assignmentId,
-                })
-                const payload = {
-                  ...aInfo,
-                  assignmentId: assignmentId,
-                  assignment_isPublished: '1',
-                  courseId: courseId,
-                  branchId:itemInfo.branchId,
-                };
-                publishAssignment({
-                  driveIdFolderId: {
-                    driveId: itemInfo.driveId,
-                    folderId: itemInfo.parentFolderId,
-                  },
-                  itemId: itemInfo.itemId,
-                  payload: payload,
-                });
-               
-                result.then((resp) => {
-                  if (resp) {
-                    // addToast(`Add new assignment 'Untitled assignment'`, ToastType.SUCCESS);
-                    // setAssignmentForm(resp) TODO
-                  }
-                  // else{
-                  //   onAddAssignmentError({errorMessage: resp.data.message});
-                  // }
-                });
-                // .catch( e => {
-                //   onAddAssignmentError({errorMessage: e.message});
-                // })
-              }}
-              type="submit"
-            ></Button>
-          </div>
-        </>
-      }
-    </>
+                    branchId: itemInfo.branchId,
+                  };
+                  publishAssignment({
+                    driveIdFolderId: {
+                      driveId: itemInfo.driveId,
+                      folderId: itemInfo.parentFolderId,
+                    },
+                    itemId: itemInfo.itemId,
+                    payload: payload,
+                  });
 
- 
+                  result.then((resp) => {
+                    if (resp) {
+                      // addToast(`Add new assignment 'Untitled assignment'`, ToastType.SUCCESS);
+                      // setAssignmentForm(resp) TODO
+                    }
+                    // else{
+                    //   onAddAssignmentError({errorMessage: resp.data.message});
+                    // }
+                  });
+                  // .catch( e => {
+                  //   onAddAssignmentError({errorMessage: e.message});
+                  // })
+                }}
+                type="submit"
+              ></Button>
+            </div>
+          </>
+        }
+      </>
+    );
   }
- // // Make Assignment Title update(Load back available assignment) //TODO add assignmentId from ainfo
- if(itemInfo.isAssignment === '0'  && aInfo?.assignmentId){  
-  loadAssignmentButton = <>
-  <Button value="load Assignment" callback={loadBackAssignment} />
-  </>
-}
-//  Make Assignment to content 
-  if(itemInfo.isAssignment === '1'){
-assignmentToContentButton =
-  <Button value="Make Content" callback={handleMakeContent} />
- }
+  // // Make Assignment Title update(Load back available assignment) //TODO add assignmentId from ainfo
+  if (itemInfo.isAssignment === '0' && aInfo?.assignmentId) {
+    loadAssignmentButton = (
+      <>
+        <Button value="load Assignment" callback={loadBackAssignment} />
+      </>
+    );
+  }
+  //  Make Assignment to content
+  if (itemInfo.isAssignment === '1') {
+    assignmentToContentButton = (
+      <>
+        <Button value="Make Content" callback={handleMakeContent} />
+        <br />
+        <Button
+          value="View Assignment"
+          callback={() => {
+            openOverlay({
+              type: 'assignment',
+              branchId: itemInfo?.branchId,
+              contentId: itemInfo?.contentId,
+              assignmentId: itemInfo?.assignmentId,
+            });
+          }}
+        />
+      </>
+    );
+  }
 
-
-
-  return <>
-  {makeAssignmentButton}
-  <br /><br />
-  {publishContentButton}<br /> 
-
-  {loadAssignmentButton}<br />
-  {assignmentToContentButton}<br />
-  {assignmentForm}
-  {unPublishContentButton}
-  </>
-}
-const FolderInfoPanel = () =>{
   return (
     <>
-    Folder Info
+      {makeAssignmentButton}
+      <br />
+      {publishContentButton}
+      <br />
+      {viewDoenetMLButton}
+       <br />
+      {loadAssignmentButton}
+      <br />
+      {assignmentToContentButton}
+      <br />
+      {assignmentForm}
+      <br />
+      {/* {unPublishContentButton} */}
     </>
-  )
-}
-
-
-
-
-const ItemInfo = (props) => {
-
-  const contentInfoLoad = useRecoilValueLoadable(selectedInformation);
-  if (contentInfoLoad.state === "loading"){ return null;}
-  if (contentInfoLoad.state === "hasError"){ 
-    console.error(contentInfoLoad.contents)
-    return null;}
-    let contentInfo = contentInfoLoad?.contents?.itemInfo;
-    console.log(">>> contentInfo",contentInfo);
-
-    if(contentInfoLoad.contents?.number > 1){
-       return <>
-       <h1>{contentInfoLoad.contents.number} Content Selected</h1>
-       </>
-    } else if(contentInfoLoad.contents?.number === 1){
-      if(contentInfo?.itemType === "DoenetML"){
-        return <DoenetMLInfoPanel 
-        key={`DoenetMLInfoPanel${contentInfo.itemId}`}
-        contentInfo = {contentInfo}
-        props={props}
-        />
-      }else if(contentInfo?.itemType === "Folder"){
-        return <FolderInfoPanel 
-        key={`FolderInfoPanel${contentInfo.itemId}`}
-        contentInfo = {contentInfo}
-        />
-      }
-    }
-    return null;
-    
- 
+  );
+};
+const FolderInfoPanel = () => {
+  return <h1>Folder Info</h1>;
 };
 
+const ItemInfo = (props) => {
+  const contentInfoLoad = useRecoilValueLoadable(selectedInformation);
+  if (contentInfoLoad.state === 'loading') {
+    return null;
+  }
+  if (contentInfoLoad.state === 'hasError') {
+    console.error(contentInfoLoad.contents);
+    return null;
+  }
+  let contentInfo = contentInfoLoad?.contents?.itemInfo;
 
-
+  if (contentInfoLoad.contents?.number > 1) {
+    return (
+      <>
+        <h1>{contentInfoLoad.contents.number} Content Selected</h1>
+      </>
+    );
+  } else if (contentInfoLoad.contents?.number === 1) {
+    if (contentInfo?.itemType === 'DoenetML') {
+      return (
+        <DoenetMLInfoPanel
+          key={`DoenetMLInfoPanel${contentInfo.itemId}`}
+          contentInfo={contentInfo}
+          props={props}
+        />
+      );
+    } else if (contentInfo?.itemType === 'Folder') {
+      return (
+        <FolderInfoPanel
+          key={`FolderInfoPanel${contentInfo.itemId}`}
+          contentInfo={contentInfo}
+        />
+      );
+    }
+  }
+  return null;
+};
 
 //Student view info panel
 
