@@ -129,12 +129,12 @@ export const useAssignment = () => {
       let { driveIdcourseIditemIdparentFolderId, ...value } = props;
 
       const saveInfo = await snapshot.getPromise(assignmentDictionary(driveIdcourseIditemIdparentFolderId));
-
-      set(assignmentDictionary(driveIdcourseIditemIdparentFolderId), (old) => {
-        return { ...old, ...value };
-      });
+        // console.log(">>> saveInfo",saveInfo, "value", value);
+        //       set(assignmentDictionary(driveIdcourseIditemIdparentFolderId), (old) => {
+        //         return { ...old, ...value };
+        //       });
       let saveAssignmentNew = { ...saveInfo, ...value };
-      // set(assignmentDictionary(driveIdcourseIditemIdparentFolderId), saveAssignmentNew);
+      set(assignmentDictionary(driveIdcourseIditemIdparentFolderId), saveAssignmentNew);
       const payload = {
         ...saveAssignmentNew,
         assignmentId: saveAssignmentNew.assignmentId,
