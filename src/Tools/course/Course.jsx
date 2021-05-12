@@ -39,11 +39,12 @@ import GlobalFont from '../../_utils/GlobalFont';
 import Tool from '../_framework/Tool';
 import { useToolControlHelper, ProfileContext } from '../_framework/ToolRoot';
 import Toast, { useToast } from '../_framework/Toast';
-import { drivecardSelectedNodesAtom,URLPathSync } from '../library/Library';
+import { drivecardSelectedNodesAtom } from '../library/Library';
 import Enrollment from './Enrollment';
 import { useAssignment } from '../course/CourseActions';
 import { useAssignmentCallbacks } from '../../_reactComponents/Drive/DriveActions';
 import { selectedInformation } from '../library/Library';
+import {URLPathSync} from '../../_sharedRecoil/urlPathsync'
 // import {assignmentDictionary} from "../_framework/Overlays/Content"
 import CollapseSection from '../../_reactComponents/PanelHeaderComponents/CollapseSection';
 

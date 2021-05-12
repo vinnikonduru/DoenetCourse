@@ -58,6 +58,7 @@ import { driveColors, driveImages } from '../../_reactComponents/Drive/util';
 import Tool from '../_framework/Tool';
 import { useToolControlHelper , ProfileContext } from '../_framework/ToolRoot';
 import { useToast } from '../_framework/Toast';
+import { URLPathSync } from '../../_sharedRecoil/urlPathsync'
 
 
 function Container(props){
@@ -840,57 +841,6 @@ function AutoSelect(props){
   return null;
 }
 
-export function URLPathSync(props){
-
-  const [drivePath,setDrivePath] = useRecoilState(drivePathSyncFamily("main"))
-  const history = useHistory();
-  const init = useRef(true);
-  const sourceOfPathChange = useRef(false);
-
-  useEffect(()=>{
-    if (!sourceOfPathChange.current){
-      let urlParamsObj = Object.fromEntries(new URLSearchParams(props.route.location.search));
-      if (urlParamsObj?.path){
-        const  [routePathDriveId,routePathFolderId,pathItemId,type] = urlParamsObj.path.split(":");
-        setDrivePath({driveId:routePathDriveId,parentFolderId:routePathFolderId,itemId:pathItemId,type})
-      }
-    }
-    sourceOfPathChange.current = false;
-    
-  },[props.route, setDrivePath])
-
-
-  useEffect(()=>{
-    let urlParamsObj = Object.fromEntries(new URLSearchParams(props.route.location.search));
-    //Update the URL Parameter if drivePath changes
-    let changed = false;
-    if (urlParamsObj?.path){
-      const  [routePathDriveId,routePathFolderId,pathItemId,type] = urlParamsObj.path.split(":");
-
-      if (routePathDriveId !== drivePath.driveId ||
-        routePathFolderId !== drivePath.parentFolderId ||
-        pathItemId !== drivePath.itemId
-        ){
-          changed = true;
-        }
-    }else{
-      //When first open and no path parameter
-      changed = true;
-    }
-
-    if (changed && !init.current){
-      let newParams = {...urlParamsObj} 
-      newParams['path'] = `${drivePath.driveId}:${drivePath.parentFolderId}:${drivePath.itemId}:${drivePath.type}`
-      history.push('?'+encodeParams(newParams))
-      sourceOfPathChange.current = true;
-
-    }
-    init.current = false;
-    
-  },[drivePath])
-  
-  return null;
-}
 
 export default function Library(props) {
   // console.log("=== 📚 Doenet Library Tool",props);  
