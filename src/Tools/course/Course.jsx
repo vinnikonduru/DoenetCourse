@@ -428,7 +428,7 @@ const DoenetMLInfoPanel = (props) => {
   let unPublishContentButton = null;
   let viewDoenetMLButton = (itemInfo.isAssignment === '0' &&
     <Button
-      value="View DoenetML"
+      value="View Content"
       callback={() => {
         openOverlay({
           type: 'content',
