@@ -1,134 +1,108 @@
-// set up db
-// check  overview exists
-// remove overview -> check if overview NOT exist
-// check  syllabus exists
-// remove syllabus -> check if syllabus NOT exist
-// check  grade exists
-// remove grade -> check if grade NOT exist
-// check  assignment exists
-// remove assignment -> check if assignment NOT exist
+import {signIn} from '../DoenetSignin/DoenetSignin';
+import {signOut} from '../DoenetSignin/DoenetSignOut';
 
-// check if 13th item NOT exists
-// add header, now check if 13th item exists
-// check if 14th item NOT exists
-// add assignments, now check if 14th item exists
-// remove 13th item
-// check if 13th item NOT exists
-describe('Admin Navigation Tests', function () {
-  it('setUp', function() {
-    cy.request('POST', 'api/cypressCleanupAdminTree.php').then((response) => {
-      cy.log(response);
-    })
-    cy.request('POST', 'api/enableAll.php').then((response) => {
-      cy.log(response);
-    })
-  });
-  beforeEach(() => {
+describe('Assignment creation in course', function () {
+    beforeEach(() => {
+      cy.visit('/signin');
       cy.visit('/course');
-  })
-  it('overview', function() {
-    cy.wait(1000);
-    cy.get('[data-cy=overviewNavItem]').should('exist');
+      cy.wait(500);
+    });
+
+
+//   it('Creating a new assignment by clicking the make assignment button', function() {
+//     cy.wait(1000)
+//     let courseDriveCardLabel = "";
+//     const driveCard = cy.get('[data-cy=driveCard]').first();
+//     driveCard.within(() => {
+//       cy.get('[data-cy=driveCardLabel]').invoke('text').then(driveLabel => {
+//         courseDriveCardLabel = driveLabel;
+//       })
+//     });
+//     driveCard.dblclick();
+
+//     cy.get(':nth-child(1) > :nth-child(1) > [data-cy=navDriveHeader]').should('exist');
     
-    cy.visit('/admin');
-    cy.wait(1000);
-    cy.get('[data-cy=overviewNavItem] > :nth-child(3)').click();
-    
-    cy.visit('/course');
-    cy.wait(1000);
-    cy.get('[data-cy=overviewNavItem]').should('not.exist');
+//     cy.get('[data-cy=navPanel]').within(() => {
+//       cy.get('[data-cy=navDriveHeader]').should('exist').click();
+//     });
+//       cy.get('[data-cy=mainPanel]').within(() => {
+//       cy.get('[data-cy=driveItem]').first().should('exist');
 
-  });
-  it('syllabus', function() {
-    cy.wait(1000);
-    cy.get('[data-cy=syllabusNavItem]').should('exist');
-    
-    cy.visit('/admin');
-    cy.wait(1000);
-    cy.get('[data-cy=syllabusNavItem] > :nth-child(3)').click();
-    
-    cy.visit('/course');
-    cy.wait(1000);
-    cy.get('[data-cy=syllabusNavItem]').should('not.exist');
+//         cy.get('[data-cy=doenetMLIcon]').should('exist');
+//         const doenetML = cy.get('[data-cy=driveItem]').first();
+//         doenetML.invoke('attr', 'data-cy', 'doenetMLItem')
+//         doenetML.click();
+//          });
+         
+//          cy.wait(2000);
+//          cy.get("body").then(($body) => {
+//           if ($body.find("[data-cy=createNewAssignmentButton]").length) {
+//             cy.get('[data-cy=createNewAssignmentButton]').click();
+//            } else {
+//             // cy.get('[data-cy=panelDragHandle]').click({multiple: true});
+//             // cy.get('[data-cy=createNewCourseButton]').click();
+//            }
+//         })
+// })
 
-  });
-  it('grade', function() {
-    cy.wait(1000);
-    cy.get('[data-cy=gradesNavItem]').should('exist');
-    
-    cy.visit('/admin');
-    cy.wait(1000);
-    cy.get('[data-cy=gradesNavItem] > :nth-child(3)').click();
-    
-    cy.visit('/course');
-    cy.wait(1000);
-    cy.get('[data-cy=gradesNavItem]').should('not.exist');
+// it('Publish a new assignment by clicking the publish assignment button', function() {
+//   let courseDriveCardLabel = "";
+//   const driveCard = cy.get('[data-cy=driveCard]').first();
+//   driveCard.within(() => {
+//     cy.get('[data-cy=driveCardLabel]').invoke('text').then(driveLabel => {
+//       courseDriveCardLabel = driveLabel;
+//     })
+//   });
+//   driveCard.dblclick();
 
-  });
-  it('assignment', function() {
-    cy.wait(1000);
-    cy.get('[data-cy=assignmentsNavItem]').should('exist');
-    
-    cy.visit('/admin');
-    cy.wait(1000);
-    cy.get('[data-cy=assignmentsNavItem] > .switch > .slider').click();
-    
-    cy.visit('/course');
-    cy.wait(1000);
-    cy.get('[data-cy=assignmentsNavItem]').should('not.exist');
+//   cy.get(':nth-child(1) > :nth-child(1) > [data-cy=navDriveHeader]').should('exist');
+  
+//   cy.get('[data-cy=navPanel]').within(() => {
+//     cy.get('[data-cy=navDriveHeader]').should('exist').click();
+//   });
+//     cy.get('[data-cy=mainPanel]').within(() => {
+//     cy.get('[data-cy=driveItem]').first().should('exist');
 
-  });
-  it('CleanUp', function() {
-    cy.request('POST', 'api/enableAll.php').then((response) => {
-      cy.log(response);
-    })
-  });
-  it('addHeader', function() {
-    cy.wait(1000);
-    cy.get('[data-cy=header13]').should('not.exist');
+//       cy.get('[data-cy=doenetMLIcon]').should('exist');
+//       const doenetML = cy.get('[data-cy=driveItem]').first();
+//       doenetML.invoke('attr', 'data-cy', 'doenetMLItem')
+//       doenetML.click();
+//        });
+       
+//        cy.get('[data-cy=publishAssignmentButton]').click();
 
-    cy.visit('/admin');
-    cy.wait(1000);
-    cy.get('[data-cy=addHeader]').click();
-    cy.get(':nth-child(17)').click();
-    cy.get('[data-cy=modifyTree]').click();
-    cy.get('[data-cy=arrowUp13]').should('exist');
-    cy.get('[data-cy=arrowRight13]').should('exist');
+// })
 
-    cy.visit('/course');
-    cy.wait(1000);
-    cy.get('[data-cy=assignmentsNavItem]').should('exist').click();
-    cy.get('[data-cy=header13]').should('exist');
+// it('Publish content type doenetMl', function() {
+//   let courseDriveCardLabel = "";
+//   const driveCard = cy.get('[data-cy=driveCard]').first();
+//   driveCard.within(() => {
+//     cy.get('[data-cy=driveCardLabel]').invoke('text').then(driveLabel => {
+//       courseDriveCardLabel = driveLabel;
+//     })
+//   });
+//   driveCard.dblclick();
 
-  });  
-  it('addAssignment', function() {
-    cy.wait(1000);
-    cy.get('[data-cy=assignmentsNavItem]').should('exist').click();
-    cy.get('[data-cy=header13]').should('exist');
-    cy.get('[data-cy=assignment14]').should('not.exist');
+//   cy.get(':nth-child(1) > :nth-child(1) > [data-cy=navDriveHeader]').should('exist');
+  
+//   cy.get('[data-cy=navPanel]').within(() => {
+//     cy.get('[data-cy=navDriveHeader]').should('exist').click();
+//   });
+//     cy.get('[data-cy=mainPanel]').within(() => {
+//     cy.get('[data-cy=driveItem]').first().should('exist');
 
+//       cy.get('[data-cy=doenetMLIcon]').should('exist');
+//       const doenetML = cy.get('[data-cy=driveItem]').first();
+//       doenetML.invoke('attr', 'data-cy', 'doenetMLItem')
+//       doenetML.click();
+//        });
+//        cy.get('[data-cy=publishContentButton]').click();
+//        cy.get("body").then(($body) => {
+//          if ($body.find("[data-cy=publishContentButton]").length) {
+//        cy.get('[data-cy=publishContentButton]').click();
+//           } 
+                
+//         })
+// })
 
-    cy.visit('/admin');
-    cy.wait(1000);
-    cy.get('[data-cy=addAssignment]').click();
-    cy.get('[data-cy=arrowLeft13]').click();
-
-    cy.visit('/course');
-    cy.wait(1000);
-    cy.get('[data-cy=assignmentsNavItem]').should('exist').click();
-    cy.get('[data-cy=header13]').should('exist');
-    cy.get('[data-cy=assignment14]').should('exist');
-
-    cy.visit('/admin');
-    cy.wait(1000);
-    cy.get('[data-cy=removeTree]').click();
-    cy.get('[data-cy=close13]').click();
-
-  });
-
-  it('CleanUp', function() {
-    cy.request('POST', 'api/enableAll.php').then((response) => {
-      cy.log(response);
-    })
-  });
 })

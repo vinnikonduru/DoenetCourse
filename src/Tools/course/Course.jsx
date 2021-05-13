@@ -279,6 +279,7 @@ export default function Course(props) {
         <div
           style={{ marginBottom: '40px', height: '100vh' }}
           onClick={useOutsideDriveSelector}
+          data-cy="navPanel"
         >
           <Drive driveId={routePathDriveId} foldersOnly={true} drivePathSyncKey="main"/>
         </div>
@@ -295,6 +296,7 @@ export default function Course(props) {
               onClick={() => {
                 clearSelections();
               }}
+              data-cy="mainPanel"
               // className={routePathDriveId ? 'mainPanelStyle' : ''}
             >
               <Container>
@@ -322,6 +324,7 @@ export default function Course(props) {
             <div
               onClick={cleardrivecardSelection}
               tabIndex={0}
+              data-cy="mainPanel"
               // className={routePathDriveId ? '' : 'mainPanelStyle'}
             >
               {!routePathDriveId && <h2>Admin</h2>}
@@ -334,6 +337,7 @@ export default function Course(props) {
                 driveDoubleClickCallback={({ item }) => {
                   DriveCardCallBack({ item });
                 }}
+                
               />
               {!routePathDriveId && <h2>Student</h2>}
               <DriveCards
@@ -345,6 +349,7 @@ export default function Course(props) {
                 driveDoubleClickCallback={({ item }) => {
                   DriveCardCallBack({ item });
                 }}
+                data-cy="drivecard"
               />
             </div>
           </>
@@ -616,6 +621,7 @@ const DoenetMLInfoPanel = (props) => {
     publishContentButton = (
       <>
         <Button
+        data-cy="publishContentButton"
           value="Publish Content"
           switch_value="Published"
           callback={handlePublishContent}
@@ -630,6 +636,7 @@ const DoenetMLInfoPanel = (props) => {
       <>
         <Button
           value="Make Assignment"
+          data-cy="createNewAssignmentButton"
           callback={async () => {
             let assignmentId = nanoid();
             setShowAForm(true);
@@ -688,7 +695,7 @@ const DoenetMLInfoPanel = (props) => {
     assignmentForm = (
       <>
         {
-          <>
+           <CollapseSection title="Assignment Settings">
             <div>
               <label>Assignment Name :</label>
               <input
@@ -854,6 +861,7 @@ const DoenetMLInfoPanel = (props) => {
             <br />
             <div>
               <Button
+               data-cy="publishAssignmentButton"
                 value="Publish assignment"
                 switch_value="publish changes"
                 callback={() => {
@@ -901,7 +909,7 @@ const DoenetMLInfoPanel = (props) => {
                 type="submit"
               ></Button>
             </div>
-          </>
+          </CollapseSection>
         }
       </>
     );
