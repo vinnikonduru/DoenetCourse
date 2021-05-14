@@ -428,6 +428,7 @@ const DoenetMLInfoPanel = (props) => {
   let unPublishContentButton = null;
   let viewDoenetMLButton = (itemInfo.isAssignment === '0' &&
     <Button
+    data-cy="viewContentButton"
       value="View Content"
       callback={() => {
         openOverlay({
@@ -699,6 +700,7 @@ const DoenetMLInfoPanel = (props) => {
             <div>
               <label>Assignment Name :</label>
               <input
+                data-cy="assignmentNameInputValue"
                 required
                 type="text"
                 name="assignment_title"
@@ -918,7 +920,7 @@ const DoenetMLInfoPanel = (props) => {
   if (itemInfo.isAssignment === '0' && aInfo?.assignmentId) {
     loadAssignmentButton = (
       <>
-        <Button value="load Assignment" callback={loadBackAssignment} />
+        <Button value="load Assignment" callback={loadBackAssignment} data-cy="loadAssignmentButton"/>
       </>
     );
   }
@@ -926,7 +928,7 @@ const DoenetMLInfoPanel = (props) => {
   if (itemInfo.isAssignment === '1') {
     assignmentToContentButton = (
       <>
-        <Button value="Make Content" callback={handleMakeContent} />
+        <Button value="Make Content" callback={handleMakeContent} data-cy="makeContentButton"/>
         <br />
         <Button
           value="View Assignment"
