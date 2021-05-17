@@ -53,10 +53,12 @@ export const roleAtom = atom({
 });
 const loadAssignmentSelector = selectorFamily({
   key: 'loadAssignmentSelector',
-  get: (assignmentId) => async ({ get, set }) => {
+  get: (branchId) => async ({ get, set }) => {
     const { data } = await axios.get(
-      `/api/getAllAssignmentSettings.php?assignmentId=${assignmentId}`,
+      `/api/getAllAssignmentSettings.php?branchId=${branchId}`,
     );
+    console.log(">>data",data);
+
     return data;
   },
 });
@@ -151,10 +153,10 @@ export default function Course(props) {
   if (urlParamsObj?.path !== undefined) {
     [routePathDriveId] = urlParamsObj.path.split(':');
   }
-  let courseId = '';
-  if (urlParamsObj?.courseId !== undefined) {
-    courseId = urlParamsObj?.courseId;
-  }
+  // let courseId = '';
+  // if (urlParamsObj?.courseId !== undefined) {
+  //   courseId = urlParamsObj?.courseId;
+  // }
 
   //Select +Add menuPanel if no course selected on startup
   useEffect(() => {
@@ -165,17 +167,16 @@ export default function Course(props) {
   const history = useHistory();
 
   const DriveCardCallBack = ({ item }) => {
-    // setDrivePath({
-    //   driveId:item.driveId,
-    //   parentFolderId:item.driveId,
-    //   itemId:item.driveId,
-    //   courseId:courseId,
-    //   type:"Drive"
-    // })
-    let newParams = {};
-    newParams['path'] = `${item.driveId}:${item.driveId}:${item.driveId}:Drive`;
-    newParams['courseId'] = `${item.courseId}`;
-    history.push('?' + encodeParams(newParams));
+    setDrivePath({
+      driveId:item.driveId,
+      parentFolderId:item.driveId,
+      itemId:item.driveId,
+      type:"Drive"
+    })
+    // let newParams = {};
+    // newParams['path'] = `${item.driveId}:${item.driveId}:${item.driveId}:Drive`;
+    // // newParams['courseId'] = `${item.courseId}`;
+    // history.push('?' + encodeParams(newParams));
   };
 
 
@@ -189,12 +190,12 @@ export default function Course(props) {
     setDrivecardSelection([]);
   }
   function useOutsideDriveSelector() {
-    // setDrivePath({
-    //   driveId:":",
-    //   parentFolderId:":",
-    //   itemId:":",
-    //   type:""
-    // })
+    setDrivePath({
+      driveId:":",
+      parentFolderId:":",
+      itemId:":",
+      type:""
+    })
     let newParams = {};
     newParams['path'] = `:::`;
     history.push('?' + encodeParams(newParams));
@@ -206,7 +207,7 @@ export default function Course(props) {
     setEnrollmentView(!openEnrollment);
   };
 
-  const enrollCourseId = { courseId: courseId };
+  const enrollCourseId = { driveId: routePathDriveId };
   let hideUnpublished = true;
   if (role === 'Instructor') {
     hideUnpublished = false;
@@ -270,11 +271,12 @@ export default function Course(props) {
   }
 
   return (
+    <>
+   <URLPathSync route={props.route}/> 
+   <GlobalFont />
     <Tool>
-       <URLPathSync route={props.route}/>
       <headerPanel title="Course" />
       <navPanel isInitOpen>
-        <GlobalFont />
         <div
           style={{ marginBottom: '40px', height: '100vh' }}
           onClick={useOutsideDriveSelector}
@@ -330,12 +332,14 @@ export default function Course(props) {
                 types={['course']}
                 drivePathSyncKey="main"
                 subTypes={['Administrator']}
-                driveDoubleClickCallback={({ item }) => {
-                  DriveCardCallBack({ item });
-                }}
+                // driveDoubleClickCallback={({ item }) => {
+                //   DriveCardCallBack({ item });
+                // }}
               />
+             
               {!routePathDriveId && <h2>Student</h2>}
               <DriveCards
+              isOneDriveSelect={true}
                 routePathDriveId={routePathDriveId}
                 isOneDriveSelect={true}
                 types={['course']}
@@ -354,11 +358,12 @@ export default function Course(props) {
           <ItemInfo route={props.route} />
           <br />
           {/* <MaterialsInfo
-           itemType={itemType} courseId={courseId} pathItemId={pathItemId} routePathDriveId={routePathDriveId} routePathFolderId={routePathFolderId} /> */}
+           itemType={itemType} pathItemId={pathItemId} routePathDriveId={routePathDriveId} routePathFolderId={routePathFolderId} /> */}
         </menuPanel>
       )}
       <menuPanel title="+add"></menuPanel>
     </Tool>
+    </>
   );
 }
 
@@ -367,10 +372,10 @@ const DoenetMLInfoPanel = (props) => {
     new URLSearchParams(props.props.route.location.search),
   );
 
-  let courseId = '';
-  if (urlParamsObj?.courseId !== undefined) {
-    courseId = urlParamsObj?.courseId;
-  }
+  // let courseId = '';
+  // if (urlParamsObj?.courseId !== undefined) {
+  //   courseId = urlParamsObj?.courseId;
+  // }
 
   const {
     addContentAssignment,
@@ -395,12 +400,12 @@ const DoenetMLInfoPanel = (props) => {
   } = useAssignmentCallbacks();
 
   const itemInfo = props.contentInfo;
+  console.log(">>> itemInfo",itemInfo);
   const assignmentInfoSettings = useRecoilValueLoadable(
     assignmentDictionarySelector({
       driveId: itemInfo.driveId,
       folderId: itemInfo.parentFolderId,
       itemId: itemInfo.itemId,
-      courseId: courseId,
     }),
   );
 
@@ -449,7 +454,6 @@ const DoenetMLInfoPanel = (props) => {
         driveId: itemInfo.driveId,
         folderId: itemInfo.parentFolderId,
         itemId: itemInfo.itemId,
-        courseId: courseId,
       },
     });
     result
@@ -473,7 +477,6 @@ const DoenetMLInfoPanel = (props) => {
         driveId: itemInfo.driveId,
         folderId: itemInfo.parentFolderId,
         itemId: itemInfo.itemId,
-        courseId: courseId,
       },
     });
     let payload = {
@@ -482,6 +485,8 @@ const DoenetMLInfoPanel = (props) => {
       isAssignment: '1',
       assignmentId: aInfo?.assignmentId,
       [name]: value,
+      branchId:itemInfo.branchId,
+      contentId:itemInfo.contentId
     };
     // if (name === 'assignment_title') {
       updateAssignmentTitle({
@@ -491,6 +496,9 @@ const DoenetMLInfoPanel = (props) => {
         },
         itemId: itemInfo.itemId,
         payloadAssignment: payload,
+        branchId:itemInfo.branchId,
+        contentId:itemInfo.contentId
+
       });
 
     // }
@@ -542,7 +550,6 @@ const DoenetMLInfoPanel = (props) => {
         driveId: itemInfo.driveId,
         folderId: itemInfo.parentFolderId,
         itemId: itemInfo.itemId,
-        courseId: courseId,
       },
     });
    
@@ -571,6 +578,7 @@ const DoenetMLInfoPanel = (props) => {
   const loadBackAssignment = () => {
     let payload = {
       itemId: itemInfo.itemId,
+      branchId:itemInfo.branchId,
       isAssignment: '1',
       assignmentId: aInfo?.assignmentId,
       assignment_title: aInfo?.assignment_title,
@@ -581,7 +589,6 @@ const DoenetMLInfoPanel = (props) => {
         driveId: itemInfo.driveId,
         folderId: itemInfo.parentFolderId,
         itemId: itemInfo.itemId,
-        courseId: courseId,
       },
     });
 
@@ -623,7 +630,7 @@ const DoenetMLInfoPanel = (props) => {
     );
   }
 
-  if (itemInfo?.isAssignment === '0' && itemInfo.assignmentId === null) {
+  if (itemInfo?.isAssignment === '0') {
     // // Make assignment
     makeAssignmentButton = (
       <>
@@ -637,21 +644,19 @@ const DoenetMLInfoPanel = (props) => {
                 driveId: itemInfo.driveId,
                 folderId: itemInfo.parentFolderId,
                 itemId: itemInfo.itemId,
-                courseId: courseId,
               },
               branchId: itemInfo.branchId,
               contentId: itemInfo.contentId
                 ? itemInfo.contentId
                 : itemInfo.branchId,
-              assignmentId: assignmentId,
             });
             let payload = {
               ...aInfo,
               itemId: itemInfo.itemId,
               assignment_title: 'Untitled Assignment',
-              assignmentId: assignmentId,
               isAssignment: '1',
               branchId: itemInfo.branchId,
+              contentId: itemInfo.contentId,
             };
 
             makeAssignment({
@@ -681,9 +686,7 @@ const DoenetMLInfoPanel = (props) => {
   }
   // // View Assignment Form
   if (
-    itemInfo.isAssignment === '1' &&
-    (itemInfo.assignmentId || aInfo?.assignmentId)
-  ) {
+    itemInfo.isAssignment === '1') {
     assignmentForm = (
       <>
         {
@@ -861,19 +864,15 @@ const DoenetMLInfoPanel = (props) => {
                       driveId: itemInfo.driveId,
                       folderId: itemInfo.parentFolderId,
                       itemId: itemInfo.itemId,
-                      courseId: courseId,
                     },
                     branchId: itemInfo.branchId,
                     contentId: itemInfo.contentId
                       ? itemInfo.contentId
                       : itemInfo.branchId,
-                    assignmentId: assignmentId,
                   });
                   const payload = {
                     ...aInfo,
-                    assignmentId: assignmentId,
                     assignment_isPublished: '1',
-                    courseId: courseId,
                     branchId: itemInfo.branchId,
                   };
                   publishAssignment({
@@ -905,8 +904,8 @@ const DoenetMLInfoPanel = (props) => {
       </>
     );
   }
-  // // Make Assignment Title update(Load back available assignment) //TODO add assignmentId from ainfo
-  if (itemInfo.isAssignment === '0' && aInfo?.assignmentId) {
+  // // Make Assignment Title update(Load back available assignment) 
+  if (itemInfo.isAssignment === '0') {
     loadAssignmentButton = (
       <>
         <Button value="load Assignment" callback={loadBackAssignment} />
@@ -926,7 +925,6 @@ const DoenetMLInfoPanel = (props) => {
               type: 'assignment',
               branchId: itemInfo?.branchId,
               contentId: itemInfo?.contentId,
-              assignmentId: itemInfo?.assignmentId,
             });
           }}
         />
