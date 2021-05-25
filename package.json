@@ -73,7 +73,6 @@
     "@testing-library/react": "^11.2.7",
     "@web/test-runner": "^0.12.19",
     "chai": "^4.2.0",
-    "esbuild": "^0.12.1",
     "eslint": "^7.26.0",
     "eslint-config-prettier": "^8.2.0",
     "eslint-plugin-import": "^2.23.2",
