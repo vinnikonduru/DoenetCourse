@@ -36,6 +36,7 @@
     "crypto-js": "^4.0.0",
     "cssesc": "^3.0.0",
     "csv-parse": "^4.15.3",
+    "esbuild": "^0.12.2",
     "esm-seedrandom": "^3.0.5",
     "handsontable": "^8.4.0",
     "http2-proxy": "^5.0.53",
