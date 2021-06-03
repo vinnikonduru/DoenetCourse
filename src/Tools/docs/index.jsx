@@ -1,8 +1,34 @@
+/**
+ * External dependencies
+ */
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { HashRouter as Router, Switch, Route } from 'react-router-dom';
+import { RecoilRoot } from 'recoil';
+
+/**
+ * Internal dependencies
+ */
+import Docs from './Docs';
+import ToolRoot from '../_framework/ToolRoot';
 
 ReactDOM.render(
-  <h1>This is Docs</h1>,
+
+      <RecoilRoot>
+        <Router>
+          <Switch>
+            <Route
+              path="/"
+              render={(routeprops) => (
+                <ToolRoot
+                  tool={<Docs key={'BaseTool'} route={{ ...routeprops }} />}
+                />
+              )}
+            />
+          </Switch>
+        </Router>
+      </RecoilRoot>,
+ 
   document.getElementById('root'),
 );
 
