@@ -30,7 +30,7 @@ import DoenetViewer from '../../Viewer/DoenetViewer';
 
  export default function Docs(props){
    console.log("props",props);
-   const [selectedComponentDoenetMl,setSelectedComponentDoenetML] = useState()
+   const [selectedComponentDoenetML,setSelectedComponentDoenetML] = useState()
    
    const onSelectComponent = async (componentName) =>{
     const newComponent = await import(`./DocsDoenetML/Slider.txt`)
@@ -43,8 +43,8 @@ import DoenetViewer from '../../Viewer/DoenetViewer';
     let solutionDisplayMode = "button";
 
      return <DoenetViewer
-     key={"doenetviewer" + selectedComponentDoenetMl }
-     doenetML={selectedComponentDoenetMl}
+     key={"doenetviewer" + selectedComponentDoenetML }
+     doenetML={selectedComponentDoenetML}
      flags={{
        showCorrectness: true,
        readOnly: false,
@@ -86,7 +86,7 @@ import DoenetViewer from '../../Viewer/DoenetViewer';
          
        <CodeMirror
        className="CodeMirror"
-       value={selectedComponentDoenetMl}
+       value={selectedComponentDoenetML}
   
       />
        </mainPanel>
