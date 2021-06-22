@@ -1,1 +1,49 @@
-<p>Use this to test DoenetML</p>
+
+<p>Use this to test slider</p>
+
+<slider/> 
+
+<p>Use this to test relative</p> 
+
+<slider width="50%"/> 
+
+
+<p>Use this to test absolute</p> 
+
+<slider width="1000px"/> 
+
+
+<p>Use this to test sequence</p>
+
+<slider > 
+ <sequence from="0" to="20" />
+</slider> 
+
+  
+  
+  <p>Use this to test sequence step number</p>
+
+  <slider width= "1500px" name="a" initialNumber="89.8"><sequence from="1" to="100" /></slider>
+
+    <p>Use this to test number</p>
+
+  <slider name="b" ><sequence from="1" to="40"  /></slider>
+
+
+<p>Use this to test number</p>
+
+ <slider>
+    <number>1</number>
+    <number>2</number>
+    <number>3</number>
+    <number>4</number>
+  </slider>
+
+<p>Use this to test number</p>
+
+ <slider>
+    <text>Dog</text>
+    <text>Cat</text>
+    <text>Monkey</text>
+    <text>Elephant</text>
+  </slider>
