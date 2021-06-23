@@ -1,16 +1,18 @@
 
-<p>Use this to test slider</p>
+  
+  <p>Use this to test sequence step number</p>
 
-<slider/> 
+  <slider width="500px"  name="a" initialNumber="5.8"><sequence from="1" to="10" step="1" /></slider>
 
+  
 <p>Use this to test relative</p> 
 
-<slider width="50%"/> 
+<slider width="500%" showControls/> 
 
 
 <p>Use this to test absolute</p> 
 
-<slider width="1000px"/> 
+<slider width="1000px"/>  
 
 
 <p>Use this to test sequence</p>
@@ -19,15 +21,10 @@
  <sequence from="0" to="20" />
 </slider> 
 
-  
-  
-  <p>Use this to test sequence step number</p>
-
-  <slider width= "1500px" name="a" initialNumber="89.8"><sequence from="1" to="100" /></slider>
 
     <p>Use this to test number</p>
 
-  <slider name="b" ><sequence from="1" to="40"  /></slider>
+  <slider name="b" ><sequence from="1" to="10"  /></slider>
 
 
 <p>Use this to test number</p>

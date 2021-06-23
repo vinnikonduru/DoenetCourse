@@ -114,6 +114,12 @@ export default function Slider(props) {
   let [name, SVs, actions] = useDoenetRender(props);
   //console.log("name: ", name, " value: ", SVs.value, " index: ", SVs.index);
 
+  let width = (SVs.width.size);
+        if(SVs.width.isAbsolute === true){
+        width = SVs.width.size + 'px';
+        }else if(SVs.width.isAbsolute === false){ 
+        width= SVs.width.size + 'px'; 
+        }
   const containerRef = useRef(null);
 
   let sorted_points = [...SVs.items].sort((p1, p2) => p1 - p2);
@@ -158,12 +164,12 @@ export default function Slider(props) {
             <div style = {{height: (SVs.showControls||SVs.label) ? "20px": "0px"}}>
                 {SVs.label? <StyledValueLabel>{SVs.label}</StyledValueLabel> : null}
                 {SVs.showControls? <>
-                <Button value="Next" style = {{float: "right", userSelect: "none"}} onClick = {handleNext} disabled />
-                <Button value="Prev" style = {{float: "right", userSelect: "none"}} onClick = {handlePrevious} disabled />
+                <Button value="Next" style = {{float: "right", userSelect: "none"}} callback = {(e)=>handleNext(e)} disabled />
+                <Button value="Prev" style = {{float: "right", userSelect: "none"}} callback = {(e)=>handlePrevious(e)} disabled />
                 </> : null}
             </div>
             <SubContainer2>
-                <StyledSlider width = {`${SVs.width.size}px`} >
+                <StyledSlider width = {`${width}`} >
                 <StyledThumb disabled style={{left: `${-3}px`}}/>
                 {(SVs.showTicks === false) ? null : ((SVs.sliderType === "text") ? generateTextLabels(SVs.items, divisionWidth) : generateNumericLabels(SVs.items, divisionWidth, startValue))}
                 </StyledSlider>
@@ -282,12 +288,12 @@ function handlePrevious(e) {
             {SVs.label? <StyledValueLabel>{SVs.label}</StyledValueLabel> : null}
             {/* TODO */}
             {SVs.showControls? <>
-            <Button value="Next" style = {{float: "right", userSelect: "none"}} onClick = {handleNext} data-cy="nextbutton" />
-            <Button value="Prev" style = {{float: "right", userSelect: "none"}} onClick = {handlePrevious} data-cy="prevbutton" />  
+            <Button value="Next"  callback = {(e)=>handleNext(e)} data-cy="nextbutton" />
+            <Button value="Prev"  callback = {(e)=>handlePrevious(e)} data-cy="prevbutton" /> 
             </> : null}
         </div>
         <SubContainer2 onMouseDown = {handleDragEnter} onMouseUp = {handleDragExit} onMouseMove = {handleDragThrough} onMouseLeave = {handleDragExit} >
-            <StyledSlider width = {(`${SVs.width.size}px`)} data-cy="slider1">
+            <StyledSlider width = {(`${width}`)} data-cy="slider1">
             <Spring
                 to={{ x: thumbXPos }}>              
                 {(styles) => { return <StyledThumb style={{left: `${thumbXPos - 3}px`}}
