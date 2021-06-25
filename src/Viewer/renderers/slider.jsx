@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect ,useMemo } from 'react';
 
 import styled from "styled-components";
 import {Spring} from '@react-spring/web';
@@ -73,16 +73,22 @@ function generateNumericLabels (points, div_width, point_start_val) {
   );
 }
 
-function generateTextLabels (points, div_width) {
+function generateTextLabels (points, div_width, countToHide) {
 
   return (
-      [points.map((point, index) => (
-          <Tick key = {point} x = {`${index * div_width}px`}/>
-          )
-      ),
-      points.map((point, index) => (
-              <Label key = {point} x = {`${(index * div_width) - 3}px`}>{point}</Label>
-          )
+     [points.map((point, index) => {
+            if(index <= (countToHide - 1)){
+               return  <Tick key = {point} x = {`${index * div_width}px`}/>
+            }
+        }
+        ),
+        points.map((point, index) => {
+          if(index <= (countToHide - 1)){
+             return <Label key = {point} x = {`${(index * div_width) - 3}px`}>{point}</Label>
+
+}
+}
+
       )
       ]
   );
@@ -111,6 +117,46 @@ function nearestValue(refval, points){
 }
 
 
+const getContext = () => {
+    const fragment = document.createDocumentFragment();
+    const canvas = document.createElement('canvas');
+    fragment.appendChild(canvas);
+    return canvas.getContext('2d') ;
+  };
+  
+  const getTextWidth = (currentText, font) => {
+    const context = getContext();
+    context.font = font;
+  
+    if (Array.isArray(currentText)) {
+      return Math.max(...currentText.map((t) => context.measureText(t).width));
+    } else {
+      const metrics = context.measureText(currentText);
+      return metrics.width;
+    }
+  };
+  
+  const useTextWidth = (options) => {
+    const textOptions = useMemo(() => ('text' in options ? options : undefined), [options]);
+    const refOptions = useMemo(() => ('ref' in options ? options : undefined), [options]);
+  
+    return useMemo(() => {
+      if (refOptions?.ref.current?.textContent) {
+        const context = getContext();
+        const computedStyles = window.getComputedStyle(refOptions.ref.current);
+        context.font = computedStyles.font;
+        const metrics = context.measureText(refOptions.ref.current.textContent);
+  
+        return metrics.width;
+      } else if (textOptions?.text) {
+        return getTextWidth(textOptions.text, textOptions.font ?? '12px times');
+      }
+  
+      return NaN;
+    }, [textOptions?.text, textOptions?.font, refOptions?.ref]);
+  };
+  
+  
 
 
 export default function Slider(props) {
@@ -133,8 +179,38 @@ export default function Slider(props) {
   const [offsetLeft, setOffsetLeft] = useState(0);
   const [startValue, setStartValue] = useState((SVs.sliderType === "text") ? 0 : sorted_points[0]);
   const [endValue, setEndValue] = useState((SVs.sliderType === "text") ? 0 : sorted_points[sorted_points.length - 1]);
-  const [divisionWidth, setDivisionWidth] = useState((SVs.sliderType === "text") ? SVs.width.size/(SVs.items.length - 1) : SVs.width.size/(endValue - startValue));
+//   const [divisionWidth, setDivisionWidth] = useState((SVs.sliderType === "text") ? SVs.width.size/(SVs.items.length - 1) : SVs.width.size/(endValue - startValue));
+  let divisionWidth = (SVs.sliderType === "text") ? SVs.width.size/(SVs.items.length - 1) : SVs.width.size/(endValue - startValue);
   const [index, setIndex] = useState(0);
+  const [totalWidth, setTotalWidth] = useState(SVs.width.size);
+
+  const getTotalWidth = (points) => {
+    let value = 0;
+
+    points.map((point, index) => {
+      const widthpoint = useTextWidth({ text: point, font: '12px Times' });
+
+      value = value + widthpoint;
+    });
+
+    return value;
+  };
+  const [eachPointWidth, setEachPointWidth] = useState(getTotalWidth(SVs.items));
+
+//   console.log(">>>>eachPointWidth",eachPointWidth);
+let filteredItems = [];
+let originalItems = SVs.items;
+let countToHide = 0;
+if(eachPointWidth < SVs.width.size){}
+else{
+    //  countToHide = (eachPointWidth/(SVs.items.length -1));
+     countToHide = 3;
+     divisionWidth = 33;
+    //  setDivisionWidth(SVs.width.size/countToHide)
+    //  console.log(">>>countToHide",countToHide);
+    // filteredItems = originalItems.splice(-1,countToHide); 
+}
+
 
 
   useEffect(() => {
@@ -167,8 +243,8 @@ export default function Slider(props) {
             <div style = {{height: (SVs.showControls||SVs.label) ? "20px": "0px"}}>
                 {SVs.label? <StyledValueLabel>{SVs.label}</StyledValueLabel> : null}
                 {SVs.showControls? <>
-                <Button value="Next" style = {{float: "right", userSelect: "none"}} callback = {(e)=>handleNext(e)} disabled />
                 <Button value="Prev" style = {{float: "right", userSelect: "none"}} callback = {(e)=>handlePrevious(e)} disabled />
+                <Button value="Next" style = {{float: "right", userSelect: "none"}} callback = {(e)=>handleNext(e)} disabled />
                 </> : null}
             </div>
             <SubContainer2>
@@ -291,8 +367,9 @@ function handlePrevious(e) {
             {SVs.label? <StyledValueLabel>{SVs.label}</StyledValueLabel> : null}
             {/* TODO */}
             {SVs.showControls? <>
-            <Button value="Next"  callback = {(e)=>handleNext(e)} data-cy="nextbutton" />
             <Button value="Prev"  callback = {(e)=>handlePrevious(e)} data-cy="prevbutton" /> 
+            <Button value="Next"  callback = {(e)=>handleNext(e)} data-cy="nextbutton" />
+
             </> : null}
         </div>
         <SubContainer2 onMouseDown = {handleDragEnter} onMouseUp = {handleDragExit} onMouseMove = {handleDragThrough} onMouseLeave = {handleDragExit} >
@@ -303,7 +380,7 @@ function handlePrevious(e) {
                 data-cy="slider1-handle"/>
             }}
             </Spring>
-            {(SVs.showTicks === false) ? null : ((SVs.sliderType === "text") ? generateTextLabels(SVs.items, divisionWidth) : generateNumericLabels(SVs.items, divisionWidth, startValue))}
+            {(SVs.showTicks === false) ? null : ((SVs.sliderType === "text") ? generateTextLabels(SVs.items, divisionWidth, countToHide) : generateNumericLabels(SVs.items, divisionWidth, startValue))}
             </StyledSlider>
         </SubContainer2>
     </SliderContainer>
