@@ -58,32 +58,50 @@ const Label = styled.p`
     user-select: none;
 `;
 
-function generateNumericLabels (points, div_width, point_start_val) {
+function generateNumericLabels (points, div_width, point_start_val,countToShow,points_widths) {
 
   return (
-      [points.map(point => (
-          <Tick key = {point} x = {`${(point - point_start_val) * div_width}px`}/>
-          )
+      [points.map((point,index) => {
+        if(index <= (countToShow - 1)){
+          // console.log(">>>points_width",getWidthOnIndex(index,points_widths));
+          return <Tick key = {point} x = {`${getWidthOnIndex(index,points_widths)}px`}/>
+        }
+        
+      }
+          
+          
       ),
-      points.map(point => (
-              <Label key = {point} x = {`${((point - point_start_val) * div_width) - 3}px`}>{point}</Label>
-          )
+      points.map((point,index) => {
+        if(index <= (countToShow - 1)){
+        return <Label key = {point} x = {`${getWidthOnIndex(index,points_widths) - 3}px`}>{point}</Label>
+        }
+      }
+          
       )
       ]
   );
 }
+function getWidthOnIndex(index,points_widths){
+  let width = 2;
+  let newWidthArr = points_widths.slice(0,index);
+  for(let i=0;i<newWidthArr.length;i++){
+    width = width + newWidthArr[i];
+  }
+  return width;
 
-function generateTextLabels (points, div_width, countToHide) {
+}
+
+function generateTextLabels (points, div_width, countToShow) {
 
   return (
      [points.map((point, index) => {
-            if(index <= (countToHide - 1)){
+            if(index <= (countToShow - 1)){
                return  <Tick key = {point} x = {`${index * div_width}px`}/>
             }
         }
         ),
         points.map((point, index) => {
-          if(index <= (countToHide - 1)){
+          if(index <= (countToShow -1)){
              return <Label key = {point} x = {`${(index * div_width) - 3}px`}>{point}</Label>
 
 }
@@ -186,26 +204,49 @@ export default function Slider(props) {
 
   const getTotalWidth = (points) => {
     let value = 0;
-
+    let widthsArr = [];
     points.map((point, index) => {
       const widthpoint = useTextWidth({ text: point, font: '12px Times' });
-
+      widthsArr.push(widthpoint);
       value = value + widthpoint;
     });
 
-    return value;
+    return {'value':value,'pointWidths':widthsArr};
   };
-  const [eachPointWidth, setEachPointWidth] = useState(getTotalWidth(SVs.items));
+  const [totalTextWidth, setTotlaTextWidth] = useState(getTotalWidth(SVs.items));
 
-//   console.log(">>>>eachPointWidth",eachPointWidth);
+  // console.log(">>>>###totalTextWidth value",totalTextWidth.value);
+  console.log(">>>>###pointWidths",totalTextWidth.pointWidths);
 let filteredItems = [];
 let originalItems = SVs.items;
 let countToHide = 0;
-if(eachPointWidth < SVs.width.size){}
+let countToShow = 0;
+
+if(totalTextWidth.value < SVs.width.size){
+  countToShow = originalItems.length;
+  divisionWidth = (SVs.sliderType === "text") ? SVs.width.size/(SVs.items.length - 1) : SVs.width.size/(endValue - startValue);
+
+}
 else{
-    //  countToHide = (eachPointWidth/(SVs.items.length -1));
-     countToHide = 3;
-     divisionWidth = 33;
+  let checkCountToHide = false;
+  let newWidthsArr = 0;
+  for(let i=0; i<totalTextWidth.pointWidths.length; i++){
+    newWidthsArr = newWidthsArr + totalTextWidth.pointWidths[i];
+    if(newWidthsArr <= SVs.width.size){
+      checkCountToHide = true;
+      countToShow = i + 1;
+    }else{
+      newWidthsArr = newWidthsArr - totalTextWidth.pointWidths[i];
+      break;
+    }
+  } 
+console.log(">>newWidthsArr",newWidthsArr);
+  // console.log(">>>>countToShow",countToShow);
+  // countToHide = 3;
+  divisionWidth = (SVs.sliderType === "text") ? newWidthsArr/(countToShow -1) :  newWidthsArr/(countToShow - 1) ;
+
+    //  countToHide = (totalTextWidth/(SVs.items.length -1));
+ 
     //  setDivisionWidth(SVs.width.size/countToHide)
     //  console.log(">>>countToHide",countToHide);
     // filteredItems = originalItems.splice(-1,countToHide); 
@@ -380,7 +421,7 @@ function handlePrevious(e) {
                 data-cy="slider1-handle"/>
             }}
             </Spring>
-            {(SVs.showTicks === false) ? null : ((SVs.sliderType === "text") ? generateTextLabels(SVs.items, divisionWidth, countToHide) : generateNumericLabels(SVs.items, divisionWidth, startValue))}
+            {(SVs.showTicks === false) ? null : ((SVs.sliderType === "text") ? generateTextLabels(SVs.items, divisionWidth, countToShow) : generateNumericLabels(SVs.items, divisionWidth, startValue,countToShow,totalTextWidth.pointWidths))}
             </StyledSlider>
         </SubContainer2>
     </SliderContainer>
