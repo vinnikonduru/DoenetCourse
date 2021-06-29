@@ -1,8 +1,40 @@
 
+<p>Use this to test number</p>
 
- <slider width="190px">
-    <text>Dog</text>
-    <text>Cat</text>
-    <text>Monkey</text>
-    <text>Elephant</text>
+ <slider >
+    <text>new</text>
+    <text>nw..</text>
+    <text>nw..</text>
+    <text>nw..</text>
+    <text>nw..</text>
+    <text>nw..</text>
+    <text>nww..</text>
+    <text>nww..</text>
+    <text>df</text>
+    <text>gh</text>
+    
+  </slider>
+
+ <slider >
+    <text>new</text>
+  
+    <text>.....</text>
+    <text>df</text>
+  
+    
+  </slider>
+ <slider >
+    <number>1</number>
+    <number>2</number>
+    <number>3</number>
+    <number>4</number>
+    
+  </slider>
+
+   <slider width="100%" >
+    <number>1</number>
+    <number>..</number>
+    <number>..</number>
+    <number>..</number>
+    
   </slider>

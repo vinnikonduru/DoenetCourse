@@ -185,7 +185,7 @@ export default function Slider(props) {
         if(SVs.width.isAbsolute === true){
         width = SVs.width.size + 'px';
         }else if(SVs.width.isAbsolute === false){ 
-        width= SVs.width.size + 'px'; 
+        width= SVs.width.size ; 
         }
   const containerRef = useRef(null);
 
@@ -216,7 +216,7 @@ export default function Slider(props) {
   const [totalTextWidth, setTotlaTextWidth] = useState(getTotalWidth(SVs.items));
 
   // console.log(">>>>###totalTextWidth value",totalTextWidth.value);
-  console.log(">>>>###pointWidths",totalTextWidth.pointWidths);
+  // console.log(">>>>###pointWidths",totalTextWidth.pointWidths);
 let filteredItems = [];
 let originalItems = SVs.items;
 let countToHide = 0;
@@ -240,7 +240,7 @@ else{
       break;
     }
   } 
-console.log(">>newWidthsArr",newWidthsArr);
+// console.log(">>newWidthsArr",newWidthsArr);
   // console.log(">>>>countToShow",countToShow);
   // countToHide = 3;
   divisionWidth = (SVs.sliderType === "text") ? newWidthsArr/(countToShow -1) :  newWidthsArr/(countToShow - 1) ;
