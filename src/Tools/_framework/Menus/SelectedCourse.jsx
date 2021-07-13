@@ -1,6 +1,7 @@
 import React,{useState} from 'react';
 import { useRecoilValue,useSetRecoilState,useRecoilStateLoadable } from 'recoil';
-import { fetchDrivesSelector ,fetchDriveUsers} from '../../../_reactComponents/Drive/Drive';
+import { fetchDriveUsers} from '../../../_reactComponents/Drive/NewDrive';
+import {fetchDrivesSelector } from '../ToolHandlers/CourseToolHandler'
 import { 
   faChalkboard,
   faCode,
