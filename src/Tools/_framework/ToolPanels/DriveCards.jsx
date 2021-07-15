@@ -1,6 +1,6 @@
 import React, { useEffect ,useState} from 'react';
 import axios from "axios";
-// import { useHistory } from 'react-router';
+import { useHistory } from 'react-router';
 import Button from '../temp/Button'
 import { useRecoilCallback,selector, useRecoilValue, useSetRecoilState, useRecoilState,useRecoilValueLoadable } from 'recoil';
 import { selectedMenuPanelAtom } from '../Panels/NewMenuPanel';
@@ -16,6 +16,8 @@ export default function DriveCardsNew(props){
   console.log(">>>===DriveCards");
   
   const driveInfo = useRecoilValueLoadable(fetchDrivesQuery);
+  const setDrivecardSelection = useSetRecoilState(drivecardSelectedNodesAtom);
+
   let driveIdsAndLabelsInfo = '';
   if(driveInfo.state == 'hasValue'){
     driveIdsAndLabelsInfo = driveInfo.contents.driveIdsAndLabels;
@@ -37,6 +39,31 @@ export default function DriveCardsNew(props){
 
   // const [count,setCount] = useState(0)
   // let history = useHistory();
+
+  const [ locationKeys, setLocationKeys ] = useState([])
+  const history = useHistory()
+useEffect(() => {
+  return history.listen(location => {
+    if (history.action === 'PUSH') {
+      setLocationKeys([ location.key ])
+    }
+
+    if (history.action === 'POP') {
+      if (locationKeys[1] === location.key) {
+        setLocationKeys(([ _, ...keys ]) => keys)
+
+        // Handle forward event
+        setDrivecardSelection([]);
+      } else {
+        setLocationKeys((keys) => [ location.key, ...keys ])
+
+        // Handle back event
+        setDrivecardSelection([]);
+      }
+    }
+  })
+}, [ locationKeys, ])
+
   return <div style={props.style}>
 
   { driveIdsAndLabelsInfo && <DriveCardWrapper 
@@ -57,7 +84,7 @@ const DriveCardWrapper = (props) => {
   // console.log(" columnJSX drivesInfo",drivecardInfo)
   const setParamObj = useSetRecoilState(paramObjAtom);
 
-
+console.log(">>>>>>>>>drivecardSelectedValue",drivecardSelectedValue);
 
   let driveCardItems =[];
   let heights = [];
