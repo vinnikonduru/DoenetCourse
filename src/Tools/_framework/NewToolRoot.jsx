@@ -23,6 +23,7 @@ import { animated } from '@react-spring/web';
 import { selectedMenuPanelAtom } from './Panels/NewMenuPanel';
 import { mainPanelClickAtom } from './Panels/NewMainPanel';
 import { useHistory } from 'react-router';
+import {drivecardSelectedNodesAtom} from './ToolHandlers/CourseToolHandler'
 
 
 const ToolContainer = styled(animated.div)`
@@ -100,6 +101,17 @@ export default function ToolRoot(props){
   const supportPanelDictionary = useRef({}) //key -> {index, type}
   // const [supportContentObj,setSupportContentObj] = useState({})
   const [menusOpen,setMenusOpen] = useState(true)
+
+  const setDrivecardSelection = useSetRecoilState(drivecardSelectedNodesAtom);
+  let history = useHistory();
+
+useEffect(() => {
+  return history.listen((location) => {
+    if (history.action === 'POP') {
+      setDrivecardSelection([]);
+    }
+  });
+}, [history]);
 
   const setPage = useRecoilCallback(({set})=> (tool,origPath)=>{
     // console.log(">>> Root setPAge",tool,origPath)
