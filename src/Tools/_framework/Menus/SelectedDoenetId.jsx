@@ -1,68 +1,168 @@
 import React ,{useState} from 'react';
-import { useRecoilValue } from 'recoil';
+import axios from 'axios';
+import { atom, useRecoilValue, useRecoilValueLoadable,useSetRecoilState } from 'recoil';
 import { globalSelectedNodesAtom } from '../../../_reactComponents/Drive/NewDrive';
 import Button from '../../../_reactComponents/PanelHeaderComponents/Button';
 import IncrementMenu from '../../../_reactComponents/PanelHeaderComponents/IncrementMenu';
-import Switch from '../../_framework/Switch'
+import Switch from '../../_framework/Switch';
+import { useToast } from '../../_framework/Toast';
+
+import { useAssignment } from '../../course/CourseActions';
+import { useAssignmentCallbacks } from '../../../_reactComponents/Drive/DriveActions';
+import { itemHistoryAtom } from '../ToolHandlers/CourseToolHandler';
+
+export const selectedVersionAtom = atom({
+  key: 'selectedVersionAtom',
+  default: '',
+});
 export default function SelectedDoenetId(props){
 
   const selection = useRecoilValue(globalSelectedNodesAtom);
+  // console.log(">>> new @@@@ here selection",selection);
   const [checkIsAssigned, setIsAssigned] = useState(false);
+  const [selectVersion, setSelectVersion] = useState(false);
+  const [selectedVId, setSelectedVId] = useState();
+  const setSelectedVersionAtom = useSetRecoilState(selectedVersionAtom);
+  const [addToast, ToastType] = useToast();
 
+  const {addContentAssignment,changeSettings,updateVersionHistory,saveSettings,assignmentToContent,loadAvailableAssignment, publishContentAssignment,onAssignmentError} = useAssignment();
+  const {makeAssignment,onmakeAssignmentError,publishAssignment,onPublishAssignmentError,publishContent,onPublishContentError, updateAssignmentTitle,onUpdateAssignmentTitleError,convertAssignmentToContent,onConvertAssignmentToContentError} = useAssignmentCallbacks();
   // console.log(">>> SelectedDoenetId selection",selection);
   let makeAssignmentforReleasedButton = null;
   let assignmentForm = null;
   let aInfo = '';
+  // handle on blur on aForm
+  const handleOnBlur = (e) => {
+    e.preventDefault();
+    let name = e.target.name;
+    let value = e.target.value;
+    if(value !== oldValue ){
+    const result = saveSettings({
+      [name]: value,
+      driveIditemIddoenetIdparentFolderId: {
+        driveId: itemInfo.driveId,
+        folderId: itemInfo.parentFolderId,
+        itemId: itemInfo.itemId,
+        doenetId: itemInfo.doenetId,
+        versionId: selectedVId,
+        contentId: selectedContentId(),
+      },
+    });
+    let payload = {
+      ...aInfo,
+      itemId: itemInfo.itemId,
+      isAssigned: '1',
+      [name]: value,
+      doenetId: itemInfo.doenetId,
+      contentId: itemInfo.contentId,
+    };
+    updateAssignmentTitle({
+      driveIdFolderId: {
+        driveId: itemInfo.driveId,
+        folderId: itemInfo.parentFolderId,
+      },
+      itemId: itemInfo.itemId,
+      payloadAssignment: payload,
+      doenetId: itemInfo.doenetId,
+      contentId: itemInfo.contentId,
+    });
+
+        result
+          .then((resp) => {
+            if (resp.data.success) {
+              addToast(`Updated '${name}' to '${value}'`, ToastType.SUCCESS);
+            } else {
+              onAssignmentError({ errorMessage: resp.data.message });
+            }
+          })
+          .catch((e) => {
+            onAssignmentError({ errorMessage: e.message });
+          });
+  }
+  };
+  // released versions selection 
+  const selectedVersion = (item) => {
+    setSelectVersion(true);
+    setSelectedVId(item);
+    setSelectedVersionAtom(item);
+  };
+
+  const versionHistory = useRecoilValueLoadable(itemHistoryAtom(selection[0].doenetId));
+  if (versionHistory.state === "loading"){ return null;}
+  if (versionHistory.state === "hasError"){ 
+    console.error(versionHistory.contents)
+    return null;}
+    // if (versionHistory.state === "hasValue"){ 
+    //   const contentId = versionHistory.contents.named.contentId;
+    //  }
+    // console.log(">>>> ## versionHistory",versionHistory);
+  
+  let assigned = (
+    <select multiple onChange={(event) => selectedVersion(event.target.value)}>
+      {versionHistory.contents.named.map((item, i) => (
+        <>
+          {item.isReleased == 1 ? (
+            <option key={i} value={item.versionId}>
+              {item.isAssigned == 1 ? '(Assigned)' : ''}
+              {item.title}
+            </option>
+          ) : (
+            ''
+          )}
+        </>
+      ))}
+    </select>
+  );
   makeAssignmentforReleasedButton = (
     <>
       <Button
         value="Make Assignment"
         onClick={async () => {
           setIsAssigned(true);
-          // const result = await addContentAssignment({
-          //   driveIditemIddoenetIdparentFolderId: {
-          //     driveId: itemInfo.driveId,
-          //     folderId: itemInfo.parentFolderId,
-          //     itemId: itemInfo.itemId,
-          //     doenetId: itemInfo.doenetId,
-          //     contentId: selectedContentId(),
-          //     versionId: selectedVId,
-          //   },
-          //   doenetId: itemInfo.doenetId,
-          //   contentId: selectedContentId(),
-          //   versionId: selectedVId,
-          // });
-          // let payload = {
-          //   ...aInfo,
-          //   itemId: itemInfo.itemId,
-          //   isAssigned: '1',
-          //   doenetId: itemInfo.doenetId,
-          //   contentId: selectedContentId(),
-          //   driveId: itemInfo.driveId,
-          //   versionId: selectedVId,
-          // };
+          const result = await addContentAssignment({
+            driveIditemIddoenetIdparentFolderId: {
+              driveId: selection[0].driveId,
+              folderId: selection[0].parentFolderId,
+              itemId: selection[0].itemId,
+              doenetId: selection[0].doenetId,
+              contentId: selection[0].contentId,
+              versionId: selection[0].versionId,
+            },
+            doenetId: selection[0].doenetId,
+            contentId: selection[0].contentId,
+            versionId: selection[0].versionId,
+          });
+          let payload = {
+            ...aInfo,
+            itemId: selection[0].itemId,
+            isAssigned: '1',
+            doenetId: selection[0].doenetId,
+            contentId: selection[0].contentId,
+            driveId: selection[0].driveId,
+            versionId: selection[0].versionId,
+          };
 
           // makeAssignment({
           //   driveIdFolderId: {
-          //     driveId: itemInfo.driveId,
-          //     folderId: itemInfo.parentFolderId,
+          //     driveId: selection[0].driveId,
+          //     folderId: selection[0].parentFolderId,
           //   },
-          //   itemId: itemInfo.itemId,
+          //   itemId: selection[0].itemId,
           //   payload: payload,
           // });
-          // updateVersionHistory(itemInfo.doenetId, selectedVId);
-          // try {
-          //   if (result.success) {
-          //     addToast(
-          //       `Add new assignment`,
-          //       ToastType.SUCCESS,
-          //     );
-          //   } else {
-          //     onAssignmentError({ errorMessage: result.message });
-          //   }
-          // } catch (e) {
-          //   onAssignmentError({ errorMessage: e });
-          // }
+          updateVersionHistory(selection[0].doenetId, selection[0].versionId);
+          try {
+            if (result.success) {
+              addToast(
+                `Add new assignment`,
+                ToastType.SUCCESS,
+              );
+            } else {
+              onAssignmentError({ errorMessage: result.message });
+            }
+          } catch (e) {
+            onAssignmentError({ errorMessage: e });
+          }
         }}
       />
       
@@ -231,10 +331,80 @@ export default function SelectedDoenetId(props){
       }
     </>
   );
+  const checkIfAssigned = () => {
+    const assignedArr = versionHistory.contents.named.filter(
+      (item) => item.versionId === selection[0].versionId,
+    );
+    if (assignedArr.length > 0 && assignedArr[0].isAssigned == '1') {
+      return true;
+    } else {
+      return false;
+    }
+  };
+let unAssignButton = ''; 
+unAssignButton = (
+  <>
+    <Button
+      value="Unassign"
+      onClick={async () => {
+        assignmentToContent({
+          driveIditemIddoenetIdparentFolderId: {
+            driveId: selection[0].driveId,
+              folderId: selection[0].parentFolderId,
+              itemId: selection[0].itemId,
+              doenetId: selection[0].doenetId,
+              contentId: selection[0].contentId,
+              versionId: selection[0].versionId
+          },
+          doenetId: selection[0].doenetId,
+          contentId: selection[0].contentId,
+          versionId: selection[0].versionId
+        });
 
+        // convertAssignmentToContent({ // TODO
+        //   driveIdFolderId: {
+        //     driveId: selection[0].driveId,
+        //       folderId: selection[0].parentFolderId,
+        //   },
+        //      itemId: selection[0].itemId,
+        //       doenetId: selection[0].doenetId,
+        //       contentId: selection[0].contentId,
+        //       versionId: selection[0].versionId
+        // });
+
+        const result = axios.post(`/api/handleMakeContent.php`, {
+          itemId: selection[0].itemId,
+          doenetId: selection[0].doenetId,
+          contentId: selection[0].contentId,
+          versionId: selection[0].versionId
+        });
+        result
+          .then((resp) => {
+            if (resp.data.success) {
+              addToast(
+                `'UnAssigned ''`, 
+                ToastType.SUCCESS,
+              );
+            } else {
+              onAssignmentError({ errorMessage: resp.data.message });
+            }
+          })
+          .catch((e) => {
+            onAssignmentError({ errorMessage: e.message });
+          });
+      }}
+    />
+    <br />
+    <br />
+  </>
+);
   return <>
   <p>Released Versions(Soon)</p>
-  {makeAssignmentforReleasedButton}
+  {assigned} 
+
+  {selection[0].isAssigned == '1' && checkIfAssigned() && selectVersion && unAssignButton }
+
+  {selection[0].isAssigned === '0' && selectVersion && makeAssignmentforReleasedButton}
   <br />
   {checkIsAssigned && assignmentForm}
   
