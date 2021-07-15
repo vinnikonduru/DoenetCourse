@@ -1,13 +1,12 @@
-import React,{useEffect,useState} from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom'
-import { useRecoilCallback,useSetRecoilState } from 'recoil';
+import { useRecoilCallback } from 'recoil';
 import { toolViewAtom } from '../NewToolRoot';
 import Cookies from 'js-cookie'; // import Textinput from "../imports/Textinput";
 import logo from '../../../Media/Doenet_Logo_Frontpage.png';
 import styled from 'styled-components';
 import './homepage.css' ;
 import Button from '../../../_reactComponents/PanelHeaderComponents/Button';
-import { drivecardSelectedNodesAtom } from '../ToolHandlers/CourseToolHandler';
 
 
 const Headings = styled.h1`
@@ -96,34 +95,12 @@ export default function HomePage(props){
   let history = useHistory();
 
   const jwt = Cookies.get();
-  const setDrivecardSelection = useSetRecoilState(drivecardSelectedNodesAtom);
 
   let isSignedIn = false;
   if (Object.keys(jwt).includes('JWT_JS')) {
     isSignedIn = true;
   }
-  const [ locationKeys, setLocationKeys ] = useState([])
-useEffect(() => {
-  return history.listen(location => {
-    if (history.action === 'PUSH') {
-      setLocationKeys([ location.key ])
-    }
 
-    if (history.action === 'POP') {
-      if (locationKeys[1] === location.key) {
-        setLocationKeys(([ _, ...keys ]) => keys)
-
-        // Handle forward event
-        setDrivecardSelection([]);
-      } else {
-        setLocationKeys((keys) => [ location.key, ...keys ])
-
-        // Handle back event
-        setDrivecardSelection([]);
-      }
-    }
-  })
-}, [ locationKeys, ])
 
   return <div style = {props.style}>
         <DoenetLogo>

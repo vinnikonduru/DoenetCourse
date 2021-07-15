@@ -1,4 +1,4 @@
-import  { useRef,useState,useEffect } from 'react';
+import  { useRef } from 'react';
 import { 
   atom, 
   useRecoilValue,
@@ -14,7 +14,6 @@ import { mainPanelClickAtom } from '../Panels/NewMainPanel';
 import { selectedMenuPanelAtom } from '../Panels/NewMenuPanel';
 import { globalSelectedNodesAtom } from '../../../_reactComponents/Drive/NewDrive';
 import axios from "axios";
-import { useHistory } from 'react-router';
 
 export const itemHistoryAtom = atomFamily({
   key:"itemHistoryAtom",
@@ -219,34 +218,6 @@ export default function CourseToolHandler(props){
   console.log(">>>===CourseToolHandler")
   
   let lastAtomTool = useRef("");
-  const [ locationKeys, setLocationKeys ] = useState([])
-  const history = useHistory()
-  const setDrivecardSelection = useSetRecoilState(drivecardSelectedNodesAtom);
-
-useEffect(() => {
-  return history.listen(location => {
-    if (history.action === 'PUSH') {
-      setLocationKeys([ location.key ])
-      setDrivecardSelection([]);
-
-    }
-
-    if (history.action === 'POP') {
-      if (locationKeys[1] === location.key) {
-        setLocationKeys(([ _, ...keys ]) => keys)
-
-        // Handle forward event
-        setDrivecardSelection([]);
-      } else {
-        setLocationKeys((keys) => [ location.key, ...keys ])
-
-        // Handle back event
-        setDrivecardSelection([]);
-      }
-    }
-  })
-}, [ locationKeys, ])
-
   const setTool = useRecoilCallback(({set})=> (tool,lastAtomTool)=>{
     //Set starting tool
     // if (tool === ""){
