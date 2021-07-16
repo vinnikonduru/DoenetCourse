@@ -89,6 +89,16 @@ export default function Button(props) {
         button.value = ''
     }
 }
+
+if (props.alert) {
+  button.backgroundColor = '#C1292E'
+}
+
+if (props.disabled) {
+  button.backgroundColor = '#e2e2e2';
+  button.color = 'black';
+  button.cursor = 'not-allowed';
+}
   // if (props.value) {
   //     button.value = props.value;
   // };
