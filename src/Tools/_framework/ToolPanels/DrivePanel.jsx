@@ -48,7 +48,7 @@ export default function DrivePanel(props){
   <hr />
   {/* set(selectedMenuPanelAtom,"SelectedDoenetId"); //replace selection */}
 
-  <div><button onClick={(e)=>{e.stopPropagation();setSelections([{doenetId:'t_YIYCkech9DzTAO6zdqW',driveId:'eK-V11tX3pDOkvf6eu4KI',itemId:'c2HTe-_F1EapftWyw5cNp',parentFolderId:'eK-V11tX3pDOkvf6eu4KI',contentId:'0aaba9a3ea9cc1b99ea40d67702465d6192ea6789a4ac65bd2fcff4aec13c8f5',versionId:'oURYF4dUazpN-aWByiVec',isAssigned:'0'}])}}>select f1</button></div>
+  <div><button onClick={(e)=>{e.stopPropagation();setSelections([{doenetId:'0mgbplfx_5d8n40WgRh0e',driveId:'0gcWRwzWL-gAlgFkF6oxW',itemId:'0R-MRr8K-o7ubTkJEIoui',parentFolderId:'0gcWRwzWL-gAlgFkF6oxW',contentId:'6039092f70864b935e614eaf0ff41bcb91357e8e746997f9af55f5b9f7f8f684',versionId:'UWowjL0MMTLZPzL4NWJN4',isAssigned:'0'}])}}>select f1</button></div>
   <div><button onClick={(e)=>{e.stopPropagation();setSelections(['f1','f2'])}}>select f1 and f2</button></div>
   <hr />
 
