@@ -56,16 +56,15 @@ export default function SelectedCourse(props){
     for(let x=0;x< selection.length;x++){
       selectionArr.push(selection[x].driveId);
     }
-      
       setDrivesInfo({
-        color:'abc',
-        label:'abcd',
-        image:'ancds',
+        color:'',
+        label:'',
+        image:'',
         newDriveId:selectionArr,
         type:"delete drive"
       })
       setDrivecardSelection([]);
-    // }
+
     
   }}/>
       </>
