@@ -9,7 +9,7 @@ import { useToast } from '../../_framework/Toast';
 
 import { useAssignment } from '../../course/CourseActions';
 import { useAssignmentCallbacks } from '../../../_reactComponents/Drive/DriveActions';
-import { itemHistoryAtom } from '../ToolHandlers/CourseToolHandler';
+import { itemHistoryAtom ,assignmentDictionarySelector} from '../ToolHandlers/CourseToolHandler';
 
 export const selectedVersionAtom = atom({
   key: 'selectedVersionAtom',
@@ -30,7 +30,26 @@ export default function SelectedDoenetId(props){
   // console.log(">>> SelectedDoenetId selection",selection);
   let makeAssignmentforReleasedButton = null;
   let assignmentForm = null;
+
+
+  const assignmentInfoSettings = useRecoilValueLoadable(
+    assignmentDictionarySelector({
+      driveId: selection[0].driveId,
+      folderId: selection[0].parentFolderId,
+      itemId: selection[0].itemId,
+      doenetId: selection[0].doenetId,
+      versionId: selection[0].versionId,
+      contentId: selection[0].contentId,
+    }),
+  );
+
   let aInfo = '';
+
+  if (assignmentInfoSettings?.state === 'hasValue') {
+    aInfo = assignmentInfoSettings?.contents; 
+  } 
+  // console.log(">>>>> here aInfo",aInfo);
+  
   // handle on blur on aForm
   const handleOnBlur = (e) => {
     e.preventDefault();
@@ -103,7 +122,7 @@ export default function SelectedDoenetId(props){
         <>
           {item.isReleased == 1 ? (
             <option key={i} value={item.versionId}>
-              {item.isAssigned == 1 ? '(Assigned)' : ''}
+              {item.isAssigned == '1' ? '(Assigned)' : ''}
               {item.title}
             </option>
           ) : (
@@ -119,6 +138,9 @@ export default function SelectedDoenetId(props){
         value="Make Assignment"
         onClick={async () => {
           setIsAssigned(true);
+
+          const versionResult = await updateVersionHistory(selection[0].doenetId, selection[0].versionId);
+
           const result = await addContentAssignment({
             driveIditemIddoenetIdparentFolderId: {
               driveId: selection[0].driveId,
@@ -150,9 +172,8 @@ export default function SelectedDoenetId(props){
           //   itemId: selection[0].itemId,
           //   payload: payload,
           // });
-          updateVersionHistory(selection[0].doenetId, selection[0].versionId);
           try {
-            if (result.success) {
+            if (result.success && versionResult) {
               addToast(
                 `Add new assignment`,
                 ToastType.SUCCESS,
@@ -404,7 +425,7 @@ unAssignButton = (
 
   {selection[0].isAssigned == '1' && checkIfAssigned() && selectVersion && unAssignButton }
 
-  {selection[0].isAssigned === '0' && selectVersion && makeAssignmentforReleasedButton}
+  {selection[0].isAssigned === '0' &&  selectVersion && makeAssignmentforReleasedButton}
   <br />
   {checkIsAssigned && assignmentForm}
   
