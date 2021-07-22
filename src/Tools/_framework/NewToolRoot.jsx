@@ -1,13 +1,12 @@
-import React, { useState, lazy, Suspense, useRef, useEffect } from 'react';
+import React, { useState, lazy, Suspense, useRef } from 'react';
 import {
   atom,
   selector,
-  atomFamily,
   useRecoilValue,
+  atomFamily,
   useRecoilCallback,
-  useRecoilValueLoadable,
-  useSetRecoilState,
   useRecoilState,
+  useSetRecoilState,
 } from 'recoil';
 import styled from 'styled-components';
 import Toast from './Toast';
@@ -20,8 +19,7 @@ import SupportPanel from './Panels/NewSupportPanel';
 import MenuPanel from './Panels/NewMenuPanel';
 import FooterPanel from './Panels/FooterPanel';
 import { animated } from '@react-spring/web';
-import { selectedMenuPanelAtom } from './Panels/NewMenuPanel';
-import { mainPanelClickAtom } from './Panels/NewMainPanel';
+
 import { useHistory, useLocation } from 'react-router';
 
 
@@ -41,7 +39,6 @@ const ToolContainer = styled(animated.div)`
   gap: 0px;
   box-sizing: border-box;
 `;
-
 
 export const profileAtom = atom({
   key: "profileAtom",
@@ -75,20 +72,13 @@ export const paramObjAtom = atom({
   default:{}
 })
 
-export const toolViewAtom = atom({
-  key: "toolViewAtom",
-  default:{
-    pageName:"init",
-  }
-})
-
 // **** ToolRoot ****
 //Keep  as simple as we can
 //Keep refreshes to a minimum 
 //Don't use recoil in ToolRoot
 
-export default function ToolRoot(props){
-  // console.log(">>>ToolRoot props",props) 
+export default function ToolRoot(){
+  console.log(">>>===ToolRoot ") 
 
   const [toolRootMenusAndPanels,setToolRootMenusAndPanels] = useState({
     pageName:"init",
@@ -123,7 +113,7 @@ export default function ToolRoot(props){
     DriveCards:lazy(() => import('./ToolPanels/DriveCards')),
     SignIn:lazy(() => import('./ToolPanels/SignIn')),
     SignOut:lazy(() => import('./ToolPanels/SignOut')),
-    DrivePanel:lazy(() => import('./ToolPanels/DrivePanel')),
+    NavigationPanel:lazy(() => import('./ToolPanels/NavigationPanel')),
     EditorViewer:lazy(() => import('./ToolPanels/EditorViewer')),
     DoenetMLEditor:lazy(() => import('./ToolPanels/DoenetMLEditor')),
     Enrollment:lazy(() => import('./ToolPanels/Enrollment')),
@@ -132,16 +122,8 @@ export default function ToolRoot(props){
   const LazyControlObj = useRef({
     BackButton:lazy(() => import('./HeaderControls/BackButton')),
     ViewerUpdateButton:lazy(() => import('./HeaderControls/ViewerUpdateButton')),
+    NavigationBreadCrumb: lazy(() => import('./HeaderControls/NavigationBreadCrumb')),
   }).current;
-
-  const LazyToolHandlerObj = useRef({
-    CourseToolHandler:lazy(() => import('./ToolHandlers/CourseToolHandler')),
-  }).current;
-
-  
-
-  console.log(">>>===ToolRoot")
-  
  
 
   function buildPanel({key,type,visible}){
@@ -154,8 +136,6 @@ export default function ToolRoot(props){
     {React.createElement(LazyPanelObj[type],{key,style:{display:hideStyle}})}
     </Suspense>
   } 
-
-  // console.log(">>>toolRootMenusAndPanels",toolRootMenusAndPanels)
 
    let MainPanelKey = `${toolRootMenusAndPanels.pageName}-${toolRootMenusAndPanels.currentMainPanel}`;
 
@@ -177,9 +157,11 @@ export default function ToolRoot(props){
       if (controlObj){
         const key = `headerControls${MainPanelKey}`;
         headerControlsPositions.push(toolRootMenusAndPanels.headerControlsPositions[i])
-        headerControls.push(<Suspense key={key} fallback={<LoadingFallback>loading...</LoadingFallback>}>
-        {React.createElement(controlObj,{key:{key}})}
-        </Suspense>)
+        headerControls.push(
+          <Suspense key={key} fallback={<LoadingFallback>loading...</LoadingFallback>}>
+            {React.createElement(controlObj,{key:{key}})}
+          </Suspense>
+        )
       }
     }
   }
@@ -261,6 +243,7 @@ export default function ToolRoot(props){
    
     {/* <RootController key='root_controller' setToolRootMenusAndPanels={setToolRootMenusAndPanels}/> */}
     <MemoizedRootController key='root_controller' setToolRootMenusAndPanels={setToolRootMenusAndPanels}/>
+    <MemoizedOnLeave key='MemoizedOnLeave' />
   </>
 } 
 
@@ -275,7 +258,7 @@ export default function ToolRoot(props){
 // headerControls:["BackButton"],
 // headerControlsPositions:["Right"], 
 // hasNoMenuPanel: true,
-// toolHandler:"CourseToolHandler",
+
 
 let navigationObj = {
   
@@ -304,42 +287,41 @@ let navigationObj = {
       // currentMenus:["CreateCourse","CourseEnroll"],
       // menusTitles:["Create Course","Enroll"],
       menusInitOpen:[true,false],
-      toolHandler:"CourseToolHandler"
+      onLeave:"CourseChooserLeave",
     },
     navigation:{
       pageName:"Course",
-      currentMainPanel:"DrivePanel",
+      currentMainPanel:"NavigationPanel",
       currentMenus:["AddDriveItems","EnrollStudents"],
       menusTitles:["Add Items","Enrollment"],
+      // currentMenus:["AddDriveItems","EnrollStudents","gradebook"],
+      // menusTitles:["Add Items","Enrollment","gradebook"],
       menusInitOpen:[true,false],
-      toolHandler:"CourseToolHandler",
+      headerControls: ["NavigationBreadCrumb"],
+      headerControlsPositions: ["Left"],
       onLeave:"NavigationLeave",
     },
     editor:{
       pageName:"Course",
       currentMainPanel:"EditorViewer",
-      currentMenus:["DoenetMLSettings","VersionHistory","Variant"], 
-      menusTitles:["Settings","Version History","Variant"],
-      menusInitOpen:[false,false,false],
+      currentMenus:["VersionHistory","DoenetMLSettings","Variant"], 
+      menusTitles:["Version History","Document Settings","Variant"],
+      menusInitOpen:[true,false,false],
       supportPanelOptions:["DoenetMLEditor"],
       supportPanelTitles:["DoenetML Editor"],
       supportPanelIndex:0,
-      headerControls: ["ViewerUpdateButton"],
-      headerControlsPositions: ["Left"],
-      toolHandler:"CourseToolHandler"
-    }
-  },
-  enrollment:{
-    default:{
+      headerControls: ["BackButton","ViewerUpdateButton",],
+      headerControlsPositions: ["Left","Left"],
+    },
+    enrollment:{
       pageName:"Enrollment",
-      currentMenus:[],
-      menusTitles:[],
-      menusInitOpen:[],
+      currentMenus:["LoadEnrollment","ManualEnrollment"],
+      menusTitles:["Load","Manual"],
+      menusInitOpen:[false,false],
       currentMainPanel:"Enrollment",
       supportPanelOptions:[],
       supportPanelTitles:[],
       supportPanelIndex:0,
-      hasNoMenuPanel: true,
       headerControls: ["BackButton"],
       headerControlsPositions: ["Right"]
     }
@@ -419,11 +401,48 @@ let encodeParams = p => Object.entries(p).map(kv =>
     key:"pageToolViewAtom",
     default:{page:"init",tool:"",view:""}
   })
+
+  const onLeaveComponentStr = atom({
+    key:"onLeaveComponentStr",
+    default:{str:null,updateNum:0}
+  })
+
+  export const finishedOnLeave = atom({
+    key:"finishedOnLeave",
+    default:null
+  })
+
+  const MemoizedOnLeave = React.memo(OnLeave)
+  function OnLeave(){
+    const leaveComponentObj = useRecoilValue(onLeaveComponentStr)
+    const leaveComponentStr = leaveComponentObj.str;
+    //TODO: make a queue of onLeaveStrings.  Remove from queue after component has finished.
+    let leaveComponent = null;
+
+    const LazyEnterLeaveObj = useRef({
+      NavigationLeave:lazy(() => import('./EnterLeave/NavigationLeave')),
+      CourseChooserLeave:lazy(() => import('./EnterLeave/CourseChooserLeave')),
+    }).current;
+
+    if (leaveComponentStr){
+      const key = `leave${leaveComponentStr}`
+      leaveComponent = <Suspense key={key} fallback={null}>
+      {/* {React.createElement(LazyEnterLeaveObj[leaveComponentName.current],{key})} */}
+      {React.createElement(LazyEnterLeaveObj[leaveComponentStr])}
+      </Suspense>
+    }
+
+    return <>{leaveComponent}</>;
+  }
+  
   const MemoizedRootController = React.memo(RootController)
   function RootController(props){
     const [recoilPageToolView,setRecoilPageToolView ] = useRecoilState(pageToolViewAtom);
+    const setOnLeaveStr = useSetRecoilState(onLeaveComponentStr);
     let lastPageToolView = useRef({page:"init",tool:"",view:""});
     let backPageToolView = useRef({page:"init",tool:"",view:""});
+    let backParams = useRef({})
+    let currentParams = useRef({})
     let lastLocationStr = useRef("");
     let location = useLocation();
     let history = useHistory();
@@ -446,14 +465,9 @@ let encodeParams = p => Object.entries(p).map(kv =>
     }
   })
 
-  const LazyEnterLeaveObj = useRef({
-    NavigationLeave:lazy(() => import('./EnterLeave/NavigationLeave')),
-  }).current;
-
-  
-    let enterComponent = null; //Lazy loaded entering component
-    let leaveComponent = null; //Lazy loaded leaving component
-    let leaveComponentName = useRef(null); //Name of the component to load if we leave
+ 
+    // let enterComponent = null; //Lazy loaded entering component
+    let leaveComponentName = useRef(null)
     let locationStr = `${location.pathname}${location.search}`;
     let nextPageToolView = {page:"",tool:"",view:""};
     let nextMenusAndPanels = null;
@@ -485,7 +499,13 @@ let encodeParams = p => Object.entries(p).map(kv =>
       isRecoilChange = true;
       // console.log(">>>Recoil change nextPageToolView = recoilPageToolView",recoilPageToolView)
       if (recoilPageToolView.back){
-        setRecoilPageToolView(backPageToolView.current)
+        if (backPageToolView.current.page === "init"){
+          backPageToolView.current.page = 'home'; //Go home if started with the page
+        }
+        // console.log(">>>User hit back button backParams.current",backParams.current)
+        let pageToolViewParams = {...backPageToolView.current,params:backParams.current}
+
+        setRecoilPageToolView(pageToolViewParams)
         return null;
       }
       nextPageToolView = {...recoilPageToolView}
@@ -504,9 +524,12 @@ let encodeParams = p => Object.entries(p).map(kv =>
 
       //TODO: handle page == "" and tool changed
       //TODO: handle page == "" and tool == "" and view changed
-    
+    let isPageChange = false;
+    let isToolChange = false;
+    let isViewChange = false;
     if (lastPageToolView.current.page !== nextPageToolView.page){
       //Page changed!
+      isPageChange = true;
       if (nextPageToolView.tool === ""){
         //Load default
         
@@ -520,24 +543,27 @@ let encodeParams = p => Object.entries(p).map(kv =>
       }else{
         nextMenusAndPanels = navigationObj[nextPageToolView.page][nextPageToolView.tool];
       }
-      //Load and Update Navigation Leave
-      if (leaveComponentName.current){
-        const key = `leave${leaveComponentName.current}`
-        leaveComponent = <Suspense key={key} fallback={null}>
-        {React.createElement(LazyEnterLeaveObj[leaveComponentName.current],{key})}
-        </Suspense>
-      }
-      leaveComponentName.current = null;
-      if (nextMenusAndPanels.onLeave){
-        leaveComponentName.current = nextMenusAndPanels.onLeave
-      }
+     
     }else if (lastPageToolView.current.tool !== nextPageToolView.tool){
+      //Tool Changed
+      isToolChange = true;
       //TODO: Check for default view
       nextMenusAndPanels = navigationObj[nextPageToolView.page][nextPageToolView.tool];
 
     }else if (lastPageToolView.current.view !== nextPageToolView.view){
       //View changed!
+      isViewChange = true;
+    }
 
+    //Update Navigation Leave
+    if (isPageChange || isToolChange || isViewChange){
+      if (leaveComponentName.current){
+        setOnLeaveStr((was)=>({str:leaveComponentName.current,updateNum:was.updateNum+1})) 
+      }
+      leaveComponentName.current = null;
+      if (nextMenusAndPanels.onLeave){
+        leaveComponentName.current = nextMenusAndPanels.onLeave
+      }
     }
 
 
@@ -555,10 +581,19 @@ let encodeParams = p => Object.entries(p).map(kv =>
     // console.log(">>>nextMenusAndPanels",nextMenusAndPanels)
     //Only update ToolRoot if nextMenusAndPanels was indicated as a change
     if (nextMenusAndPanels && JSON.stringify(nextPageToolView) !== JSON.stringify(lastPageToolView.current) ){
-      // console.log(">>>UPDATE TOOL ROOT!")
-      backPageToolView.current = lastPageToolView.current;  //Set back for back button
+      backPageToolView.current = lastPageToolView.current;  //Set PageToolView for back button
+      let params = {};
+      if (isURLChange){
+        params = searchObj;
+      }else if (isRecoilChange){
+        params = recoilPageToolView.params;
+      }
+
+        backParams.current = currentParams.current; //Set params for back button
+        currentParams.current = params; 
+
+        props.setToolRootMenusAndPanels(nextMenusAndPanels)
       
-      props.setToolRootMenusAndPanels(nextMenusAndPanels)
     }
 
 
@@ -595,10 +630,7 @@ let encodeParams = p => Object.entries(p).map(kv =>
     lastSearchObj.current = searchObj;
     lastLocationStr.current = locationStr;
     lastPageToolView.current = nextPageToolView;
-    return <>
-    {leaveComponent}
-    {enterComponent}
-    </>;
+    return null; 
   }
 
 
@@ -609,8 +641,8 @@ const LoadingFallback = styled.div`
   justify-content: center;
   align-items: center;
   font-size: 2em;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
 `;
 
 

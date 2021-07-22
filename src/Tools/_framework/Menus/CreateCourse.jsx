@@ -2,7 +2,7 @@ import React from 'react';
 import { nanoid } from 'nanoid';
 import axios from "axios";
 
-import { useToast } from '@Toast';
+import { useToast, toastType } from '@Toast';
 import Button from '../../../_reactComponents/PanelHeaderComponents/Button';
 import { useRecoilCallback } from 'recoil';
 // import { driveColors, driveImages } from '../../_reactComponents/Drive/util';
@@ -11,7 +11,7 @@ import { fetchDrivesQuery } from '../../../_reactComponents/Drive/NewDrive';
 
 
 const CreateCourse = (props) =>{
-  const [toast, toastType] = useToast();
+  const toast = useToast();
   const onError = ({errorMessage}) => {
     toast(`Course not created. ${errorMessage}`, toastType.ERROR);
   }

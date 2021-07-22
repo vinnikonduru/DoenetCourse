@@ -1,19 +1,27 @@
-import  { useRef } from 'react';
+import React, { useState } from 'react';
 import { 
   atom, 
-  useRecoilValue,
   selector, 
-  useRecoilCallback, 
-  // useRecoilState, 
-  useSetRecoilState,
   atomFamily,
-  selectorFamily
+  selectorFamily,
+  useRecoilCallback
  } from 'recoil'
-import { searchParamAtomFamily, toolViewAtom, paramObjAtom } from '../NewToolRoot';
-import { mainPanelClickAtom } from '../Panels/NewMainPanel';
-import { selectedMenuPanelAtom } from '../Panels/NewMenuPanel';
-import { globalSelectedNodesAtom } from '../../../_reactComponents/Drive/NewDrive';
 import axios from "axios";
+import sha256 from 'crypto-js/sha256';
+import CryptoJS from 'crypto-js';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { useToast, toastType } from '@Toast';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faExternalLinkAlt
+ } from '@fortawesome/free-solid-svg-icons';
+
+ import { 
+  faClipboard
+ } from '@fortawesome/free-regular-svg-icons';
+
+import { nanoid } from 'nanoid';
 
 export const itemHistoryAtom = atomFamily({
   key:"itemHistoryAtom",
@@ -213,7 +221,6 @@ export const fetchDrivesSelector = selector({
     }
   }
 })
-
 export const loadAssignmentSelector = selectorFamily({
   key: 'loadAssignmentSelector',
   get:
@@ -265,104 +272,106 @@ export let assignmentDictionarySelector = selectorFamily({
     },
 });
 
+export const variantInfoAtom = atom({
+  key:"variantInfoAtom",
+  default:{index:null,name:null,lastUpdatedIndexOrName:null,requestedVariant:{index:1}}
+})
 
-export default function CourseToolHandler(props){
-  console.log(">>>===CourseToolHandler")
-  
-  let lastAtomTool = useRef("");
+export const variantPanelAtom = atom({
+  key:"variantPanelAtom",
+  default:{index:null,name:null}
+})
 
-  const setTool = useRecoilCallback(({set})=> (tool,lastAtomTool)=>{
-    //Set starting tool
-    // if (tool === ""){
-    //   tool = 'courseChooser';
-    //   window.history.replaceState('','','/new#/course?tool=courseChooser')
-    // }
-    // if (tool === lastAtomTool){ return; }
+export function buildTimestamp(){
+  const dt = new Date();
+  return `${
+    dt.getFullYear().toString().padStart(2, '0')}-${
+    (dt.getMonth()+1).toString().padStart(2, '0')}-${
+    dt.getDate().toString().padStart(2, '0')} ${
+    dt.getHours().toString().padStart(2, '0')}:${
+    dt.getMinutes().toString().padStart(2, '0')}:${
+    dt.getSeconds().toString().padStart(2, '0')}`
+}
 
-      if (tool === 'courseChooser'){
-
-        set(toolViewAtom,{
-          pageName:"Course",
-          currentMainPanel:"DriveCards",
-          currentMenus:["CreateCourse"],
-          menusTitles:["Create Course"],
-          // currentMenus:["CreateCourse","CourseEnroll"],
-          // menusTitles:["Create Course","Enroll"],
-          menusInitOpen:[true,false],
-          toolHandler:"CourseToolHandler"
-        })
-        set(selectedMenuPanelAtom,""); //clear selection
-        set(mainPanelClickAtom,[{atom:drivecardSelectedNodesAtom,value:[]},{atom:selectedMenuPanelAtom,value:""}])
-     
-      }else if (tool === 'navigation'){
-        // if (role === "Student"){
-          //TODO
-        // }else if (role === "Owner" || role === "Admin"){
-
-            set(toolViewAtom,{
-              pageName:"Course",
-              currentMainPanel:"DrivePanel",
-              currentMenus:["AddDriveItems","EnrollStudents"],
-              menusTitles:["Add Items","Enrollment"],
-              menusInitOpen:[true,false],
-              toolHandler:"CourseToolHandler"
-            })
-
-        // }
-        set(selectedMenuPanelAtom,""); //clear selection
-        set(mainPanelClickAtom,[{atom:globalSelectedNodesAtom,value:[]},{atom:selectedMenuPanelAtom,value:""}])
-      }else if (tool === 'editor'){
-
-        set(toolViewAtom,{
-          pageName:"Course",
-          currentMainPanel:"EditorViewer",
-          currentMenus:["DoenetMLSettings","VersionHistory","Variant"], 
-          menusTitles:["Settings","Version History","Variant"],
-          menusInitOpen:[false,false,false],
-          supportPanelOptions:["DoenetMLEditor"],
-          supportPanelTitles:["DoenetML Editor"],
-          supportPanelIndex:0,
-          headerControls: ["ViewerUpdateButton"],
-          headerControlsPositions: ["Left"],
-          toolHandler:"CourseToolHandler"
-        })
-        set(selectedMenuPanelAtom,""); //clear selection
-        set(mainPanelClickAtom,[])  //clear main panel click
-
-      }else if (tool === 'enrollment'){
-
-        set(toolViewAtom,{
-          pageName:"Course",
-          currentMainPanel:"Enrollment",
-          currentMenus:[], 
-          menusTitles:[],
-          menusInitOpen:[],
-          supportPanelOptions:[],
-          supportPanelTitles:[],
-          supportPanelIndex:0,
-          headerControls: ["BackButton"],
-          headerControlsPositions: ["Right"],
-          toolHandler:"CourseToolHandler"
-        })
-        set(selectedMenuPanelAtom,""); //clear selection
-        set(mainPanelClickAtom,[])  //clear main panel click
-
-      }else{
-        console.log(`>>>Course Tool Handler: tool '${tool}' didn't match!`)
-      }
-  })
-  const atomTool = useRecoilValue(searchParamAtomFamily('tool')) 
-  const setParamObj = useSetRecoilState(paramObjAtom);
-  // console.log(`>>>atomTool >${atomTool}< lastAtomTool.current >${lastAtomTool.current}<`)
-
-
-  //Update panels when tool changes
-  if (atomTool !== lastAtomTool.current){
-    setTool(atomTool,lastAtomTool.current)
-    lastAtomTool.current = atomTool;
-  }else if (atomTool === '' && lastAtomTool.current === ''){
-    setParamObj({tool:'courseChooser'})
+export const getSHAofContent = (doenetML)=>{
+  if (doenetML === undefined){
+    return;
   }
-  return null;
+  //NOTICE: JSON.stringify CHANGES THE CONTENT SO IT DOESN'T MATCH
+  // let contentId = sha256(JSON.stringify(doenetML)).toString(CryptoJS.enc.Hex);
+  let contentId = sha256(doenetML).toString(CryptoJS.enc.Hex);
+  return contentId;
+}
+
+export function ClipboardLinkButtons(props){
+  const addToast = useToast();
+
+
+  if (!props.contentId){
+    console.error("Component only handles contentId at this point")
+    return null;
+  }
+  
+
+  const link = `http://${window.location.host}/content/#/?contentId=${props.contentId}`
+  return <div> 
+  <CopyToClipboard onCopy={()=>addToast('Link copied to clipboard!', toastType.SUCCESS)} text={link}>
+  <button>copy link <FontAwesomeIcon icon={faClipboard}/></button> 
+  </CopyToClipboard>
+
+  <button onClick={
+    ()=>window.open(link, '_blank')
+  }>visit <FontAwesomeIcon icon={faExternalLinkAlt}/></button>
+  </div>
+}
+
+export function RenameVersionControl(props){
+  let [textFieldFlag,setTextFieldFlag] = useState(false);
+  let [currentTitle,setCurrentTitle] = useState(props.title);
+
+  const renameVersion = useRecoilCallback(({set})=> async (doenetId,versionId,newTitle)=>{
+    // console.log(">>>",{doenetId,versionId,newTitle})
+      set(itemHistoryAtom(doenetId),(was)=>{
+        let newHistory = {...was}
+        newHistory.named = [...was.named];
+        let newVersion;
+        for (const [i,version] of newHistory.named.entries()){
+          if (versionId === version.versionId){
+            newVersion = {...version}
+            newVersion.title = newTitle;
+            newHistory.named.splice(i,1,newVersion)
+          }
+        }
+        let newDBVersion = {...newVersion,
+          isNewTitle:'1',
+          doenetId
+        }
+           axios.post("/api/saveNewVersion.php",newDBVersion)
+            // .then((resp)=>{console.log(">>>resp saveNamedVersion",resp.data)})
+        return newHistory;
+      })
+  
+    });
+
+    function renameIfChanged(){
+      setTextFieldFlag(false)
+      if (props.title !== currentTitle){
+        renameVersion(props.doenetId,props.versionId,currentTitle);
+      }
+    }
+
+    if (!textFieldFlag){
+      return <button onClick={()=>setTextFieldFlag(true)}>Rename</button>
+    }
+  return <input type='text' autoFocus value={currentTitle} 
+  onChange={(e)=>{setCurrentTitle(e.target.value)}}
+  onKeyDown={(e)=>{
+    if (e.key === 'Enter'){
+    renameIfChanged();
+  }}}
+  onBlur={()=>{
+    renameIfChanged();
+  }}
+  />
 
 }

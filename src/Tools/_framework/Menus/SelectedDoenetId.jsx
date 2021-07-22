@@ -5,7 +5,7 @@ import { globalSelectedNodesAtom } from '../../../_reactComponents/Drive/NewDriv
 import Button from '../../../_reactComponents/PanelHeaderComponents/Button';
 import IncrementMenu from '../../../_reactComponents/PanelHeaderComponents/IncrementMenu';
 import Switch from '../../_framework/Switch';
-import { useToast } from '../../_framework/Toast';
+// import { useToast } from '../../_framework/Toast';
 
 import { useAssignment } from '../../course/CourseActions';
 import { useAssignmentCallbacks } from '../../../_reactComponents/Drive/DriveActions';
@@ -18,12 +18,12 @@ export const selectedVersionAtom = atom({
 export default function SelectedDoenetId(props){
 
   const selection = useRecoilValue(globalSelectedNodesAtom);
-  // console.log(">>> new @@@@ here selection",selection);
+  console.log(">>> new @@@@ here selection",selection);
   const [checkIsAssigned, setIsAssigned] = useState(false);
   const [selectVersion, setSelectVersion] = useState(false);
   const [selectedVId, setSelectedVId] = useState();
   const setSelectedVersionAtom = useSetRecoilState(selectedVersionAtom);
-  const [addToast, ToastType] = useToast();
+  // const [addToast, ToastType] = useToast();
 
   const {addContentAssignment,changeSettings,updateVersionHistory,saveSettings,assignmentToContent,loadAvailableAssignment, publishContentAssignment,onAssignmentError} = useAssignment();
   const {makeAssignment,onmakeAssignmentError,publishAssignment,onPublishAssignmentError,publishContent,onPublishContentError, updateAssignmentTitle,onUpdateAssignmentTitleError,convertAssignmentToContent,onConvertAssignmentToContentError} = useAssignmentCallbacks();
@@ -89,7 +89,7 @@ export default function SelectedDoenetId(props){
         result
           .then((resp) => {
             if (resp.data.success) {
-              addToast(`Updated '${name}' to '${value}'`, ToastType.SUCCESS);
+              // addToast(`Updated '${name}' to '${value}'`, ToastType.SUCCESS);
             } else {
               onAssignmentError({ errorMessage: resp.data.message });
             }
@@ -174,10 +174,10 @@ export default function SelectedDoenetId(props){
           // });
           try {
             if (result.success && versionResult) {
-              addToast(
-                `Add new assignment`,
-                ToastType.SUCCESS,
-              );
+              // addToast(
+              //   `Add new assignment`,
+              //   ToastType.SUCCESS,
+              // );
             } else {
               onAssignmentError({ errorMessage: result.message });
             }
@@ -402,10 +402,10 @@ unAssignButton = (
         result
           .then((resp) => {
             if (resp.data.success) {
-              addToast(
-                `'UnAssigned ''`, 
-                ToastType.SUCCESS,
-              );
+              // addToast(
+              //   `'UnAssigned ''`, 
+              //   ToastType.SUCCESS,
+              // );
             } else {
               onAssignmentError({ errorMessage: resp.data.message });
             }
@@ -431,3 +431,88 @@ unAssignButton = (
   
   </>
 }
+
+
+
+// const itemInfo = props.itemInfo;
+  // const { deleteItem, renameItem } = useSockets('drive');
+
+  // const setFolder = useSetRecoilState(
+  //   folderDictionaryFilterSelector({
+  //     driveId: itemInfo.driveId,
+  //     folderId: itemInfo.parentFolderId,
+  //   }),
+  // );
+
+  // const [label, setLabel] = useState(itemInfo.label);
+
+  // let dIcon = <FontAwesomeIcon icon={faCode} />;
+
+  // const renameItemCallback = (newLabel) => {
+  //   renameItem({
+  //     driveIdFolderId: {
+  //       driveId: itemInfo.driveId,
+  //       folderId: itemInfo.parentFolderId,
+  //     },
+  //     itemId: itemInfo.itemId,
+  //     itemType: itemInfo.itemType,
+  //     newLabel: newLabel,
+  //   });
+  // };
+
+  // return (
+  //   <>
+  //     <h2 data-cy="infoPanelItemLabel">
+  //       {dIcon} {itemInfo.label}
+  //     </h2>
+
+  //     <label>
+  //       DoenetML Label
+  //       <input
+  //         type="text"
+  //         data-cy="infoPanelItemLabelInput"
+  //         value={label}
+  //         onChange={(e) => setLabel(e.target.value)}
+  //         onKeyDown={(e) => {
+  //           if (e.key === 'Enter') {
+  //             //Only rename if label has changed
+  //             if (itemInfo.label !== label) {
+  //               renameItemCallback(label);
+  //             }
+  //           }
+  //         }}
+  //         onBlur={() => {
+  //           //Only rename if label has changed
+  //           if (itemInfo.label !== label) {
+  //             renameItemCallback(label);
+  //           }
+  //         }}
+  //       />
+  //     </label>
+  //     <br />
+  //     <br />
+  //     <Button
+  //       value="Edit DoenetML"
+  //       onClick={() => {
+  //         //TODO: toolview?
+  //       }}
+  //     />
+  //     <br />
+  //     <br />
+  //     <Button
+  //       data-cy="deleteDoenetMLButton"
+  //       value="Delete DoenetML"
+  //       onClick={() => {
+  //         deleteItem({
+  //           driveIdFolderId: {
+  //             driveId: itemInfo.driveId,
+  //             folderId: itemInfo.parentFolderId,
+  //           },
+  //           itemId: itemInfo.itemId,
+  //           driveInstanceId: itemInfo.driveInstanceId,
+  //           label: itemInfo.label,
+  //         });
+  //       }}
+  //     />
+  //   </>
+  // );
