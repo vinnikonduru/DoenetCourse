@@ -5,7 +5,7 @@ import { globalSelectedNodesAtom } from '../../../_reactComponents/Drive/NewDriv
 import Button from '../../../_reactComponents/PanelHeaderComponents/Button';
 import IncrementMenu from '../../../_reactComponents/PanelHeaderComponents/IncrementMenu';
 import Switch from '../../_framework/Switch';
-// import { useToast } from '../../_framework/Toast';
+import { useToast } from '../../_framework/Toast';
 
 import { useAssignment } from '../../course/CourseActions';
 import { useAssignmentCallbacks } from '../../../_reactComponents/Drive/DriveActions';
@@ -23,7 +23,7 @@ export default function SelectedDoenetId(props){
   const [selectVersion, setSelectVersion] = useState(false);
   const [selectedVId, setSelectedVId] = useState();
   const setSelectedVersionAtom = useSetRecoilState(selectedVersionAtom);
-  // const [addToast, ToastType] = useToast();
+  const addToast = useToast();
 
   const {addContentAssignment,changeSettings,updateVersionHistory,saveSettings,assignmentToContent,loadAvailableAssignment, publishContentAssignment,onAssignmentError} = useAssignment();
   const {makeAssignment,onmakeAssignmentError,publishAssignment,onPublishAssignmentError,publishContent,onPublishContentError, updateAssignmentTitle,onUpdateAssignmentTitleError,convertAssignmentToContent,onConvertAssignmentToContentError} = useAssignmentCallbacks();
@@ -89,7 +89,7 @@ export default function SelectedDoenetId(props){
         result
           .then((resp) => {
             if (resp.data.success) {
-              // addToast(`Updated '${name}' to '${value}'`, ToastType.SUCCESS);
+              addToast(`Updated '${name}' to '${value}'`);
             } else {
               onAssignmentError({ errorMessage: resp.data.message });
             }
@@ -174,10 +174,8 @@ export default function SelectedDoenetId(props){
           // });
           try {
             if (result.success && versionResult) {
-              // addToast(
-              //   `Add new assignment`,
-              //   ToastType.SUCCESS,
-              // );
+              addToast(
+                `Add new assignment`);
             } else {
               onAssignmentError({ errorMessage: result.message });
             }
@@ -402,10 +400,7 @@ unAssignButton = (
         result
           .then((resp) => {
             if (resp.data.success) {
-              // addToast(
-              //   `'UnAssigned ''`, 
-              //   ToastType.SUCCESS,
-              // );
+              addToast(`'UnAssigned ''`);
             } else {
               onAssignmentError({ errorMessage: resp.data.message });
             }
