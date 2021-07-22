@@ -1,7 +1,7 @@
 import React ,{useState} from 'react';
 import axios from 'axios';
 import { atom, useRecoilValue, useRecoilValueLoadable,useSetRecoilState } from 'recoil';
-import { globalSelectedNodesAtom } from '../../../_reactComponents/Drive/NewDrive';
+import { globalSelectedNodesAtom,selectedDriveItemsAtom } from '../../../_reactComponents/Drive/NewDrive';
 import Button from '../../../_reactComponents/PanelHeaderComponents/Button';
 import IncrementMenu from '../../../_reactComponents/PanelHeaderComponents/IncrementMenu';
 import Switch from '../../_framework/Switch';
@@ -18,7 +18,7 @@ export const selectedVersionAtom = atom({
 export default function SelectedDoenetId(props){
 
   const selection = useRecoilValue(globalSelectedNodesAtom);
-  console.log(">>> new @@@@ here selection",selection);
+  // console.log(">>> new @@@@ here selection",selection);
   const [checkIsAssigned, setIsAssigned] = useState(false);
   const [selectVersion, setSelectVersion] = useState(false);
   const [selectedVId, setSelectedVId] = useState();
@@ -30,16 +30,28 @@ export default function SelectedDoenetId(props){
   // console.log(">>> SelectedDoenetId selection",selection);
   let makeAssignmentforReleasedButton = null;
   let assignmentForm = null;
-
-
+let  driveId=  'wgl2z1du7L15UsHhj3n--';
+let folderId =  'wgl2z1du7L15UsHhj3n--';
+let itemId=  'AeeCWnrx6H5-tun5B7GMp';
+let doenetId= 'gFZysXdzvj-eEK75dcHG2';
+let versionId= '5ES0fNig-vziKDo8Y11QF';
+let contentId= 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855';
+let isAssigned = '0';
   const assignmentInfoSettings = useRecoilValueLoadable(
     assignmentDictionarySelector({
-      driveId: selection[0].driveId,
-      folderId: selection[0].parentFolderId,
-      itemId: selection[0].itemId,
-      doenetId: selection[0].doenetId,
-      versionId: selection[0].versionId,
-      contentId: selection[0].contentId,
+      // driveId: selection[0].driveId,
+      // folderId: selection[0].parentFolderId,
+      // itemId: selection[0].itemId,
+      // doenetId: selection[0].doenetId,
+      // versionId: selection[0].versionId,
+      // contentId: selection[0].contentId,
+
+       driveId: driveId,
+      folderId: folderId,
+      itemId: itemId,
+      doenetId: doenetId,
+      versionId: versionId,
+      contentId: contentId,
     }),
   );
 
@@ -106,7 +118,7 @@ export default function SelectedDoenetId(props){
     setSelectedVersionAtom(item);
   };
 
-  const versionHistory = useRecoilValueLoadable(itemHistoryAtom(selection[0].doenetId));
+  const versionHistory = useRecoilValueLoadable(itemHistoryAtom(doenetId));
   if (versionHistory.state === "loading"){ return null;}
   if (versionHistory.state === "hasError"){ 
     console.error(versionHistory.contents)
@@ -416,11 +428,12 @@ unAssignButton = (
 );
   return <>
   <p>Released Versions(Soon)</p>
-  {assigned} 
+  {/* {assigned}  */}
 
-  {selection[0].isAssigned == '1' && checkIfAssigned() && selectVersion && unAssignButton }
+  {/* {selection[0].isAssigned == '1' && checkIfAssigned() && selectVersion && unAssignButton } */}
 
-  {selection[0].isAssigned === '0' &&  selectVersion && makeAssignmentforReleasedButton}
+  {/* {selection[0].isAssigned === '0' &&  selectVersion && makeAssignmentforReleasedButton} */}
+  {selectVersion && makeAssignmentforReleasedButton}
   <br />
   {checkIsAssigned && assignmentForm}
   
@@ -430,84 +443,84 @@ unAssignButton = (
 
 
 // const itemInfo = props.itemInfo;
-  // const { deleteItem, renameItem } = useSockets('drive');
+//   const { deleteItem, renameItem } = useSockets('drive');
 
-  // const setFolder = useSetRecoilState(
-  //   folderDictionaryFilterSelector({
-  //     driveId: itemInfo.driveId,
-  //     folderId: itemInfo.parentFolderId,
-  //   }),
-  // );
+//   const setFolder = useSetRecoilState(
+//     folderDictionaryFilterSelector({
+//       driveId: itemInfo.driveId,
+//       folderId: itemInfo.parentFolderId,
+//     }),
+//   );
 
-  // const [label, setLabel] = useState(itemInfo.label);
+//   const [label, setLabel] = useState(itemInfo.label);
 
-  // let dIcon = <FontAwesomeIcon icon={faCode} />;
+//   let dIcon = <FontAwesomeIcon icon={faCode} />;
 
-  // const renameItemCallback = (newLabel) => {
-  //   renameItem({
-  //     driveIdFolderId: {
-  //       driveId: itemInfo.driveId,
-  //       folderId: itemInfo.parentFolderId,
-  //     },
-  //     itemId: itemInfo.itemId,
-  //     itemType: itemInfo.itemType,
-  //     newLabel: newLabel,
-  //   });
-  // };
+//   const renameItemCallback = (newLabel) => {
+//     renameItem({
+//       driveIdFolderId: {
+//         driveId: itemInfo.driveId,
+//         folderId: itemInfo.parentFolderId,
+//       },
+//       itemId: itemInfo.itemId,
+//       itemType: itemInfo.itemType,
+//       newLabel: newLabel,
+//     });
+//   };
 
-  // return (
-  //   <>
-  //     <h2 data-cy="infoPanelItemLabel">
-  //       {dIcon} {itemInfo.label}
-  //     </h2>
+//   return (
+//     <>
+//       <h2 data-cy="infoPanelItemLabel">
+//         {dIcon} {itemInfo.label}
+//       </h2>
 
-  //     <label>
-  //       DoenetML Label
-  //       <input
-  //         type="text"
-  //         data-cy="infoPanelItemLabelInput"
-  //         value={label}
-  //         onChange={(e) => setLabel(e.target.value)}
-  //         onKeyDown={(e) => {
-  //           if (e.key === 'Enter') {
-  //             //Only rename if label has changed
-  //             if (itemInfo.label !== label) {
-  //               renameItemCallback(label);
-  //             }
-  //           }
-  //         }}
-  //         onBlur={() => {
-  //           //Only rename if label has changed
-  //           if (itemInfo.label !== label) {
-  //             renameItemCallback(label);
-  //           }
-  //         }}
-  //       />
-  //     </label>
-  //     <br />
-  //     <br />
-  //     <Button
-  //       value="Edit DoenetML"
-  //       onClick={() => {
-  //         //TODO: toolview?
-  //       }}
-  //     />
-  //     <br />
-  //     <br />
-  //     <Button
-  //       data-cy="deleteDoenetMLButton"
-  //       value="Delete DoenetML"
-  //       onClick={() => {
-  //         deleteItem({
-  //           driveIdFolderId: {
-  //             driveId: itemInfo.driveId,
-  //             folderId: itemInfo.parentFolderId,
-  //           },
-  //           itemId: itemInfo.itemId,
-  //           driveInstanceId: itemInfo.driveInstanceId,
-  //           label: itemInfo.label,
-  //         });
-  //       }}
-  //     />
-  //   </>
-  // );
+//       <label>
+//         DoenetML Label
+//         <input
+//           type="text"
+//           data-cy="infoPanelItemLabelInput"
+//           value={label}
+//           onChange={(e) => setLabel(e.target.value)}
+//           onKeyDown={(e) => {
+//             if (e.key === 'Enter') {
+//               //Only rename if label has changed
+//               if (itemInfo.label !== label) {
+//                 renameItemCallback(label);
+//               }
+//             }
+//           }}
+//           onBlur={() => {
+//             //Only rename if label has changed
+//             if (itemInfo.label !== label) {
+//               renameItemCallback(label);
+//             }
+//           }}
+//         />
+//       </label>
+//       <br />
+//       <br />
+//       <Button
+//         value="Edit DoenetML"
+//         onClick={() => {
+//           //TODO: toolview?
+//         }}
+//       />
+//       <br />
+//       <br />
+//       <Button
+//         data-cy="deleteDoenetMLButton"
+//         value="Delete DoenetML"
+//         onClick={() => {
+//           deleteItem({
+//             driveIdFolderId: {
+//               driveId: itemInfo.driveId,
+//               folderId: itemInfo.parentFolderId,
+//             },
+//             itemId: itemInfo.itemId,
+//             driveInstanceId: itemInfo.driveInstanceId,
+//             label: itemInfo.label,
+//           });
+//         }}
+//       />
+//     </>
+//   );
